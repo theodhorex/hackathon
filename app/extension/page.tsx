@@ -1,15 +1,11 @@
-import ExtensionPanel from "../components/ExtensionPanel";
-import ExtensionPanel_1 from "../components/ExtensionPanel_1";
+import Extension_Panel_alven from "../components/Extension_Panel_alven";
+import ContentSidebar from "../components/navbar/ContentSidebar";
 
-export default function Extension() {
+export default function page() {
   return (
     <div>
-      <ExtensionPanel_1 />
-      <h1>Hlelloooo</h1>
-      <h1>sdifhsdhfjsdfhjsdfs</h1>
-      <h1>pp</h1>
-      <h1>ppsdfghjuytredcvghjuytredfghjuytredcvbnhfdfghjhgfdedfghjhgfeddfghjhgfdefgh</h1>
-
+      <Extension_Panel_alven />
+      {/* <ContentSidebar /> */}
     </div>
   );
 }
