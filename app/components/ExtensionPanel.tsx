@@ -91,7 +91,7 @@ export default function ExtensionPanel() {
 
         {/* Subtitle */}
         <p className="text-gray-500 text-sm mb-4">
-          Start your new meeting or enter a code to connect.
+          Start your new meeting or enter a code to connectsssssssssssssssssss.
         </p>
 
         {/* Start Meeting Button */}
