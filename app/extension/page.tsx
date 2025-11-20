@@ -1,15 +1,11 @@
 import ExtensionPanel from "../components/ExtensionPanel";
 import ExtensionPanel_1 from "../components/ExtensionPanel_1";
+import Extension_Panel_joe from "../components/Extension_Panel_joe";
 
 export default function Extension() {
   return (
     <div>
-      <ExtensionPanel_1 />
-      <h1>Hlelloooo</h1>
-      <h1>sdifhsdhfjsdfhjsdfs</h1>
-      <h1>pp</h1>
-      <h1>ppsdfghjuytredcvghjuytredfghjuytredcvbnhfdfghjhgfdedfghjhgfeddfghjhgfdefgh</h1>
-
+      <Extension_Panel_joe />
     </div>
   );
 }
