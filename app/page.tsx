@@ -7,7 +7,7 @@ export default function Home() {
       <ExtensionPanel />
       <h1>Hlelloooo</h1>
       <h1>sdifhsdhfjsdfhjsdfs</h1>
-
+      <h1>pp</h1>
     </div>
   );
 }
