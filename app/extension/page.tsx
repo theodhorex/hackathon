@@ -1,12 +1,11 @@
-import ExtensionPanel from "../components/ExtensionPanel";
-import ExtensionPanel_1 from "../components/ExtensionPanel_1";
-import Extension_Panel_joe from "../components/Extension_Panel_joe";
-import Extension_Panel_alven from "../components/Extension_Panel_alven";
+import Extension_Panel_Baru from "../components/Extension_Panel_Baru";
+import ContentSidebar from "../components/navbar/ContentSidebar";
 
-export default function Extension() {
+export default function page() {
   return (
     <div>
-      <Extension_Panel_alven />
+      <Extension_Panel_Baru />
+      {/* <ContentSidebar /> */}
     </div>
   );
 }
