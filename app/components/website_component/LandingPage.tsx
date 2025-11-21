@@ -1,1125 +1,646 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Twitter, Send, MessageCircle, Youtube, Instagram, ChevronDown, Menu, X } from 'lucide-react';
 
-export default function VelocityLanding() {
+export default function GenesisLanding() {
+  const [isVisible, setIsVisible] = useState(false);
+  const [activeTab, setActiveTab] = useState('swap');
   const [scrollY, setScrollY] = useState(0);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const observerRef = useRef(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    setIsVisible(true);
+    
     const handleScroll = () => setScrollY(window.scrollY);
-    const handleMouseMove = (e) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
-    };
-
     window.addEventListener('scroll', handleScroll);
-    window.addEventListener('mousemove', handleMouseMove);
-
-    // Intersection Observer for scroll animations
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('animate-in');
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    document.querySelectorAll('.observe').forEach((el) => {
-      observerRef.current.observe(el);
-    });
-
+    
+    // Particle animation
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    const particles: Array<{x: number, y: number, vx: number, vy: number, size: number}> = [];
+    for (let i = 0; i < 50; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5,
+        size: Math.random() * 2
+      });
+    }
+    
+    let animationId: number;
+    const animate = () => {
+      ctx.fillStyle = 'rgba(10, 1, 24, 0.1)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+        
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(236, 72, 153, ${Math.random() * 0.5 + 0.3})`;
+        ctx.fill();
+      });
+      
+      animationId = requestAnimationFrame(animate);
+    };
+    animate();
+    
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('mousemove', handleMouseMove);
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
+      cancelAnimationFrame(animationId);
     };
   }, []);
 
+  const stats = [
+    { label: 'TOTAL VALUE LOCKED', value: '$99,233,374', color: 'from-pink-500 to-rose-500' },
+    { label: 'CIRCULATING SUPPLY', value: '18,021,367', color: 'from-purple-500 to-pink-500' },
+    { label: 'CIRCULATING MARKET CAP', value: '$5,768,639', color: 'from-blue-500 to-purple-500' },
+    { label: 'THE PRICE', value: '$0.32', color: 'from-cyan-500 to-blue-500' },
+  ];
+
+  const bottomStats = [
+    { label: 'EPOCH ENDS IN', value: '$5,454,114', color: 'from-violet-500 to-purple-500' },
+    { label: '24H VOLUME', value: '2D 10H 18M', color: 'from-fuchsia-500 to-pink-500' },
+  ];
+
+  const team = [
+    {
+      name: 'Brooklyn Simmons',
+      role: 'Founder',
+      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop',
+    },
+    {
+      name: 'Guy Hawkins',
+      role: 'Ceo',
+      image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop',
+    },
+    {
+      name: 'Courtney Henry',
+      role: 'Manager',
+      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop',
+    },
+  ];
+
   return (
-    <div className="bg-black text-white min-h-screen overflow-x-hidden">
-      {/* Ultra Advanced Animated Background */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {/* Animated gradient orbs with mouse interaction */}
-        <div className="absolute inset-0">
-          <div 
-            className="orb orb-1" 
-            style={{
-              transform: `translate(${mousePos.x * 0.02}px, ${mousePos.y * 0.02}px)`
-            }}
-          />
-          <div 
-            className="orb orb-2"
-            style={{
-              transform: `translate(${-mousePos.x * 0.015}px, ${mousePos.y * 0.015}px)`
-            }}
-          />
-          <div className="orb orb-3" />
-          <div className="orb orb-4" />
-          <div className="orb orb-5" />
-        </div>
-        
-        {/* Advanced geometric shapes */}
-        <div className="absolute inset-0">
-          {/* Animated Wireframe Cubes */}
-          <div className="cube-container cube-1">
-            <div className="cube">
-              <div className="cube-face front"></div>
-              <div className="cube-face back"></div>
-              <div className="cube-face right"></div>
-              <div className="cube-face left"></div>
-              <div className="cube-face top"></div>
-              <div className="cube-face bottom"></div>
-            </div>
-          </div>
-          
-          <div className="cube-container cube-2">
-            <div className="cube">
-              <div className="cube-face front"></div>
-              <div className="cube-face back"></div>
-              <div className="cube-face right"></div>
-              <div className="cube-face left"></div>
-              <div className="cube-face top"></div>
-              <div className="cube-face bottom"></div>
-            </div>
-          </div>
+    <div className="min-h-screen bg-[#0a0118] text-white overflow-hidden relative">
+      {/* Animated Background Canvas */}
+      <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0" />
+      
+      {/* Grid Overlay */}
+      <div className="fixed inset-0 bg-[linear-gradient(rgba(139,92,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.03)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none z-0" />
 
-          {/* Spiraling Pentagon */}
-          <div className="pentagon pent-1" />
-          <div className="pentagon pent-2" />
-          
-          {/* Morphing Blobs */}
-          <div className="blob blob-1" />
-          <div className="blob blob-2" />
-          <div className="blob blob-3" />
-          
-          {/* Orbital Rings */}
-          <div className="orbital-ring ring-1">
-            <div className="ring-dot"></div>
-          </div>
-          <div className="orbital-ring ring-2">
-            <div className="ring-dot"></div>
-          </div>
-          <div className="orbital-ring ring-3">
-            <div className="ring-dot"></div>
-          </div>
-          
-          {/* Wave Lines */}
-          <svg className="wave-svg wave-1" viewBox="0 0 1200 300">
-            <path d="M0,150 Q300,50 600,150 T1200,150" fill="none" stroke="rgba(255, 140, 66, 0.3)" strokeWidth="2"/>
-          </svg>
-          <svg className="wave-svg wave-2" viewBox="0 0 1200 300">
-            <path d="M0,150 Q300,250 600,150 T1200,150" fill="none" stroke="rgba(239, 68, 68, 0.3)" strokeWidth="2"/>
-          </svg>
-        </div>
-
-        {/* Particle System */}
-        <div className="particles">
-          {[...Array(30)].map((_, i) => (
-            <div
-              key={i}
-              className="particle-advanced"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 15}s`,
-                animationDuration: `${10 + Math.random() * 20}s`
-              }}
-            />
-          ))}
-        </div>
-
-        {/* Dynamic Mesh Grid */}
-        <div className="mesh-grid" />
-        
-        {/* Scan lines */}
-        <div className="scan-line scan-horizontal" />
-        <div className="scan-line scan-vertical" />
-      </div>
-
-      {/* Navigation with advanced animation */}
-      <nav className="relative z-50 px-6 md:px-12 py-6 flex items-center justify-between nav-reveal">
-        <div className="flex items-center space-x-2 logo-bounce">
-          <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center transform hover:rotate-180 transition-transform duration-500">
-            <span className="text-white font-bold">V</span>
-          </div>
-          <span className="text-xl font-bold">Velocity</span>
-        </div>
-        <div className="hidden md:flex space-x-8 text-sm nav-items">
-          {['Why Velocity', 'How It Works', 'Feedback', 'Testimonials', 'Pricing'].map((item, i) => (
-            <a 
-              key={i} 
-              href="#" 
-              className="hover:text-orange-400 transition-all hover:scale-110 nav-item"
-              style={{ animationDelay: `${i * 0.1}s` }}
-            >
-              {item}
-            </a>
-          ))}
-        </div>
-        <div className="flex space-x-4 btn-group">
-          <button className="px-6 py-2 border border-white rounded-full hover:bg-white hover:text-black transition-all transform hover:scale-110 hover:rotate-2">
-            Projects
-          </button>
-          <button className="px-6 py-2 bg-gradient-to-r from-orange-500 to-red-600 rounded-full hover:shadow-xl hover:shadow-orange-500/50 transition-all transform hover:scale-110 hover:-rotate-2 pulse-btn">
-            Get Started
-          </button>
-        </div>
-      </nav>
-
-      {/* Hero Section with magnetic effect */}
-      <section className="relative z-10 px-6 md:px-12 py-20 md:py-32 text-center">
-        <div className="observe inline-block mb-6 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm badge-float">
-          Overall turnkey founders we work 🔥
-        </div>
-        <h1 className="observe text-5xl md:text-7xl font-bold mb-6 hero-title">
-          Launch faster.
-          <br />
-          <span className="bg-gradient-to-r from-orange-400 via-red-500 to-orange-600 bg-clip-text text-transparent gradient-text">
-            Convert better.
-          </span>
-        </h1>
-        <p className="observe text-gray-400 text-lg mb-8 max-w-2xl mx-auto hero-subtitle">
-          We Design Landing Pages That Help Your Product
-          <br />
-          Launch Faster And Grow Forever
-        </p>
-        <div className="observe flex flex-col sm:flex-row gap-4 justify-center mb-12 hero-buttons">
-          <button className="px-8 py-4 bg-gradient-to-r from-orange-500 to-red-600 rounded-full text-lg font-semibold hover:shadow-2xl hover:shadow-orange-500/50 transition-all transform hover:scale-110 magnetic-btn">
-            Get Started Now
-          </button>
-          <button className="px-8 py-4 border border-white/30 rounded-full text-lg hover:bg-white/10 transition-all transform hover:scale-110 magnetic-btn">
-            See Reviews
-          </button>
-        </div>
-        <p className="observe text-sm text-gray-500 mb-4">Trusted by 100+ startups worldwide</p>
-        <div className="observe flex flex-wrap justify-center items-center gap-8 opacity-60 brand-logos">
-          {['LANCE', 'PromptPilot', 'System', 'CrewMax', 'Pillar'].map((brand, i) => (
-            <span 
-              key={i} 
-              className="text-xl font-bold hover:text-orange-400 transition-all transform hover:scale-125 brand-logo"
-              style={{ animationDelay: `${i * 0.15}s` }}
-            >
-              {brand}
-            </span>
-          ))}
-        </div>
-      </section>
-
-      {/* Testimonials Section with card flip */}
-      <section className="relative z-10 px-6 md:px-12 py-20 bg-gradient-to-b from-transparent to-black/50">
-        <h2 className="observe text-3xl md:text-4xl font-bold text-center mb-4 section-title">
-          What Founders Are Saying
-        </h2>
-        <p className="observe text-center text-gray-400 mb-12 section-subtitle">
-          Startups love Velocity! Founders who didn't craft perfect tweets went from
-          <br />
-          launches that missed marks to conversions that grew with Velocity.
-        </p>
-        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {[
-            { name: 'Michael B.', role: 'CEO at SaaSCo', text: 'Velocity completely changed our launch. Our conversion rate doubled!' },
-            { name: 'Jason L.', role: 'Founder at StartupX', text: 'The team understood exactly what we needed. Best decision ever.' },
-            { name: 'Emily R.', role: 'Head of Product', text: 'Working with Velocity was seamless. They delivered beyond expectations.' }
-          ].map((testimonial, i) => (
-            <div 
-              key={i} 
-              className="observe testimonial-card bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:border-orange-500/50 transition-all transform hover:scale-105 hover:-translate-y-4 hover:rotate-1"
-              style={{ animationDelay: `${i * 0.2}s` }}
-            >
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-full mr-3 avatar-pulse" />
-                <div>
-                  <h4 className="font-semibold">{testimonial.name}</h4>
-                  <p className="text-sm text-gray-400">{testimonial.role}</p>
-                </div>
+      {/* Navigation */}
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-700 ${scrollY > 50 ? 'bg-[#0a0118]/95 backdrop-blur-xl border-b border-purple-500/20 shadow-lg shadow-purple-500/5' : 'bg-transparent'} ${isVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="relative group cursor-pointer">
+              <div className="absolute -inset-2 bg-gradient-to-r from-pink-500 to-purple-500 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
+              <div className="relative text-2xl font-black bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                Genesis
               </div>
-              <p className="text-gray-300">{testimonial.text}</p>
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Pricing Section with 3D cards */}
-      <section className="relative z-10 px-6 md:px-12 py-20">
-        <h2 className="observe text-3xl md:text-4xl font-bold text-center mb-4 section-title">
-          Straightforward pricing that fits
-        </h2>
-        <p className="observe text-center text-gray-400 mb-12 section-subtitle">
-          Choose the plan that works for you, from startups to enterprises.
-          <br />
-          Value first, plain and fits your stack.
-        </p>
-        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {[
-            { name: 'Starter Plan', price: '$1080 USD', features: ['1 page design', 'Basic features', '48hr delivery', 'Email support'] },
-            { name: 'Pro Plan', price: '$2600 USD', features: ['3+ pages design', 'Priority support', 'Design iterations', '24hr completion', 'Analytics'], highlight: true },
-            { name: 'Velocity+ Plan', price: '$4200 USD', features: ['Unlimited pages', 'Dedicated designer', 'White label', 'API access'] }
-          ].map((plan, i) => (
-            <div 
-              key={i} 
-              className={`observe pricing-card rounded-2xl p-8 border transition-all transform hover:scale-110 hover:-translate-y-6 ${
-                plan.highlight 
-                  ? 'bg-gradient-to-br from-orange-500/20 to-red-600/20 border-orange-500 shadow-xl shadow-orange-500/30 featured-card' 
-                  : 'bg-white/5 backdrop-blur-sm border-white/10 hover:border-orange-500/50'
-              }`}
-              style={{ animationDelay: `${i * 0.2}s` }}
-            >
-              <div className="mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg mb-4 icon-rotate" />
-                <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                <p className="text-4xl font-bold price-counter">{plan.price}</p>
-              </div>
-              <ul className="space-y-3 mb-8">
-                {plan.features.map((feature, j) => (
-                  <li key={j} className="flex items-center text-gray-300 feature-item" style={{ animationDelay: `${j * 0.1}s` }}>
-                    <svg className="w-5 h-5 mr-2 text-orange-500 check-icon" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <button className={`w-full py-3 rounded-full font-semibold transition-all transform hover:scale-105 plan-btn ${
-                plan.highlight 
-                  ? 'bg-gradient-to-r from-orange-500 to-red-600 hover:shadow-xl hover:shadow-orange-500/50' 
-                  : 'border border-white/30 hover:bg-white/10'
-              }`}>
-                Choose this plan
+            
+            {/* Desktop Menu */}
+            <div className="hidden lg:flex space-x-8">
+              {['Home', 'Swap', 'Liquidity', 'Lock', 'Vote', 'Rewards'].map((item, i) => (
+                <a
+                  key={item}
+                  href="#"
+                  className="text-sm font-medium text-gray-300 hover:text-white transition-all duration-300 relative group"
+                  style={{ transitionDelay: `${i * 50}ms` }}
+                >
+                  {item}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-500 to-purple-500 group-hover:w-full transition-all duration-300"></span>
+                </a>
+              ))}
+              <button className="text-sm font-medium text-gray-300 hover:text-white transition-all duration-300 flex items-center gap-1">
+                More <ChevronDown size={16} />
               </button>
             </div>
-          ))}
-        </div>
-      </section>
 
-      {/* Why Clients Section with stagger animation */}
-      <section className="relative z-10 px-6 md:px-12 py-20">
-        <h2 className="observe text-3xl md:text-4xl font-bold text-center mb-4 section-title">
-          Why Clients Stick With Us
-        </h2>
-        <p className="observe text-center text-gray-400 mb-12 section-subtitle">
-          We combine velocity, trust, and high-performing design to
-          <br />
-          deliver results that actually grow.
-        </p>
-        <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-          {[
-            { title: 'Implementation and tools', desc: 'We don\'t just design, we integrate with your stack and existing tools.' },
-            { title: 'High-converting', desc: 'Data-driven performance built for conversions by the numbers.' },
-            { title: 'Maximum Return on ROI', desc: 'Every dollar you invest returns value through proven growth.' },
-            { title: 'Clear steps and trust', desc: 'Full transparency with clear milestones and continuous updates.' }
-          ].map((item, i) => (
-            <div 
-              key={i} 
-              className="observe feature-box bg-gradient-to-br from-orange-500/10 to-red-600/10 backdrop-blur-sm border border-orange-500/20 rounded-2xl p-8 hover:border-orange-500 transition-all transform hover:scale-105 hover:-translate-y-3"
-              style={{ animationDelay: `${i * 0.15}s` }}
-            >
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl mb-4 flex items-center justify-center icon-bounce">
-                <div className="w-8 h-8 bg-white rounded-full" />
-              </div>
-              <h3 className="text-2xl font-bold mb-2">{item.title}</h3>
-              <p className="text-gray-400">{item.desc}</p>
+            <div className="flex items-center gap-3">
+              <button className="hidden sm:block p-2.5 bg-purple-500/10 hover:bg-purple-500/20 rounded-xl transition-all duration-300 transform hover:scale-110 hover:rotate-3 border border-purple-500/20">
+                <Twitter size={18} className="text-purple-300" />
+              </button>
+              <button className="hidden sm:block p-2.5 bg-pink-500/10 hover:bg-pink-500/20 rounded-xl transition-all duration-300 transform hover:scale-110 hover:-rotate-3 border border-pink-500/20">
+                <Send size={18} className="text-pink-300" />
+              </button>
+              <button className="relative px-6 py-2.5 font-semibold text-sm rounded-xl overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 bg-[length:200%_100%] animate-[gradient_3s_ease_infinite]"></div>
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 transition-opacity duration-300"></div>
+                <span className="relative z-10">Swap Now</span>
+              </button>
+              <button className="lg:hidden p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Process Section with timeline animation */}
-      <section className="relative z-10 px-6 md:px-12 py-20">
-        <h2 className="observe text-3xl md:text-4xl font-bold text-center mb-4 section-title">
-          The Process Fast, Clear, Done
-        </h2>
-        <p className="observe text-center text-gray-400 mb-12 section-subtitle">
-          No endless revisions. No messy handoffs. Just a process
-          <br />
-          that works and delivers fast.
-        </p>
-        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {[
-            { title: 'Share Your Vision', desc: 'Tell us what you need, your goals and your target audience.' },
-            { title: 'We Design It', desc: 'Our team creates high-converting designs tailored to your needs.' },
-            { title: 'Ready to Launch', desc: 'We deliver fully-tested, optimized pages ready to convert.' }
-          ].map((step, i) => (
-            <div 
-              key={i} 
-              className="observe process-step bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:bg-white/10 hover:border-orange-500/50 transition-all transform hover:scale-105 hover:-translate-y-4"
-              style={{ animationDelay: `${i * 0.2}s` }}
-            >
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl mb-4 flex items-center justify-center step-number">
-                <span className="text-2xl font-bold">{i + 1}</span>
-              </div>
-              <h3 className="text-2xl font-bold mb-2">{step.title}</h3>
-              <p className="text-gray-400">{step.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* FAQ Section with accordion animation */}
-      <section className="relative z-10 px-6 md:px-12 py-20">
-        <h2 className="observe text-3xl md:text-4xl font-bold text-center mb-4 section-title">
-          Questions? We've got answers.
-        </h2>
-        <p className="observe text-center text-gray-400 mb-12 section-subtitle">
-          Everything you need to know about Velocity.
-          <br />
-          If you spot more concerns here.
-        </p>
-        <div className="max-w-3xl mx-auto space-y-4">
-          {[
-            'How long does it take to deliver my landing page?',
-            'What if I don\'t like the design?',
-            'Can I request revisions after delivery?',
-            'Do you help with copywriting too?',
-            'Is development included in the pricing?'
-          ].map((question, i) => (
-            <div 
-              key={i} 
-              className="observe faq-item bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 hover:bg-white/10 hover:border-orange-500/50 transition-all cursor-pointer transform hover:scale-102"
-              style={{ animationDelay: `${i * 0.1}s` }}
-            >
-              <div className="flex justify-between items-center">
-                <p className="font-semibold">{question}</p>
-                <svg className="w-6 h-6 text-orange-500 arrow-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA Section with pulsing effect */}
-      <section className="relative z-10 px-6 md:px-12 py-20 text-center">
-        <div className="observe max-w-3xl mx-auto bg-gradient-to-br from-orange-500/20 to-red-600/20 backdrop-blur-sm border border-orange-500/30 rounded-3xl p-12 cta-container">
-          <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl mx-auto mb-6 flex items-center justify-center cta-icon">
-            <div className="w-10 h-10 bg-white rounded-full" />
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Ready to launch something
-            <br />
-            that actually works?
-          </h2>
-          <p className="text-gray-400 mb-8">
-            Let Velocity integrate the design-strategy blend those WP designs.
-            <br />
-            Prepare your launch with work that converts.
-          </p>
-          <button className="px-8 py-4 bg-gradient-to-r from-orange-500 to-red-600 rounded-full text-lg font-semibold hover:shadow-2xl hover:shadow-orange-500/50 transition-all transform hover:scale-110 cta-button">
-            Get Started Now
-          </button>
+        </div>
+        
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden bg-[#0a0118]/98 backdrop-blur-xl border-t border-purple-500/20">
+            <div className="px-4 py-6 space-y-4">
+              {['Home', 'Swap', 'Liquidity', 'Lock', 'Vote', 'Rewards', 'More'].map((item) => (
+                <a key={item} href="#" className="block text-sm font-medium text-gray-300 hover:text-white transition-colors">
+                  {item}
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+      </nav>
+
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className={`space-y-8 transition-all duration-1000 delay-200 ${isVisible ? 'translate-x-0 opacity-100' : '-translate-x-20 opacity-0'}`}>
+              <div className="inline-block px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-sm font-medium text-purple-300 backdrop-blur-sm">
+                🚀 Welcome to Genesis DEX
+              </div>
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight">
+                The{' '}
+                <span className="relative inline-block">
+                  <span className="absolute -inset-1 bg-gradient-to-r from-pink-500 to-purple-500 blur-2xl opacity-50"></span>
+                  <span className="relative bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-[gradient_3s_ease_infinite] bg-[length:200%_100%]">
+                    Native DEX
+                  </span>
+                </span>{' '}
+                of<br />
+                Arbitrum Chain
+              </h1>
+              <p className="text-gray-400 text-lg leading-relaxed max-w-xl">
+                Amet Minim Mollit Non Deserunt Ullamco Est Sit Aliqua Dolor Do Amet Sint. Velit Officia Consequat Duis Enim Velit Mollit. Exercitation Veniam Eum Deserunt Ullamco.
+              </p>
+              <button className="group relative px-8 py-4 font-bold text-lg rounded-xl overflow-hidden transform hover:scale-105 transition-all duration-300">
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 bg-[length:200%_100%] animate-[gradient_3s_ease_infinite]"></div>
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.2)_0%,transparent_70%)] transition-opacity duration-300"></div>
+                <span className="relative z-10 flex items-center gap-2">
+                  Swap Now
+                  <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </span>
+              </button>
+            </div>
+            
+            {/* 3D Floating Elements */}
+            <div className={`relative transition-all duration-1000 delay-500 ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-20 opacity-0'}`}>
+              <div className="relative w-full h-[500px] flex items-center justify-center">
+                {/* Glow Effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500/30 via-purple-500/30 to-blue-500/30 rounded-full blur-[100px] animate-pulse"></div>
+                
+                {/* Floating 3D Objects */}
+                <div className="relative w-full h-full">
+                  {/* Main Crystal/Diamond */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 animate-[float_6s_ease-in-out_infinite]">
+                    <div className="relative w-full h-full">
+                      <div className="absolute inset-0 bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 rounded-3xl rotate-45 transform-gpu animate-[spin_20s_linear_infinite] shadow-2xl shadow-purple-500/50"></div>
+                      <div className="absolute inset-4 bg-gradient-to-tl from-pink-300 via-purple-300 to-blue-300 rounded-3xl rotate-45 transform-gpu animate-[spin_15s_linear_infinite_reverse] opacity-80"></div>
+                    </div>
+                  </div>
+                  
+                  {/* Orbiting Icons */}
+                  <div className="absolute top-1/4 right-1/4 w-20 h-20 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-2xl animate-[orbit_10s_linear_infinite] shadow-lg shadow-blue-500/50 flex items-center justify-center text-3xl rotate-12">
+                    💎
+                  </div>
+                  <div className="absolute bottom-1/4 left-1/4 w-24 h-24 bg-gradient-to-br from-purple-400 to-pink-400 rounded-2xl animate-[orbit_12s_linear_infinite_reverse] shadow-lg shadow-pink-500/50 flex items-center justify-center text-4xl -rotate-12">
+                    🪙
+                  </div>
+                  <div className="absolute top-1/3 left-1/4 w-16 h-16 bg-gradient-to-br from-pink-400 to-rose-400 rounded-full animate-[orbit_8s_linear_infinite] shadow-lg shadow-pink-500/50 flex items-center justify-center text-2xl">
+                    ⭐
+                  </div>
+                </div>
+                
+                {/* Floating Badge */}
+                <div className="absolute top-20 right-10 px-4 py-2 bg-purple-500/20 backdrop-blur-xl border border-purple-400/30 rounded-full animate-[float_4s_ease-in-out_infinite] shadow-lg">
+                  <span className="text-sm font-bold bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">Backed</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Wave Line Animation */}
+          <div className="mt-16 relative h-24">
+            <svg className="w-full h-full" viewBox="0 0 1440 100" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#ec4899" />
+                  <stop offset="50%" stopColor="#8b5cf6" />
+                  <stop offset="100%" stopColor="#3b82f6" />
+                </linearGradient>
+              </defs>
+              <path
+                d="M0,50 Q360,10 720,50 T1440,50"
+                fill="none"
+                stroke="url(#waveGradient)"
+                strokeWidth="3"
+                opacity="0.6"
+              >
+                <animate
+                  attributeName="d"
+                  values="M0,50 Q360,10 720,50 T1440,50;M0,50 Q360,90 720,50 T1440,50;M0,50 Q360,10 720,50 T1440,50"
+                  dur="4s"
+                  repeatCount="indefinite"
+                />
+              </path>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            {stats.map((stat, i) => (
+              <div
+                key={i}
+                className={`group relative transition-all duration-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
+                style={{ transitionDelay: `${i * 100}ms` }}
+              >
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-pink-500 to-purple-500 rounded-2xl opacity-0 group-hover:opacity-100 blur transition duration-500"></div>
+                <div className="relative p-6 bg-gradient-to-br from-purple-950/50 via-purple-900/30 to-pink-900/30 rounded-2xl border border-purple-500/20 backdrop-blur-xl hover:border-purple-400/50 transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 shadow-xl">
+                  <div className="text-xs font-bold text-purple-300 mb-3 uppercase tracking-wider">{stat.label}</div>
+                  <div className={`text-3xl font-black bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
+                    {stat.value}
+                  </div>
+                  <div className="absolute top-2 right-2 w-12 h-12 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-full blur-xl"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            {bottomStats.map((stat, i) => (
+              <div
+                key={i}
+                className={`group relative transition-all duration-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
+                style={{ transitionDelay: `${(i + 4) * 100}ms` }}
+              >
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl opacity-0 group-hover:opacity-100 blur transition duration-500"></div>
+                <div className="relative p-6 bg-gradient-to-br from-purple-950/50 via-purple-900/30 to-pink-900/30 rounded-2xl border border-purple-500/20 backdrop-blur-xl hover:border-purple-400/50 transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 shadow-xl">
+                  <div className="text-xs font-bold text-purple-300 mb-3 uppercase tracking-wider">{stat.label}</div>
+                  <div className={`text-3xl font-black bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
+                    {stat.value}
+                  </div>
+                  <div className="absolute top-2 right-2 w-12 h-12 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-full blur-xl"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Tabs Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex flex-wrap justify-center gap-4 mb-8">
+            {['Swap', 'Staking', 'Vote'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab.toLowerCase())}
+                className={`relative px-10 py-4 font-bold text-lg rounded-xl transition-all duration-500 transform hover:scale-105 ${
+                  activeTab === tab.toLowerCase()
+                    ? 'text-white shadow-2xl'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                {activeTab === tab.toLowerCase() && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 rounded-xl animate-[gradient_3s_ease_infinite] bg-[length:200%_100%]"></div>
+                )}
+                {activeTab !== tab.toLowerCase() && (
+                  <div className="absolute inset-0 bg-purple-500/10 rounded-xl border border-purple-500/20 hover:bg-purple-500/20"></div>
+                )}
+                <span className="relative z-10">{tab}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Staking Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-900/10 to-transparent"></div>
+        <div className="max-w-7xl mx-auto relative">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="relative order-2 lg:order-1">
+              <div className="relative w-full h-[400px] flex items-center justify-center">
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 via-orange-500/20 to-pink-500/20 rounded-full blur-[120px] animate-pulse"></div>
+                
+                {/* Stacked Coins Animation */}
+                <div className="relative">
+                  {[...Array(5)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="absolute left-1/2 top-1/2 -translate-x-1/2 w-32 h-32 bg-gradient-to-br from-yellow-400 via-orange-400 to-yellow-500 rounded-full shadow-2xl shadow-yellow-500/50 border-4 border-yellow-300/50"
+                      style={{
+                        transform: `translate(-50%, -50%) translateY(${-i * 15}px) rotateX(60deg)`,
+                        animation: `float ${4 + i * 0.5}s ease-in-out infinite`,
+                        animationDelay: `${i * 0.2}s`,
+                        zIndex: 5 - i
+                      }}
+                    >
+                      <div className="w-full h-full rounded-full bg-gradient-to-br from-yellow-200/50 to-transparent"></div>
+                      <div className="absolute inset-0 flex items-center justify-center text-4xl font-black text-yellow-900">$</div>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Floating Particles */}
+                {[...Array(8)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute w-2 h-2 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full animate-[float_3s_ease-in-out_infinite]"
+                    style={{
+                      left: `${20 + Math.random() * 60}%`,
+                      top: `${20 + Math.random() * 60}%`,
+                      animationDelay: `${Math.random() * 2}s`
+                    }}
+                  ></div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="space-y-8 order-1 lg:order-2">
+              <div className="inline-block px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-sm font-medium text-purple-300 backdrop-blur-sm">
+                💰 Earn Passive Income
+              </div>
+              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight">
+                Investing In{' '}
+                <span className="relative inline-block">
+                  <span className="absolute -inset-1 bg-gradient-to-r from-pink-500 to-purple-500 blur-2xl opacity-50"></span>
+                  <span className="relative bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    Staking
+                  </span>
+                </span>
+                <br />
+                Get Passive Income
+              </h2>
+              <p className="text-gray-400 text-lg leading-relaxed">
+                Amet Minim Mollit Non Deserunt Ullamco Est Sit Aliqua Dolor Do Amet Sint. Velit Officia Consequat Duis Enim Velit Mollit. Exercitation Veniam.
+              </p>
+              <div className="flex flex-wrap gap-4">
+                <button className="group relative px-8 py-4 font-bold text-lg rounded-xl overflow-hidden transform hover:scale-105 transition-all duration-300">
+                  <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 bg-[length:200%_100%] animate-[gradient_3s_ease_infinite]"></div>
+                  <span className="relative z-10 flex items-center gap-2">
+                    Start Stake
+                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </span>
+                </button>
+                <button className="px-8 py-4 font-bold text-lg rounded-xl bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 hover:border-purple-400/50 transition-all duration-300 backdrop-blur-sm">
+                  Learn More
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Team Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+            <div className="inline-block px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-sm font-medium text-purple-300 backdrop-blur-sm mb-6">
+              👥 Our Leadership
+            </div>
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight">
+              Meet With Our
+              <br />
+              <span className="relative inline-block mt-2">
+                <span className="absolute -inset-1 bg-gradient-to-r from-pink-500 to-purple-500 blur-2xl opacity-50"></span>
+                <span className="relative bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  Team
+                </span>
+              </span>
+            </h2>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {team.map((member, i) => (
+              <div
+                key={i}
+                className={`group transition-all duration-700 transform hover:scale-105 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}
+                style={{ transitionDelay: `${i * 200}ms` }}
+              >
+                <div className="relative h-full">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 rounded-3xl opacity-0 group-hover:opacity-100 blur-xl transition duration-500 animate-[gradient_3s_ease_infinite] bg-[length:200%_100%]"></div>
+                  <div className="relative h-full bg-gradient-to-br from-purple-950/80 via-purple-900/50 to-pink-900/50 rounded-3xl overflow-hidden border border-purple-500/20 backdrop-blur-xl">
+                    {/* Top Gradient Bar */}
+                    <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-br from-pink-500 via-purple-500 to-pink-500 bg-[length:200%_100%] animate-[gradient_3s_ease_infinite]"></div>
+                    
+                    {/* Content */}
+                    <div className="relative p-8 flex flex-col items-center pt-20">
+                      {/* Profile Image */}
+                      <div className="relative mb-6 group-hover:scale-110 transition-transform duration-500">
+                        <div className="absolute -inset-2 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full blur-lg opacity-50"></div>
+                        <div className="relative w-28 h-28 rounded-full border-4 border-purple-900/50 overflow-hidden ring-4 ring-purple-500/20">
+                          <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                        </div>
+                        {/* Online Status Dot */}
+                        <div className="absolute bottom-2 right-2 w-4 h-4 bg-green-400 rounded-full border-2 border-purple-900 animate-pulse"></div>
+                      </div>
+                      
+                      {/* Name & Role */}
+                      <h3 className="text-xl font-black mb-1 text-white">{member.name}</h3>
+                      <p className="text-sm font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent mb-6">{member.role}</p>
+                      
+                      {/* Description */}
+                      <p className="text-sm text-gray-400 text-center leading-relaxed mb-6">
+                        Amet Minim Mollit Non Deserunt Ullamco Est Sit Aliqua Dolor Do Amet Sint. Velit Mollit. Exercitation Veniam Consequat Sunt Nostrud Amet.
+                      </p>
+                      
+                      {/* Social Links */}
+                      <div className="flex gap-2">
+                        {[Twitter, MessageCircle, Send].map((Icon, idx) => (
+                          <button
+                            key={idx}
+                            className="p-2 bg-purple-500/10 hover:bg-purple-500/20 rounded-lg transition-all duration-300 transform hover:scale-110 border border-purple-500/20"
+                          >
+                            <Icon size={16} className="text-purple-300" />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-900/10 to-transparent"></div>
+        <div className="max-w-5xl mx-auto relative">
+          <div className="relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 rounded-3xl opacity-30 group-hover:opacity-50 blur-2xl transition duration-1000 animate-[gradient_5s_ease_infinite] bg-[length:200%_100%]"></div>
+            <div className="relative bg-gradient-to-br from-purple-950/80 via-purple-900/50 to-pink-900/50 rounded-3xl p-12 md:p-16 border-2 border-purple-500/30 backdrop-blur-2xl overflow-hidden">
+              {/* Decorative Elements */}
+              <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-pink-500/20 to-transparent rounded-full blur-3xl"></div>
+              <div className="absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-tl from-purple-500/20 to-transparent rounded-full blur-3xl"></div>
+              
+              <div className="relative text-center space-y-8">
+                <div className="inline-block px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-sm font-medium text-purple-300 backdrop-blur-sm mb-4">
+                  🎯 Ready to Start?
+                </div>
+                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight">
+                  Get Ready{' '}
+                  <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    & Start Now
+                  </span>
+                </h2>
+                <p className="text-gray-400 text-lg leading-relaxed max-w-2xl mx-auto">
+                  Amet Minim Mollit Non Deserunt Ullamco Est Sit Aliqua Dolor Do Amet Sint. Velit Officia Consequat Duis Enim Velit Mollit.
+                </p>
+                <div className="flex flex-wrap justify-center gap-4 pt-4">
+                  <button className="group relative px-10 py-4 font-bold text-lg rounded-xl overflow-hidden transform hover:scale-105 transition-all duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 bg-[length:200%_100%] animate-[gradient_3s_ease_infinite]"></div>
+                    <span className="relative z-10 flex items-center gap-2">
+                      Swap Now
+                      <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
+                    </span>
+                  </button>
+                  <button className="px-10 py-4 font-bold text-lg rounded-xl bg-white/5 border border-purple-500/20 hover:bg-white/10 hover:border-purple-400/50 transition-all duration-300 backdrop-blur-sm">
+                    View Docs
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="observe relative z-10 px-6 md:px-12 py-12 bg-gradient-to-br from-orange-500/10 to-red-600/10 border-t border-white/10">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center">
-          <div className="flex items-center space-x-2 mb-6 md:mb-0 footer-logo">
-            <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold">V</span>
+      <footer className="py-16 px-4 sm:px-6 lg:px-8 border-t border-purple-500/10 relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center space-y-8">
+            {/* Logo */}
+            <div className="relative inline-block group cursor-pointer">
+              <div className="absolute -inset-4 bg-gradient-to-r from-pink-500 to-purple-500 rounded-lg blur-xl opacity-20 group-hover:opacity-40 transition duration-500"></div>
+              <h3 className="relative text-6xl font-black bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent bg-[length:200%_100%] animate-[gradient_3s_ease_infinite]">
+                Genesis
+              </h3>
             </div>
-            <span className="text-xl font-bold">Velocity</span>
-          </div>
-          <div className="flex flex-col md:flex-row gap-8 text-sm text-gray-400 mb-6 md:mb-0">
-            <div className="footer-column">
-              <h4 className="text-white font-semibold mb-2">Menu</h4>
-              <ul className="space-y-1">
-                {['Home', 'Why Velocity', 'Pricing', 'Reviews', 'Contact'].map((item, i) => (
-                  <li key={i}>
-                    <a href="#" className="hover:text-orange-400 transition-all footer-link">{item}</a>
-                  </li>
-                ))}
-              </ul>
+            
+            {/* Social Icons */}
+            <div className="flex justify-center gap-3">
+              {[
+                { Icon: Send, color: 'from-blue-400 to-cyan-400' },
+                { Icon: Twitter, color: 'from-sky-400 to-blue-500' },
+                { Icon: MessageCircle, color: 'from-purple-400 to-pink-400' },
+                { Icon: Youtube, color: 'from-red-400 to-rose-500' },
+                { Icon: Instagram, color: 'from-pink-400 to-purple-500' }
+              ].map(({ Icon, color }, i) => (
+                <button
+                  key={i}
+                  className="group relative p-4 rounded-xl transition-all duration-300 transform hover:scale-110 hover:-translate-y-1"
+                >
+                  <div className={`absolute inset-0 bg-gradient-to-br ${color} opacity-10 group-hover:opacity-20 rounded-xl transition-opacity duration-300`}></div>
+                  <div className={`absolute inset-0 bg-gradient-to-br ${color} opacity-0 group-hover:opacity-100 rounded-xl blur-lg transition-opacity duration-300`}></div>
+                  <Icon size={22} className={`relative z-10 text-gray-400 group-hover:text-white transition-colors duration-300`} />
+                </button>
+              ))}
             </div>
-            <div className="footer-column">
-              <h4 className="text-white font-semibold mb-2">Explore Velocity</h4>
-              <ul className="space-y-1">
-                {['Why Velocity', 'How It Works', 'Testimonials'].map((item, i) => (
-                  <li key={i}>
-                    <a href="#" className="hover:text-orange-400 transition-all footer-link">{item}</a>
-                  </li>
-                ))}
-              </ul>
+            
+            {/* Description */}
+            <p className="text-sm text-gray-500 max-w-2xl mx-auto leading-relaxed">
+              Amet Minim Mollit Non Deserunt Ullamco Est Sit Aliqua Dolor Do Amet Sint. Velit Officia Consequat Duis Enim Velit Mollit.
+            </p>
+            
+            {/* Links */}
+            <div className="flex flex-wrap justify-center gap-6 text-sm">
+              {['Terms', 'Privacy', 'Security', 'Docs', 'Support'].map((link) => (
+                <a key={link} href="#" className="text-gray-500 hover:text-white transition-colors duration-300">
+                  {link}
+                </a>
+              ))}
             </div>
-          </div>
-          <div className="flex space-x-4 social-icons">
-            {['T', 'P', 'I', 'L'].map((social, i) => (
-              <a 
-                key={i} 
-                href="#" 
-                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-orange-500 transition-all transform hover:scale-125 hover:rotate-12 social-icon"
-                style={{ animationDelay: `${i * 0.1}s` }}
-              >
-                <span className="text-xs font-bold">{social}</span>
-              </a>
-            ))}
+            
+            {/* Copyright */}
+            <div className="pt-8 border-t border-purple-500/10">
+              <p className="text-xs text-gray-600">
+                © 2025 Genesis. All rights reserved. Built on Arbitrum Chain.
+              </p>
+            </div>
           </div>
         </div>
-        <div className="text-center text-gray-500 text-sm mt-8">
-          © 2025 Velocity. All rights reserved.
+
+        {/* Animated Wave Background */}
+        <div className="mt-16 relative h-48 overflow-hidden opacity-30">
+          <svg className="w-full h-full" viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="footerGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#ec4899" stopOpacity="0.3" />
+                <stop offset="50%" stopColor="#8b5cf6" stopOpacity="0.3" />
+                <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.3" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M0,160 Q360,100 720,160 T1440,160 L1440,320 L0,320 Z"
+              fill="url(#footerGradient)"
+            >
+              <animate
+                attributeName="d"
+                values="M0,160 Q360,100 720,160 T1440,160 L1440,320 L0,320 Z;M0,160 Q360,220 720,160 T1440,160 L1440,320 L0,320 Z;M0,160 Q360,100 720,160 T1440,160 L1440,320 L0,320 Z"
+                dur="8s"
+                repeatCount="indefinite"
+              />
+            </path>
+            <path
+              d="M0,200 Q360,140 720,200 T1440,200 L1440,320 L0,320 Z"
+              fill="url(#footerGradient)"
+              opacity="0.5"
+            >
+              <animate
+                attributeName="d"
+                values="M0,200 Q360,140 720,200 T1440,200 L1440,320 L0,320 Z;M0,200 Q360,260 720,200 T1440,200 L1440,320 L0,320 Z;M0,200 Q360,140 720,200 T1440,200 L1440,320 L0,320 Z"
+                dur="10s"
+                repeatCount="indefinite"
+              />
+            </path>
+          </svg>
         </div>
       </footer>
 
+      {/* CSS Animations */}
       <style jsx>{`
-        /* Base Animations */
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
+        @keyframes gradient {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
         }
-
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes slideDown {
-          from {
-            opacity: 0;
-            transform: translateY(-30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes slideInLeft {
-          from {
-            opacity: 0;
-            transform: translateX(-50px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        @keyframes slideInRight {
-          from {
-            opacity: 0;
-            transform: translateX(50px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        @keyframes scaleIn {
-          from {
-            opacity: 0;
-            transform: scale(0.8);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-
-        @keyframes rotateIn {
-          from {
-            opacity: 0;
-            transform: rotate(-180deg) scale(0.5);
-          }
-          to {
-            opacity: 1;
-            transform: rotate(0deg) scale(1);
-          }
-        }
-
-        /* Background Animations - Ultra Advanced */
+        
         @keyframes float {
-          0%, 100% {
-            transform: translate(0, 0) scale(1);
-          }
-          33% {
-            transform: translate(40px, -40px) scale(1.15);
-          }
-          66% {
-            transform: translate(-30px, 30px) scale(0.85);
-          }
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
         }
-
-        @keyframes morphBlob {
-          0%, 100% {
-            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
-            transform: translate(0, 0) rotate(0deg) scale(1);
-          }
-          25% {
-            border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
-            transform: translate(50px, -30px) rotate(90deg) scale(1.1);
-          }
-          50% {
-            border-radius: 58% 42% 75% 25% / 76% 46% 54% 24%;
-            transform: translate(80px, 20px) rotate(180deg) scale(0.9);
-          }
-          75% {
-            border-radius: 42% 58% 35% 65% / 48% 62% 38% 52%;
-            transform: translate(30px, 50px) rotate(270deg) scale(1.05);
-          }
-        }
-
+        
         @keyframes orbit {
-          from {
-            transform: rotate(0deg) translateX(80px) rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg) translateX(80px) rotate(-360deg);
-          }
-        }
-
-        @keyframes wave {
-          0%, 100% {
-            d: path("M0,150 Q300,50 600,150 T1200,150");
-          }
-          50% {
-            d: path("M0,150 Q300,250 600,150 T1200,150");
-          }
-        }
-
-        @keyframes particleFloat {
-          0% {
-            transform: translate(0, 0) scale(1);
-            opacity: 0;
-          }
-          10% {
-            opacity: 0.6;
-          }
-          90% {
-            opacity: 0.6;
-          }
-          100% {
-            transform: translate(var(--tx), var(--ty)) scale(0);
-            opacity: 0;
-          }
-        }
-
-        @keyframes scanHorizontal {
-          0% {
-            transform: translateY(-100%);
-          }
-          100% {
-            transform: translateY(100vh);
-          }
-        }
-
-        @keyframes scanVertical {
-          0% {
-            transform: translateX(-100%);
-          }
-          100% {
-            transform: translateX(100vw);
-          }
-        }
-
-        @keyframes meshPulse {
-          0%, 100% {
-            opacity: 0.3;
-          }
-          50% {
-            opacity: 0.6;
-          }
-        }
-
-        @keyframes cube3d {
-          0% {
-            transform: rotateX(0deg) rotateY(0deg);
-          }
-          100% {
-            transform: rotateX(360deg) rotateY(360deg);
-          }
-        }
-
-        @keyframes pentagonSpin {
-          from {
-            transform: rotate(0deg) scale(1);
-          }
-          to {
-            transform: rotate(360deg) scale(1.2);
-          }
-        }
-
-        /* Background Elements Styles */
-        .orb {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(100px);
-          animation: float ease-in-out infinite;
-          transition: transform 0.3s ease-out;
-        }
-
-        .orb-1 {
-          width: 600px;
-          height: 600px;
-          background: radial-gradient(circle, rgba(255, 107, 53, 0.5) 0%, transparent 70%);
-          top: -15%;
-          left: -15%;
-          animation-duration: 25s;
-        }
-
-        .orb-2 {
-          width: 500px;
-          height: 500px;
-          background: radial-gradient(circle, rgba(255, 140, 66, 0.4) 0%, transparent 70%);
-          top: 30%;
-          right: -10%;
-          animation-duration: 30s;
-          animation-delay: -8s;
-        }
-
-        .orb-3 {
-          width: 700px;
-          height: 700px;
-          background: radial-gradient(circle, rgba(239, 68, 68, 0.3) 0%, transparent 70%);
-          bottom: -20%;
-          left: 15%;
-          animation-duration: 35s;
-          animation-delay: -15s;
-        }
-
-        .orb-4 {
-          width: 550px;
-          height: 550px;
-          background: radial-gradient(circle, rgba(249, 115, 22, 0.4) 0%, transparent 70%);
-          top: 60%;
-          right: 25%;
-          animation-duration: 28s;
-          animation-delay: -20s;
-        }
-
-        .orb-5 {
-          width: 450px;
-          height: 450px;
-          background: radial-gradient(circle, rgba(251, 146, 60, 0.5) 0%, transparent 70%);
-          bottom: 30%;
-          right: -15%;
-          animation-duration: 32s;
-          animation-delay: -25s;
-        }
-
-        /* 3D Cube */
-        .cube-container {
-          position: absolute;
-          perspective: 1000px;
-          width: 150px;
-          height: 150px;
-        }
-
-        .cube-1 {
-          top: 15%;
-          left: 20%;
-          animation: float 20s ease-in-out infinite;
-        }
-
-        .cube-2 {
-          bottom: 20%;
-          right: 25%;
-          animation: float 25s ease-in-out infinite;
-          animation-delay: -10s;
-        }
-
-        .cube {
-          width: 100%;
-          height: 100%;
-          position: relative;
-          transform-style: preserve-3d;
-          animation: cube3d 30s linear infinite;
-        }
-
-        .cube-face {
-          position: absolute;
-          width: 150px;
-          height: 150px;
-          border: 2px solid rgba(255, 140, 66, 0.4);
-          background: rgba(255, 140, 66, 0.05);
-        }
-
-        .front  { transform: rotateY(0deg) translateZ(75px); }
-        .back   { transform: rotateY(180deg) translateZ(75px); }
-        .right  { transform: rotateY(90deg) translateZ(75px); }
-        .left   { transform: rotateY(-90deg) translateZ(75px); }
-        .top    { transform: rotateX(90deg) translateZ(75px); }
-        .bottom { transform: rotateX(-90deg) translateZ(75px); }
-
-        /* Pentagon */
-        .pentagon {
-          position: absolute;
-          width: 100px;
-          height: 100px;
-          background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), transparent);
-          clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
-          animation: pentagonSpin 15s ease-in-out infinite;
-        }
-
-        .pent-1 {
-          top: 25%;
-          right: 15%;
-          animation-duration: 20s;
-        }
-
-        .pent-2 {
-          bottom: 35%;
-          left: 25%;
-          animation-duration: 18s;
-          animation-delay: -8s;
-        }
-
-        /* Morphing Blobs */
-        .blob {
-          position: absolute;
-          width: 200px;
-          height: 200px;
-          background: linear-gradient(45deg, rgba(255, 107, 53, 0.2), rgba(239, 68, 68, 0.2));
-          filter: blur(40px);
-          animation: morphBlob 20s ease-in-out infinite;
-        }
-
-        .blob-1 {
-          top: 10%;
-          left: 40%;
-          animation-duration: 22s;
-        }
-
-        .blob-2 {
-          bottom: 25%;
-          right: 30%;
-          animation-duration: 25s;
-          animation-delay: -10s;
-        }
-
-        .blob-3 {
-          top: 50%;
-          left: 10%;
-          animation-duration: 28s;
-          animation-delay: -15s;
-        }
-
-        /* Orbital Rings */
-        .orbital-ring {
-          position: absolute;
-          width: 200px;
-          height: 200px;
-          border: 2px solid rgba(249, 115, 22, 0.3);
-          border-radius: 50%;
-        }
-
-        .ring-1 {
-          top: 20%;
-          right: 20%;
-          animation: orbit 15s linear infinite;
-        }
-
-        .ring-2 {
-          bottom: 30%;
-          left: 20%;
-          animation: orbit 20s linear infinite reverse;
-        }
-
-        .ring-3 {
-          top: 55%;
-          right: 35%;
-          animation: orbit 18s linear infinite;
-          animation-delay: -5s;
-        }
-
-        .ring-dot {
-          width: 10px;
-          height: 10px;
-          background: rgba(255, 140, 66, 0.8);
-          border-radius: 50%;
-          box-shadow: 0 0 20px rgba(255, 140, 66, 0.8);
-          position: absolute;
-          top: 50%;
-          left: 50%;
-        }
-
-        /* Wave SVG */
-        .wave-svg {
-          position: absolute;
-          width: 100%;
-          height: 300px;
-          opacity: 0.3;
-        }
-
-        .wave-1 {
-          top: 20%;
-          animation: wave 10s ease-in-out infinite;
-        }
-
-        .wave-2 {
-          bottom: 20%;
-          animation: wave 12s ease-in-out infinite;
-          animation-delay: -5s;
-        }
-
-        /* Advanced Particles */
-        .particle-advanced {
-          position: absolute;
-          width: 4px;
-          height: 4px;
-          background: rgba(255, 140, 66, 0.7);
-          border-radius: 50%;
-          --tx: calc((Math.random() - 0.5) * 300px);
-          --ty: calc((Math.random() - 0.5) * 300px);
-          animation: particleFloat linear infinite;
-          box-shadow: 0 0 15px rgba(255, 140, 66, 0.9);
-        }
-
-        /* Mesh Grid */
-        .mesh-grid {
-          position: absolute;
-          inset: 0;
-          background-image: 
-            linear-gradient(rgba(255, 140, 66, 0.05) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 140, 66, 0.05) 1px, transparent 1px);
-          background-size: 60px 60px;
-          animation: meshPulse 8s ease-in-out infinite;
-        }
-
-        /* Scan Lines */
-        .scan-line {
-          position: absolute;
-          box-shadow: 0 0 30px rgba(255, 140, 66, 0.8);
-        }
-
-        .scan-horizontal {
-          width: 100%;
-          height: 2px;
-          background: linear-gradient(90deg, transparent, rgba(255, 140, 66, 0.6), transparent);
-          animation: scanHorizontal 10s linear infinite;
-        }
-
-        .scan-vertical {
-          width: 2px;
-          height: 100%;
-          background: linear-gradient(180deg, transparent, rgba(255, 140, 66, 0.6), transparent);
-          animation: scanVertical 12s linear infinite;
-        }
-
-        /* Component Animations */
-        .observe {
-          opacity: 0;
-          transform: translateY(30px);
-        }
-
-        .observe.animate-in {
-          animation: slideUp 0.8s ease-out forwards;
-        }
-
-        .nav-reveal {
-          animation: slideDown 1s ease-out;
-        }
-
-        .logo-bounce {
-          animation: scaleIn 1s ease-out;
-        }
-
-        .nav-item {
-          animation: slideDown 0.8s ease-out forwards;
-          opacity: 0;
-        }
-
-        .btn-group button:nth-child(1) {
-          animation: slideInLeft 1s ease-out;
-        }
-
-        .btn-group button:nth-child(2) {
-          animation: slideInRight 1s ease-out;
-        }
-
-        .pulse-btn {
-          animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-          0%, 100% {
-            box-shadow: 0 0 20px rgba(249, 115, 22, 0.4);
-          }
-          50% {
-            box-shadow: 0 0 40px rgba(249, 115, 22, 0.8);
-          }
-        }
-
-        .badge-float {
-          animation: float 3s ease-in-out infinite;
-        }
-
-        .hero-title {
-          animation: slideUp 1s ease-out forwards;
-        }
-
-        .gradient-text {
-          background-size: 200% auto;
-          animation: gradientShift 3s linear infinite;
-        }
-
-        @keyframes gradientShift {
-          0% {
-            background-position: 0% center;
-          }
-          100% {
-            background-position: 200% center;
-          }
-        }
-
-        .hero-subtitle {
-          animation-delay: 0.2s;
-        }
-
-        .hero-buttons {
-          animation-delay: 0.4s;
-        }
-
-        .magnetic-btn {
-          transition: transform 0.3s ease;
-        }
-
-        .magnetic-btn:hover {
-          transform: scale(1.1) translateY(-5px);
-        }
-
-        .brand-logo {
-          animation: scaleIn 0.8s ease-out forwards;
-          opacity: 0;
-        }
-
-        .section-title {
-          animation: slideUp 1s ease-out forwards;
-        }
-
-        .section-subtitle {
-          animation: slideUp 1s ease-out forwards;
-          animation-delay: 0.2s;
-        }
-
-        .testimonial-card {
-          transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .avatar-pulse {
-          animation: pulse 2s ease-in-out infinite;
-        }
-
-        .pricing-card {
-          transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-          transform-style: preserve-3d;
-        }
-
-        .pricing-card:hover {
-          box-shadow: 0 30px 60px rgba(249, 115, 22, 0.3);
-        }
-
-        .featured-card {
-          animation: pulse 3s ease-in-out infinite;
-        }
-
-        .icon-rotate {
-          animation: rotateIn 1s ease-out;
-        }
-
-        .price-counter {
-          animation: scaleIn 1s ease-out;
-        }
-
-        .feature-item {
-          animation: slideInLeft 0.6s ease-out forwards;
-          opacity: 0;
-        }
-
-        .check-icon {
-          animation: scaleIn 0.6s ease-out;
-        }
-
-        .plan-btn {
-          transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .feature-box {
-          transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .icon-bounce {
-          animation: float 3s ease-in-out infinite;
-        }
-
-        .process-step {
-          transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .step-number {
-          animation: rotateIn 1s ease-out;
-        }
-
-        .faq-item {
-          transition: all 0.4s ease;
-        }
-
-        .arrow-bounce {
-          animation: float 2s ease-in-out infinite;
-        }
-
-        .cta-container {
-          animation: scaleIn 1s ease-out;
-        }
-
-        .cta-icon {
-          animation: pulse 2s ease-in-out infinite;
-        }
-
-        .cta-button {
-          animation: pulse 2s ease-in-out infinite;
-        }
-
-        .footer-logo {
-          animation: slideUp 1s ease-out;
-        }
-
-        .footer-column {
-          animation: slideUp 1s ease-out;
-        }
-
-        .footer-link {
-          transition: all 0.3s ease;
-        }
-
-        .footer-link:hover {
-          transform: translateX(5px);
-        }
-
-        .social-icon {
-          animation: scaleIn 0.8s ease-out forwards;
-          opacity: 0;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-          .cube-container {
-            width: 100px;
-            height: 100px;
-          }
-
-          .cube-face {
-            width: 100px;
-            height: 100px;
-          }
-
-          .orb {
-            filter: blur(60px);
-          }
-
-          .orb-1, .orb-2, .orb-3, .orb-4, .orb-5 {
-            width: 300px;
-            height: 300px;
-          }
+          0% { transform: rotate(0deg) translateX(150px) rotate(0deg); }
+          100% { transform: rotate(360deg) translateX(150px) rotate(-360deg); }
+        }
+        
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
       `}</style>
     </div>
