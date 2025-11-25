@@ -1,851 +1,540 @@
 "use client";
-import React, { useState } from "react";
 
-type Detected = {
-  id: number;
-  url: string;
-  type: string;
-  status: "original" | "brand_ip" | "registered";
-  confidence: number;
-  size: string;
-  brand?: string;
-  owner?: string;
-};
+import React, { useState, useEffect } from "react";
+import { ChevronRight, Shield, Lock, Zap, Home, Check, AlertCircle, Clock, Bell, TrendingUp, Flame, Heart } from "lucide-react";
 
-export default function Extension_Panel_alven() {
-  const tabs = [
-    {
-      id: "content",
-      title: "Content Detection",
-      icon: (
-        <svg
-          className="w-5 h-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-          />
-        </svg>
-      ),
-      description:
-        "Automatically scan web pages to detect original, copyrighted content using Yakoa's AI.",
-      badge: "Yakoa Powered",
-    },
-    {
-      id: "ip",
-      title: "IP Analysis",
-      icon: (
-        <svg
-          className="w-5 h-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-          />
-        </svg>
-      ),
-      description:
-        "Deep analysis of IP ownership and infringement detection with confidence levels.",
-      badge: "AI Analysis",
-    },
-    {
-      id: "register",
-      title: "Story Register",
-      icon: (
-        <svg
-          className="w-5 h-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-          />
-        </svg>
-      ),
-      description:
-        "Register IP on Story Protocol blockchain with automatic royalty tracking.",
-      badge: "Story Protocol",
-    },
-  ];
-
-  const [active, setActive] = useState("content");
+export default function IPShieldExtension() {
+  const [currentPage, setCurrentPage] = useState("main");
+  const [activeTab, setActiveTab] = useState("content");
   const [showSidebar, setShowSidebar] = useState(false);
-  const current = tabs.find((t) => t.id === active);
+  const [selectedContent, setSelectedContent] = useState(null);
+  const [alerts, setAlerts] = useState([]);
+  const [notificationQueue, setNotificationQueue] = useState([]);
+  const [isMonitoring, setIsMonitoring] = useState(false);
 
-  const detectedContent: Detected[] = [
+  // Mock alerts data with timestamps
+  const mockAlerts = [
     {
       id: 1,
-      url: "https://via.placeholder.com/400x300/1a4d3a/ffffff?text=Image+1",
-      type: "image",
-      status: "original",
-      confidence: 98,
-      size: "1920x1080",
+      type: "infringement",
+      severity: "high",
+      title: "Infringement Detected!",
+      description: "Your artwork 'Digital Dream' found on unauthorized platform",
+      detailedInfo: "Detected on pinterest.com/user/unknown - 95% similarity match",
+      timestamp: new Date(Date.now() - 5 * 60000),
+      ipId: "0x123...abc",
+      action: "View Details",
+      icon: "⚠️",
+      color: "from-red-500 to-orange-500",
     },
     {
       id: 2,
-      url: "https://via.placeholder.com/400x300/27835c/ffffff?text=Image+2",
-      type: "image",
-      status: "brand_ip",
-      confidence: 95,
-      brand: "Nike",
-      size: "1280x720",
+      type: "registered",
+      severity: "low",
+      title: "Registration Successful!",
+      description: "Your NFT 'Original Art #47' is now on Story Protocol",
+      detailedInfo: "Transaction hash: 0x8f4e2c3a9b7d1e5f...",
+      timestamp: new Date(Date.now() - 15 * 60000),
+      ipId: "0x456...def",
+      action: "View on Explorer",
+      icon: "✅",
+      color: "from-green-500 to-emerald-500",
     },
     {
       id: 3,
-      url: "https://via.placeholder.com/400x300/8dc9b0/ffffff?text=Image+3",
-      type: "image",
-      status: "registered",
-      confidence: 87,
-      owner: "0x742d...5678",
-      size: "2560x1440",
+      type: "new_registration",
+      severity: "medium",
+      title: "Similar Content Found",
+      description: "Content similar to your work detected in Yakoa network",
+      detailedInfo: "89% similarity - registered by 0x789...ghi",
+      timestamp: new Date(Date.now() - 45 * 60000),
+      ipId: "0x789...ghi",
+      action: "Check Now",
+      icon: "🔍",
+      color: "from-blue-500 to-cyan-500",
+    },
+    {
+      id: 4,
+      type: "earning",
+      severity: "low",
+      title: "Royalty Earned!",
+      description: "You received $12.45 in royalties from 'Photography Series'",
+      detailedInfo: "Earned from 3 license uses this week",
+      timestamp: new Date(Date.now() - 2 * 3600000),
+      ipId: "0xabc...jkl",
+      action: "View Earnings",
+      icon: "💰",
+      color: "from-amber-500 to-yellow-500",
     },
   ];
 
-  return (
-    <div
-      style={{
-        display: "flex",
-        gap: "24px",
-        padding: "32px",
-        minHeight: "100vh",
-        backgroundColor: "#f5f5f0",
-        boxSizing: "border-box",
-      }}
-    >
-      {/* PANEL UTAMA */}
-      <div
-        style={{
-          width: "400px",
-          backgroundColor: "#e8dcbb",
-          borderRadius: "12px",
-          boxShadow: "0 10px 25px rgba(26, 77, 58, 0.15)",
-          overflow: "hidden",
-          border: "1px solid rgba(26, 77, 58, 0.1)",
-        }}
-      >
-        {/* Header */}
-        <div style={{ backgroundColor: "#1a4d3a", padding: "20px" }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginBottom: "16px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <div
-                style={{
-                  backgroundColor: "rgba(255,255,255,0.95)",
-                  padding: "6px",
-                  borderRadius: "8px",
-                }}
-              >
-                <svg
-                  style={{ width: "20px", height: "20px", color: "#1a4d3a" }}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                  />
-                </svg>
+  const detectedContent = [
+    { id: 1, url: "https://via.placeholder.com/400x300/1a4d3a/ffffff?text=Image+1", type: "image", status: "original", confidence: 98, size: "1920x1080" },
+    { id: 2, url: "https://via.placeholder.com/400x300/27835c/ffffff?text=Image+2", type: "image", status: "brand_ip", confidence: 95, brand: "Nike", size: "1280x720" },
+    { id: 3, url: "https://via.placeholder.com/400x300/8dc9b0/ffffff?text=Image+3", type: "image", status: "registered", confidence: 87, owner: "0x742d...5678", size: "2560x1440" },
+  ];
+
+  const protectedIPs = [
+    { id: 1, url: "https://via.placeholder.com/200x150/1a4d3a/ffffff?text=Protected+1", title: "Original Artwork #1", status: "protected", earnings: "$12.45", storyId: "0x123...abc" },
+    { id: 2, url: "https://via.placeholder.com/200x150/27835c/ffffff?text=Protected+2", title: "Photography Series", status: "protected", earnings: "$34.20", storyId: "0x456...def" },
+    { id: 3, url: "https://via.placeholder.com/200x150/8dc9b0/ffffff?text=Protected+3", title: "Design Concept", status: "pending", earnings: "$0.00", storyId: "0x789...ghi" },
+    { id: 4, url: "https://via.placeholder.com/200x150/1a4d3a/ffffff?text=Protected+4", title: "Brand Identity", status: "protected", earnings: "$56.80", storyId: "0xabc...jkl" },
+  ];
+
+  const tabs = [
+    { id: "content", title: "Detect", icon: "📸", description: "Scan for original content" },
+    { id: "ip", title: "Analyze", icon: "🔍", description: "Deep IP analysis" },
+    { id: "register", title: "Register", icon: "✍️", description: "Story registration" },
+  ];
+
+  // Simulate monitoring
+  useEffect(() => {
+    if (isMonitoring) {
+      const interval = setInterval(() => {
+        const randomAlert = mockAlerts[Math.floor(Math.random() * mockAlerts.length)];
+        const newAlert = { ...randomAlert, id: Date.now() };
+        setNotificationQueue((prev) => [...prev, newAlert]);
+        
+        // Auto remove notification after 6 seconds
+        setTimeout(() => {
+          setNotificationQueue((prev) => prev.filter((a) => a.id !== newAlert.id));
+        }, 6000);
+      }, 8000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isMonitoring]);
+
+  const currentTab = tabs.find((t) => t.id === activeTab);
+
+  // ============= NOTIFICATION TOAST =============
+  const NotificationToast = ({ alert, isFirst }) => (
+    <div className={`fixed ${isFirst ? "top-6 right-6" : "top-24 right-6"} z-50 max-w-sm animate-in slide-in-from-right-96 duration-300`}>
+      <div className={`bg-gradient-to-r ${alert.color} rounded-xl shadow-2xl overflow-hidden border border-white/20 backdrop-blur-xl`}>
+        <div className="p-4 text-white">
+          <div className="flex items-start gap-3">
+            <span className="text-3xl animate-bounce">{alert.icon}</span>
+            <div className="flex-1">
+              <h3 className="font-bold text-sm mb-0.5">{alert.title}</h3>
+              <p className="text-xs opacity-90 mb-2">{alert.description}</p>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] opacity-75">Just now</span>
+                <button className="text-xs font-bold opacity-90 hover:opacity-100 underline">{alert.action}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // ============= MAIN PANEL VIEW =============
+  const MainPanelView = () => (
+    <div className="w-full h-full bg-gradient-to-b from-[#e8dcbb] to-[#f5f5f0] rounded-xl shadow-2xl overflow-hidden border border-[#1a4d3a]/10 flex flex-col">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-[#1a4d3a] to-[#27835c] px-6 py-5 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-white rounded-full blur-3xl"></div>
+        </div>
+        <div className="relative z-10">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/95 p-2 rounded-lg shadow-lg">
+                <Shield className="w-5 h-5 text-[#1a4d3a]" />
               </div>
               <div>
-                <h1
-                  style={{
-                    color: "white",
-                    fontWeight: 600,
-                    fontSize: "16px",
-                    margin: 0,
-                  }}
-                >
-                  IP Shield
-                </h1>
-                <p style={{ color: "#8dc9b0", fontSize: "12px", margin: 0 }}>
-                  Yakoa × Story
-                </p>
+                <h1 className="text-white font-bold text-base">IP Shield</h1>
+                <p className="text-[#8dc9b0] text-xs font-medium">Yakoa × Story</p>
               </div>
             </div>
-
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                backgroundColor: "rgba(255,255,255,0.1)",
-                padding: "4px 10px",
-                borderRadius: "20px",
-              }}
+            <button
+              onClick={() => setCurrentPage("alerts")}
+              className="relative flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-sm hover:bg-white/20 transition-all"
             >
-              <div
-                style={{
-                  width: "6px",
-                  height: "6px",
-                  backgroundColor: "#8dc9b0",
-                  borderRadius: "50%",
-                }}
-              />
-              <span style={{ color: "white", fontSize: "12px" }}>Active</span>
-            </div>
+              <Bell className="w-4 h-4 text-white" />
+              <span className="text-white text-xs font-medium">Alerts</span>
+              {notificationQueue.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-5 h-5 rounded-full flex items-center justify-center animate-pulse">
+                  {notificationQueue.length}
+                </span>
+              )}
+            </button>
           </div>
 
           {/* Stats */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: "8px",
-            }}
-          >
+          <div className="grid grid-cols-3 gap-2">
             {[
-              { label: "Detected", value: "12" },
-              { label: "Protected", value: "8" },
-              { label: "Alerts", value: "2" },
+              { label: "Detected", value: "12", icon: "📸" },
+              { label: "Protected", value: "8", icon: "🛡️" },
+              { label: "Alerts", value: mockAlerts.length, icon: "⚠️" },
             ].map((stat) => (
-              <div
-                key={stat.label}
-                style={{
-                  backgroundColor: "rgba(255,255,255,0.1)",
-                  borderRadius: "8px",
-                  padding: "8px",
-                  textAlign: "center",
-                }}
-              >
-                <p
-                  style={{
-                    color: "rgba(255,255,255,0.7)",
-                    fontSize: "10px",
-                    margin: "0 0 2px 0",
-                  }}
-                >
-                  {stat.label}
-                </p>
-                <p
-                  style={{
-                    color: "white",
-                    fontWeight: 600,
-                    fontSize: "16px",
-                    margin: 0,
-                  }}
-                >
-                  {stat.value}
-                </p>
+              <div key={stat.label} className="bg-white/10 backdrop-blur-sm rounded-lg p-2.5 text-center border border-white/10">
+                <p className="text-[#8dc9b0] text-[10px] font-medium mb-1">{stat.label}</p>
+                <p className="text-white font-bold text-sm">{stat.value}</p>
               </div>
             ))}
-          </div>
-        </div>
-
-        <div style={{ padding: "20px" }}>
-          {/* Tab Navigation */}
-          <div
-            style={{
-              backgroundColor: "rgba(255,255,255,0.8)",
-              borderRadius: "8px",
-              padding: "4px",
-              display: "flex",
-              gap: "6px",
-              marginBottom: "16px",
-            }}
-          >
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActive(tab.id)}
-                style={{
-                  flex: 1,
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: "6px",
-                  padding: "10px 8px",
-                  borderRadius: "6px",
-                  border: "none",
-                  cursor: "pointer",
-                  transition: "all 0.2s",
-                  backgroundColor:
-                    active === tab.id ? "#1a4d3a" : "transparent",
-                  color:
-                    active === tab.id ? "white" : "rgba(26, 77, 58, 0.6)",
-                  boxShadow:
-                    active === tab.id
-                      ? "0 2px 8px rgba(26, 77, 58, 0.3)"
-                      : "none",
-                }}
-              >
-                {tab.icon}
-                <span
-                  style={{
-                    fontSize: "10px",
-                    fontWeight: 500,
-                    textAlign: "center",
-                    lineHeight: "1.2",
-                  }}
-                >
-                  {tab.title}
-                </span>
-              </button>
-            ))}
-          </div>
-
-          {/* Content */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            {/* Badge */}
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <span
-                style={{
-                  backgroundColor: "rgba(141, 201, 176, 0.2)",
-                  color: "#1a4d3a",
-                  padding: "4px 12px",
-                  borderRadius: "20px",
-                  fontSize: "12px",
-                  fontWeight: 500,
-                }}
-              >
-                {current?.badge}
-              </span>
-            </div>
-
-            {/* Icon */}
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <div
-                style={{
-                  width: "80px",
-                  height: "80px",
-                  borderRadius: "16px",
-                  background: "linear-gradient(135deg, #1a4d3a 0%, #27835c 100%)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  boxShadow: "0 4px 12px rgba(26, 77, 58, 0.3)",
-                }}
-              >
-                <div style={{ color: "white", transform: "scale(1.25)" }}>
-                  {current?.icon}
-                </div>
-              </div>
-            </div>
-
-            {/* Text */}
-            <div style={{ textAlign: "center" }}>
-              <h2
-                style={{
-                  fontSize: "20px",
-                  fontWeight: 600,
-                  color: "#1a4d3a",
-                  margin: "0 0 4px 0",
-                }}
-              >
-                {current?.title}
-              </h2>
-              <p
-                style={{
-                  fontSize: "12px",
-                  color: "rgba(26, 77, 58, 0.6)",
-                  lineHeight: "1.5",
-                  margin: 0,
-                  padding: "0 12px",
-                }}
-              >
-                {current?.description}
-              </p>
-            </div>
-
-            {/* Button */}
-            <button
-              onClick={() => setShowSidebar(!showSidebar)}
-              style={{
-                width: "100%",
-                padding: "12px",
-                borderRadius: "8px",
-                border: "none",
-                fontWeight: 500,
-                color: "white",
-                background:
-                  "linear-gradient(90deg, #1a4d3a 0%, #27835c 100%)",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-                fontSize: "14px",
-                transition: "all 0.2s",
-                boxShadow: "0 4px 12px rgba(26, 77, 58, 0.3)",
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.boxShadow =
-                  "0 6px 16px rgba(26, 77, 58, 0.4)";
-                e.currentTarget.style.transform = "translateY(-1px)";
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.boxShadow =
-                  "0 4px 12px rgba(26, 77, 58, 0.3)";
-                e.currentTarget.style.transform = "translateY(0)";
-              }}
-            >
-              <span>Start {current?.title}</span>
-              <svg
-                width="16"
-                height="16"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </button>
-
-            {/* Info Box */}
-            <div
-              style={{
-                backgroundColor: "rgba(255,255,255,0.5)",
-                border: "1px solid rgba(26, 77, 58, 0.1)",
-                borderRadius: "8px",
-                padding: "12px",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "flex-start", gap: "8px" }}>
-                <svg
-                  style={{
-                    width: "16px",
-                    height: "16px",
-                    color: "#27835c",
-                    marginTop: "2px",
-                    flexShrink: 0,
-                  }}
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <div>
-                  <p
-                    style={{
-                      fontSize: "10px",
-                      color: "#1a4d3a",
-                      fontWeight: 500,
-                      margin: "0 0 4px 0",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                    }}
-                  >
-                    How it works
-                  </p>
-                  <p
-                    style={{
-                      fontSize: "12px",
-                      color: "rgba(26, 77, 58, 0.7)",
-                      lineHeight: "1.5",
-                      margin: 0,
-                    }}
-                  >
-                    {active === "content" &&
-                      "Scan current page for images, videos, and audio. Get instant originality check from Yakoa AI."}
-                    {active === "ip" &&
-                      "Analyze detected content for IP infringement, brand matches, and existing registrations."}
-                    {active === "register" &&
-                      "Register your original content on Story Protocol blockchain with one click."}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div style={{ padding: "0 20px 16px" }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              fontSize: "10px",
-              color: "rgba(26, 77, 58, 0.5)",
-              paddingTop: "12px",
-              borderTop: "1px solid rgba(26, 77, 58, 0.1)",
-            }}
-          >
-            <span>v1.0.0</span>
-            <a
-              href="#"
-              style={{
-                color: "#27835c",
-                fontWeight: 500,
-                textDecoration: "none",
-                transition: "color 0.2s",
-              }}
-            >
-              Dashboard →
-            </a>
           </div>
         </div>
       </div>
 
-      {/* SIDEBAR (Muncul ketika klik tombol) */}
-      {showSidebar && (
-        <div
-          style={{
-            width: "400px",
-            height: "600px",
-            backgroundColor: "#e8dcbb",
-            borderRadius: "12px",
-            boxShadow: "0 10px 25px rgba(26, 77, 58, 0.15)",
-            overflow: "hidden",
-            border: "1px solid rgba(26, 77, 58, 0.1)",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          {/* Sidebar Header */}
-          <div style={{ backgroundColor: "#1a4d3a", padding: "16px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <button
-                  onClick={() => setShowSidebar(false)}
-                  style={{
-                    color: "white",
-                    backgroundColor: "rgba(255,255,255,0.1)",
-                    padding: "6px",
-                    borderRadius: "8px",
-                    border: "none",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    transition: "background-color 0.2s",
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.2)";
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.1)";
-                  }}
-                >
-                  <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-                <div>
-                  <h2 style={{ color: "white", fontWeight: 600, fontSize: "14px", margin: 0 }}>
-                    Detected Content
-                  </h2>
-                  <p style={{ color: "#8dc9b0", fontSize: "12px", margin: 0 }}>Current Page</p>
-                </div>
-              </div>
-              <span
-                style={{
-                  backgroundColor: "rgba(255,255,255,0.2)",
-                  color: "white",
-                  padding: "4px 10px",
-                  borderRadius: "20px",
-                  fontSize: "12px",
-                  fontWeight: 600,
-                }}
-              >
-                {detectedContent.length}
-              </span>
+      {/* Tab Navigation */}
+      <div className="px-6 pt-5 pb-4">
+        <div className="bg-white/60 backdrop-blur-sm rounded-lg p-1.5 flex gap-1.5 border border-white/50">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex-1 flex flex-col items-center gap-1.5 py-2.5 px-2 rounded-md font-medium text-xs transition-all duration-300 ${
+                activeTab === tab.id
+                  ? "bg-gradient-to-r from-[#1a4d3a] to-[#27835c] text-white shadow-lg scale-105"
+                  : "text-[#1a4d3a]/60 hover:text-[#1a4d3a]/80"
+              }`}
+            >
+              <span className="text-lg">{tab.icon}</span>
+              <span>{tab.title}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Content Area */}
+      <div className="flex-1 px-6 pb-5 overflow-y-auto">
+        <div className="flex flex-col gap-4">
+          <div className="flex justify-center">
+            <span className="bg-[#8dc9b0]/20 text-[#1a4d3a] px-3 py-1 rounded-full text-xs font-bold border border-[#8dc9b0]/30">
+              {activeTab === "content" && "🎯 Yakoa Powered"}
+              {activeTab === "ip" && "🔬 AI Analysis"}
+              {activeTab === "register" && "⛓️ Story Protocol"}
+            </span>
+          </div>
+
+          <div className="flex justify-center">
+            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#1a4d3a] to-[#27835c] flex items-center justify-center shadow-xl">
+              <span className="text-4xl">{currentTab?.icon}</span>
             </div>
           </div>
 
-          {/* Content List */}
-          <div
-            style={{
-              flex: 1,
-              overflowY: "auto",
-              padding: "16px",
-              backgroundColor: "#f5f5f0",
-              display: "flex",
-              flexDirection: "column",
-              gap: "12px",
+          <div className="text-center space-y-1.5">
+            <h2 className="text-[#1a4d3a] font-bold text-lg">{currentTab?.title}</h2>
+            <p className="text-[#1a4d3a]/60 text-xs leading-relaxed px-2">{currentTab?.description}</p>
+          </div>
+
+          <button
+            onClick={() => {
+              if (activeTab === "content") setShowSidebar(true);
             }}
+            className="w-full py-3 rounded-lg font-bold text-sm text-white bg-gradient-to-r from-[#1a4d3a] to-[#27835c] hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 group shadow-lg"
           >
-            {detectedContent.map((content) => (
-              <div
-                key={content.id}
-                style={{
-                  backgroundColor: "white",
-                  border: "1px solid rgba(26, 77, 58, 0.1)",
-                  borderRadius: "8px",
-                  padding: "12px",
-                  transition: "transform 0.22s cubic-bezier(.2,.9,.2,1), box-shadow 0.22s ease",
-                  transform: "scale(1)",
-                }}
-                onMouseOver={(e) => {
-                  const el = e.currentTarget as HTMLDivElement;
-                  el.style.boxShadow = "0 8px 20px rgba(26, 77, 58, 0.18)";
-                  el.style.transform = "scale(1.04)";
-                  el.style.zIndex = "5";
-                }}
-                onMouseOut={(e) => {
-                  const el = e.currentTarget as HTMLDivElement;
-                  el.style.boxShadow = "none";
-                  el.style.transform = "scale(1)";
-                  el.style.zIndex = "0";
-                }}
-              >
-                {/* Image Preview */}
-                <div
-                  style={{
-                    position: "relative",
-                    width: "100%",
-                    height: "112px",
-                    backgroundColor: "rgba(141, 201, 176, 0.1)",
-                    borderRadius: "8px",
-                    marginBottom: "8px",
-                    overflow: "hidden",
-                  }}
-                >
-                  <img
-                    src={content.url}
-                    alt="content"
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                  />
+            <span>Start {currentTab?.title}</span>
+            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </button>
 
-                  {/* Status Badge */}
-                  <div style={{ position: "absolute", top: "8px", right: "8px" }}>
-                    {content.status === "original" && (
-                      <span
-                        style={{
-                          backgroundColor: "#27835c",
-                          color: "white",
-                          padding: "2px 8px",
-                          borderRadius: "20px",
-                          fontSize: "10px",
-                          fontWeight: 500,
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "4px",
-                        }}
-                      >
-                        <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20">
-                          <path
-                            fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        Original
-                      </span>
-                    )}
-                    {content.status === "brand_ip" && (
-                      <span
-                        style={{
-                          backgroundColor: "#f97316",
-                          color: "white",
-                          padding: "2px 8px",
-                          borderRadius: "20px",
-                          fontSize: "10px",
-                          fontWeight: 500,
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "4px",
-                        }}
-                      >
-                        <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20">
-                          <path
-                            fillRule="evenodd"
-                            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        Brand IP
-                      </span>
-                    )}
-                    {content.status === "registered" && (
-                      <span
-                        style={{
-                          backgroundColor: "#ef4444",
-                          color: "white",
-                          padding: "2px 8px",
-                          borderRadius: "20px",
-                          fontSize: "10px",
-                          fontWeight: 500,
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "4px",
-                        }}
-                      >
-                        <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20">
-                          <path
-                            fillRule="evenodd"
-                            d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        Registered
-                      </span>
-                    )}
+          <div className="bg-white/40 backdrop-blur-sm border border-[#1a4d3a]/10 rounded-lg p-3.5 space-y-2">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-[#27835c] flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-[#1a4d3a] font-bold text-[10px] uppercase tracking-wider mb-1">How it works</p>
+                <p className="text-[#1a4d3a]/70 text-xs leading-relaxed">
+                  {activeTab === "content" && "Automatically scan pages for images, videos & audio with instant Yakoa originality checks."}
+                  {activeTab === "ip" && "Detect IP infringements, brand matches & existing registrations with confidence scoring."}
+                  {activeTab === "register" && "Register your original content on Story Protocol blockchain with one-click licensing."}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="px-6 py-3 border-t border-[#1a4d3a]/10 flex items-center justify-between text-[10px] text-[#1a4d3a]/50">
+        <span className="font-medium">v1.0.0</span>
+        <button
+          onClick={() => setCurrentPage("dashboard")}
+          className="text-[#27835c] font-bold hover:text-[#1a4d3a] transition-colors flex items-center gap-1 group"
+        >
+          Dashboard <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+        </button>
+      </div>
+    </div>
+  );
+
+  // ============= CONTENT DETECTION SIDEBAR =============
+  const ContentSidebarView = () => (
+    <div className="w-full h-full bg-gradient-to-b from-[#e8dcbb] to-[#f5f5f0] rounded-xl shadow-2xl overflow-hidden border border-[#1a4d3a]/10 flex flex-col">
+      <div className="bg-gradient-to-r from-[#1a4d3a] to-[#27835c] px-5 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowSidebar(false)}
+            className="text-white bg-white/10 p-1.5 rounded-lg hover:bg-white/20 transition-all"
+          >
+            <ChevronRight className="w-4 h-4 rotate-180" />
+          </button>
+          <div>
+            <h2 className="text-white font-bold text-sm">Detected Content</h2>
+            <p className="text-[#8dc9b0] text-xs">Current Page</p>
+          </div>
+        </div>
+        <span className="bg-white/20 text-white px-2.5 py-1 rounded-full text-xs font-bold border border-white/30">{detectedContent.length}</span>
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-[#f5f5f0]">
+        {detectedContent.map((content) => (
+          <div
+            key={content.id}
+            className="bg-white rounded-xl overflow-hidden border border-[#1a4d3a]/10 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group"
+          >
+            <div className="relative w-full h-32 bg-gradient-to-br from-[#8dc9b0]/10 to-[#1a4d3a]/5 overflow-hidden">
+              <img src={content.url} alt="content" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+              <div className="absolute top-2.5 right-2.5">
+                {content.status === "original" && (
+                  <div className="bg-[#27835c] text-white px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1.5 shadow-lg">
+                    <Check className="w-3 h-3" />
+                    Original
                   </div>
+                )}
+              </div>
+            </div>
+
+            <div className="p-3 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[#1a4d3a] font-semibold text-xs">{content.size}</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-12 h-1.5 bg-[#8dc9b0]/30 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-[#27835c]"
+                      style={{ width: `${content.confidence}%` }}
+                    />
+                  </div>
+                  <span className="text-[#1a4d3a] font-bold text-xs w-8">{content.confidence}%</span>
                 </div>
+              </div>
 
-                {/* Details */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <span style={{ fontSize: "12px", fontWeight: 500, color: "#1a4d3a" }}>
-                      {content.size}
-                    </span>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                      <div
-                        style={{
-                          width: "56px",
-                          height: "4px",
-                          backgroundColor: "rgba(141, 201, 176, 0.3)",
-                          borderRadius: "20px",
-                          overflow: "hidden",
-                        }}
-                      >
-                        <div
-                          style={{
-                            height: "100%",
-                            borderRadius: "20px",
-                            backgroundColor:
-                              content.confidence > 90
-                                ? "#27835c"
-                                : content.confidence > 70
-                                ? "#f97316"
-                                : "#ef4444",
-                            width: `${content.confidence}%`,
-                          }}
-                        />
-                      </div>
-                      <span style={{ fontSize: "10px", fontWeight: 600, color: "#1a4d3a" }}>
-                        {content.confidence}%
-                      </span>
+              {content.status === "original" && (
+                <button className="w-full mt-2 bg-gradient-to-r from-[#1a4d3a] to-[#27835c] text-white py-2 rounded-lg text-xs font-bold hover:shadow-lg transition-all">
+                  🛡️ Protect This
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="px-4 py-3 bg-white border-t border-[#1a4d3a]/10">
+        <button className="w-full bg-gradient-to-r from-[#1a4d3a] to-[#27835c] text-white py-2.5 rounded-lg font-bold text-sm hover:shadow-lg transition-all flex items-center justify-center gap-2">
+          🛡️ Protect All Original ({detectedContent.filter((c) => c.status === "original").length})
+        </button>
+      </div>
+    </div>
+  );
+
+  // ============= DASHBOARD VIEW =============
+  const DashboardView = () => (
+    <div className="w-full h-full bg-gradient-to-b from-[#e8dcbb] to-[#f5f5f0] rounded-xl shadow-2xl overflow-hidden border border-[#1a4d3a]/10 flex flex-col">
+      <div className="bg-gradient-to-r from-[#1a4d3a] to-[#27835c] px-6 py-5">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <button onClick={() => setCurrentPage("main")} className="text-white bg-white/10 p-2 rounded-lg hover:bg-white/20 transition-all">
+              <ChevronRight className="w-4 h-4 rotate-180" />
+            </button>
+            <div>
+              <h1 className="text-white font-bold text-base">Protected Assets</h1>
+              <p className="text-[#8dc9b0] text-xs font-medium">Your IP Shield</p>
+            </div>
+          </div>
+          <Home className="w-5 h-5 text-white" />
+        </div>
+
+        <div className="grid grid-cols-4 gap-2">
+          {[
+            { label: "Total", value: "47", icon: "📊" },
+            { label: "Protected", value: "45", icon: "🛡️" },
+            { label: "Earnings", value: "$234", icon: "💰" },
+            { label: "Pending", value: "2", icon: "⏳" },
+          ].map((stat) => (
+            <div key={stat.label} className="bg-white/10 backdrop-blur-sm rounded-lg p-2.5 text-center border border-white/10">
+              <p className="text-white text-lg mb-1">{stat.icon}</p>
+              <p className="text-white font-bold text-sm">{stat.value}</p>
+              <p className="text-[#8dc9b0] text-[9px] font-medium">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-6 py-5">
+        <div className="grid grid-cols-2 gap-4">
+          {protectedIPs.map((ip) => (
+            <div key={ip.id} className="bg-white rounded-xl overflow-hidden border border-[#1a4d3a]/10 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group">
+              <div className="relative w-full h-32 bg-gradient-to-br from-[#8dc9b0]/10 to-[#1a4d3a]/5 overflow-hidden">
+                <img src={ip.url} alt={ip.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                <div className="absolute top-2 right-2">
+                  {ip.status === "protected" ? (
+                    <div className="bg-[#27835c] text-white px-2 py-0.5 rounded-full text-[9px] font-bold flex items-center gap-1">
+                      <Check className="w-2.5 h-2.5" />
+                      Protected
                     </div>
+                  ) : (
+                    <div className="bg-[#f97316] text-white px-2 py-0.5 rounded-full text-[9px] font-bold flex items-center gap-1">
+                      <Clock className="w-2.5 h-2.5" />
+                      Pending
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="p-3 space-y-2">
+                <h3 className="text-[#1a4d3a] font-bold text-xs line-clamp-1">{ip.title}</h3>
+                <div className="flex items-center justify-between">
+                  <span className="text-[#1a4d3a]/60 text-[9px]">{ip.storyId}</span>
+                  <span className="text-[#27835c] font-bold text-xs">{ip.earnings}</span>
+                </div>
+                <button className="w-full text-[#1a4d3a] hover:text-[#27835c] text-xs font-bold transition-colors border-t border-[#1a4d3a]/10 pt-2">
+                  View on Story →
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="px-6 py-4 bg-white border-t border-[#1a4d3a]/10 flex gap-2">
+        <button className="flex-1 bg-gradient-to-r from-[#1a4d3a] to-[#27835c] text-white py-2.5 rounded-lg font-bold text-xs hover:shadow-lg transition-all">
+          <Zap className="w-3.5 h-3.5 inline mr-2" />
+          Detect New Content
+        </button>
+        <button className="flex-1 border-2 border-[#1a4d3a] text-[#1a4d3a] py-2 rounded-lg font-bold text-xs hover:bg-[#1a4d3a]/5 transition-all">
+          Settings
+        </button>
+      </div>
+    </div>
+  );
+
+  // ============= ALERTS CENTER VIEW =============
+  const AlertsView = () => (
+    <div className="w-full h-full bg-gradient-to-b from-[#e8dcbb] to-[#f5f5f0] rounded-xl shadow-2xl overflow-hidden border border-[#1a4d3a]/10 flex flex-col">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-[#1a4d3a] to-[#27835c] px-6 py-5">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <button onClick={() => setCurrentPage("main")} className="text-white bg-white/10 p-2 rounded-lg hover:bg-white/20 transition-all">
+              <ChevronRight className="w-4 h-4 rotate-180" />
+            </button>
+            <div>
+              <h1 className="text-white font-bold text-base">Alert Center</h1>
+              <p className="text-[#8dc9b0] text-xs font-medium">Real-time monitoring</p>
+            </div>
+          </div>
+          <Bell className="w-5 h-5 text-white animate-pulse" />
+        </div>
+
+        {/* Monitoring Toggle */}
+        <div className="flex items-center gap-3 bg-white/10 p-3 rounded-lg border border-white/20">
+          <div className="flex-1">
+            <p className="text-white font-bold text-xs mb-0.5">Background Monitoring</p>
+            <p className="text-[#8dc9b0] text-[10px]">Scans every hour for infringements</p>
+          </div>
+          <button
+            onClick={() => setIsMonitoring(!isMonitoring)}
+            className={`px-4 py-2 rounded-lg font-bold text-xs transition-all ${
+              isMonitoring
+                ? "bg-green-500 text-white shadow-lg"
+                : "bg-white/20 text-white hover:bg-white/30"
+            }`}
+          >
+            {isMonitoring ? "🔴 Active" : "⚪ Inactive"}
+          </button>
+        </div>
+      </div>
+
+      {/* Alert Stats */}
+      <div className="px-6 pt-5 pb-4 grid grid-cols-4 gap-2">
+        {[
+          { label: "Total", value: mockAlerts.length, icon: "📊", color: "from-blue-500 to-blue-600" },
+          { label: "High", value: mockAlerts.filter((a) => a.severity === "high").length, icon: "🔴", color: "from-red-500 to-red-600" },
+          { label: "Medium", value: mockAlerts.filter((a) => a.severity === "medium").length, icon: "🟡", color: "from-yellow-500 to-yellow-600" },
+          { label: "Low", value: mockAlerts.filter((a) => a.severity === "low").length, icon: "🟢", color: "from-green-500 to-green-600" },
+        ].map((stat) => (
+          <div key={stat.label} className={`bg-gradient-to-br ${stat.color} rounded-lg p-3 text-white border border-white/20 shadow-lg`}>
+            <p className="text-2xl mb-1">{stat.icon}</p>
+            <p className="font-bold text-sm">{stat.value}</p>
+            <p className="text-[9px] opacity-90">{stat.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Alerts List */}
+      <div className="flex-1 overflow-y-auto px-6 pb-5 space-y-3">
+        {mockAlerts.map((alert) => (
+          <div
+            key={alert.id}
+            className={`bg-gradient-to-r ${alert.color} rounded-xl overflow-hidden border border-white/20 shadow-lg hover:shadow-2xl hover:scale-102 transition-all duration-300 cursor-pointer group`}
+          >
+            <div className="p-4 text-white">
+              <div className="flex items-start gap-3">
+                <span className="text-3xl animate-pulse group-hover:animate-bounce">{alert.icon}</span>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="font-bold text-sm">{alert.title}</h3>
+                    <span className="text-[10px] opacity-75 font-medium">
+                      {Math.round((Date.now() - alert.timestamp) / 60000)} min ago
+                    </span>
                   </div>
-
-                  {content.brand && (
-                    <p style={{ fontSize: "10px", color: "rgba(26, 77, 58, 0.6)", margin: 0 }}>
-                      Matched:{" "}
-                      <span style={{ fontWeight: 600, color: "#1a4d3a" }}>{content.brand}</span>
-                    </p>
-                  )}
-
-                  {content.owner && (
-                    <p style={{ fontSize: "10px", color: "rgba(26, 77, 58, 0.6)", margin: 0 }}>
-                      Owner:{" "}
-                      <span style={{ fontFamily: "monospace", color: "#1a4d3a" }}>{content.owner}</span>
-                    </p>
-                  )}
-
-                  {/* Actions */}
-                  <div style={{ display: "flex", gap: "8px", paddingTop: "4px" }}>
-                    {content.status === "original" ? (
-                      <button
-                        style={{
-                          flex: 1,
-                          background: "linear-gradient(90deg, #1a4d3a 0%, #27835c 100%)",
-                          color: "white",
-                          padding: "6px",
-                          borderRadius: "6px",
-                          fontSize: "12px",
-                          fontWeight: 500,
-                          border: "none",
-                          cursor: "pointer",
-                        }}
-                        onMouseOver={(e) => {
-                          (e.currentTarget as HTMLButtonElement).style.boxShadow =
-                            "0 6px 14px rgba(26,77,58,0.2)";
-                        }}
-                        onMouseOut={(e) => {
-                          (e.currentTarget as HTMLButtonElement).style.boxShadow = "none";
-                        }}
-                      >
-                        🛡️ Protect This
-                      </button>
-                    ) : (
-                      <button
-                        style={{
-                          flex: 1,
-                          backgroundColor: "rgba(141, 201, 176, 0.2)",
-                          color: "#1a4d3a",
-                          padding: "6px",
-                          borderRadius: "6px",
-                          fontSize: "12px",
-                          fontWeight: 500,
-                          border: "none",
-                          cursor: "pointer",
-                        }}
-                        onMouseOver={(e) => {
-                          (e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                            "rgba(141,201,176,0.3)";
-                        }}
-                        onMouseOut={(e) => {
-                          (e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                            "rgba(141,201,176,0.2)";
-                        }}
-                      >
-                        View Details
-                      </button>
-                    )}
+                  <p className="text-xs opacity-90 mb-2">{alert.description}</p>
+                  <p className="text-[10px] opacity-75 mb-3 bg-white/10 p-2 rounded-lg border border-white/20">
+                    {alert.detailedInfo}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] font-mono bg-white/10 px-2 py-1 rounded">{alert.ipId}</span>
+                    <button className="text-xs font-bold opacity-90 hover:opacity-100 underline">
+                      {alert.action} →
+                    </button>
                   </div>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
+        ))}
+      </div>
 
-          {/* Footer Action */}
-          <div style={{ padding: "16px", backgroundColor: "white", borderTop: "1px solid rgba(26, 77, 58, 0.1)" }}>
-            <button
-              style={{
-                width: "100%",
-                background: "linear-gradient(90deg, #1a4d3a 0%, #27835c 100%)",
-                color: "white",
-                padding: "10px",
-                borderRadius: "8px",
-                fontWeight: 500,
-                border: "none",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-                fontSize: "14px",
-                transition: "box-shadow 0.2s",
-                boxShadow: "0 4px 12px rgba(26, 77, 58, 0.3)",
-              }}
-              onMouseOver={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.boxShadow =
-                  "0 6px 16px rgba(26, 77, 58, 0.4)";
-              }}
-              onMouseOut={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.boxShadow =
-                  "0 4px 12px rgba(26, 77, 58, 0.3)";
-              }}
-            >
-              <span>
-                Protect All Original ({detectedContent.filter((c) => c.status === "original").length})
-              </span>
-              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-            </button>
-          </div>
+      {/* Footer CTA */}
+      <div className="px-6 py-4 bg-white border-t border-[#1a4d3a]/10 flex gap-2">
+        <button className="flex-1 bg-gradient-to-r from-[#1a4d3a] to-[#27835c] text-white py-2.5 rounded-lg font-bold text-xs hover:shadow-lg transition-all">
+          <TrendingUp className="w-3.5 h-3.5 inline mr-2" />
+          View Full History
+        </button>
+        <button className="flex-1 border-2 border-[#1a4d3a] text-[#1a4d3a] py-2 rounded-lg font-bold text-xs hover:bg-[#1a4d3a]/5 transition-all">
+          Clear All
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#f5f5f0] to-[#e8dcbb] p-4 gap-6">
+      {/* Main Panel */}
+      <div className="w-96 h-screen max-h-[800px]">
+        {currentPage === "main" && <MainPanelView />}
+        {currentPage === "dashboard" && <DashboardView />}
+        {currentPage === "alerts" && <AlertsView />}
+      </div>
+
+      {/* Sidebar (when showing detected content) */}
+      {showSidebar && (
+        <div className="w-96 h-screen max-h-[800px] animate-in slide-in-from-right-96">
+          <ContentSidebarView />
         </div>
       )}
+
+      {/* Notifications Queue */}
+      <div className="fixed top-6 right-6 z-50 space-y-3">
+        {notificationQueue.map((alert, index) => (
+          <NotificationToast key={alert.id} alert={alert} isFirst={index === 0} />
+        ))}
+      </div>
+
+      {/* Responsive hint */}
+      <div className="text-center text-xs text-[#1a4d3a]/50 absolute bottom-4 left-4">
+        💡 Extension UI - Responsive Design
+      </div>
     </div>
   );
 }
