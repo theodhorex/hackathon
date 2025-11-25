@@ -1,178 +1,100 @@
-import React, { useEffect, useRef } from "react";
-import {
-  Sparkles,
-  Activity,
-  Users,
-  Shield,
-  Calendar,
-  CreditCard,
-  Settings,
-  Search,
-  BarChart3,
-  TrendingUp,
-  TrendingDown,
-  Play,
-} from "lucide-react";
-
-/**
- * Improved LandingPage with smooth particle parallax on scroll.
- * - Particles are positioned fixed (so they don't reflow when scrolling)
- * - Parallax target is based on window.scrollY
- * - Smooth motion via requestAnimationFrame + lerp (no layout thrash)
- */
-
-type Particle = {
-  leftPct: number;
-  topPct: number;
-  size: number;
-  parallax: number; // -0.2 .. 0.2
-  speedOffset: number;
-};
+import React, { useState, useEffect } from 'react';
+import { Sparkles, Activity, Users, Shield, Calendar, CreditCard, Settings, Search, BarChart3, TrendingUp, TrendingDown, Play } from 'lucide-react';
 
 export default function LandingPage() {
-  const particlesCount = 36;
-  const particlesRef = useRef<Particle[]>([]);
-  const elsRef = useRef<Array<HTMLDivElement | null>>([]);
-  const animRef = useRef<number | null>(null);
-  const lastScrollRef = useRef<number>(0);
-  const currentOffsetsRef = useRef<number[]>([]); // current Y offset for each particle (for lerp)
+  const [scrollY, setScrollY] = useState(0);
 
-  // initialize particles once
   useEffect(() => {
-    const arr: Particle[] = [];
-    for (let i = 0; i < particlesCount; i++) {
-      arr.push({
-        leftPct: Math.random() * 100,
-        topPct: Math.random() * 100,
-        size: 1 + Math.random() * 3, // px size multiplier
-        parallax: (Math.random() - 0.5) * 0.4, // -0.2 .. +0.2
-        speedOffset: Math.random() * 2,
-      });
-    }
-    particlesRef.current = arr;
-    currentOffsetsRef.current = new Array(arr.length).fill(0);
-  }, []); // run once
-
-  // update lastScrollRef on scroll (no re-render)
-  useEffect(() => {
-    const onScroll = () => {
-      lastScrollRef.current = window.scrollY || window.pageYOffset;
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // RAF loop that lerps particle transforms to target (based on scroll)
-  useEffect(() => {
-    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+  const stats = [
+    { label: 'TOTAL VALUE LOCKED', value: '$99,233,374', color: 'from-pink-500 to-rose-500' },
+    { label: 'CIRCULATING SUPPLY', value: '18,021,367', color: 'from-purple-500 to-pink-500' },
+    { label: 'CIRCULATING MARKET CAP', value: '$5,768,639', color: 'from-blue-500 to-purple-500' },
+    { label: 'THE PRICE', value: '$0.32', color: 'from-cyan-500 to-blue-500' },
+  ];
 
-    const tick = () => {
-      const scrollY = lastScrollRef.current;
-      const winH = window.innerHeight || 1;
+  const bottomStats = [
+    { label: 'EPOCH ENDS IN', value: '$5,454,114', color: 'from-violet-500 to-purple-500' },
+    { label: '24H VOLUME', value: '2D 10H 18M', color: 'from-fuchsia-500 to-pink-500' },
+  ];
 
-      for (let i = 0; i < particlesRef.current.length; i++) {
-        const p = particlesRef.current[i];
-        const el = elsRef.current[i];
-        if (!el) continue;
-
-        // compute target offset: center-based subtle parallax
-        // Using topPct to vary influence (particles near center move slightly differently)
-        const centerFactor = (p.topPct / 50) - 1; // -1 .. +1
-        const baseTarget = -scrollY * p.parallax * (0.6 + Math.abs(centerFactor) * 0.8);
-
-        // small oscillation based on time to keep it lively (use speedOffset)
-        const time = performance.now() / 1000;
-        const wobble = Math.sin(time * (0.2 + p.speedOffset * 0.4)) * (0.5 + p.size * 0.25);
-
-        const target = baseTarget + wobble;
-
-        // lerp current offset -> target
-        const cur = currentOffsetsRef.current[i] ?? 0;
-        const next = lerp(cur, target, 0.12); // 0.12 smoothing factor = fairly smooth
-        currentOffsetsRef.current[i] = next;
-
-        // apply transform using translate3d (GPU accelerated)
-        // keep initial left/top as percent and just translate in px
-        el.style.transform = `translate3d(0px, ${next}px, 0) scale(${1})`;
-        el.style.opacity = `${0.35 + Math.min(0.65, p.size * 0.15)}`; // subtle size-based alpha
-      }
-
-      animRef.current = requestAnimationFrame(tick);
-    };
-
-    animRef.current = requestAnimationFrame(tick);
-    return () => {
-      if (animRef.current) cancelAnimationFrame(animRef.current);
-    };
-  }, []);
-
-  // regenerate positions on resize to avoid out-of-viewport placements
-  useEffect(() => {
-    const onResize = () => {
-      // slightly nudge random positions to fit new viewport (so they feel "repositioned")
-      particlesRef.current = particlesRef.current.map((p) => ({
-        ...p,
-        leftPct: Math.min(98, Math.max(1, p.leftPct + (Math.random() - 0.5) * 6)),
-        topPct: Math.min(98, Math.max(1, p.topPct + (Math.random() - 0.5) * 6)),
-      }));
-    };
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
+  const team = [
+    {
+      name: 'Brooklyn Simmons',
+      role: 'Founder',
+      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop',
+    },
+    {
+      name: 'Guy Hawkins',
+      role: 'Ceo',
+      image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop',
+    },
+    {
+      name: 'Courtney Henry',
+      role: 'Manager',
+      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop',
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-blue-950 to-slate-950 text-white overflow-x-hidden">
-      {/* Animated Futuristic Background - fixed so does not reflow */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        {/* Gradient Orbs (kept) */}
-        <div className="absolute top-20 left-20 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl" style={{ willChange: "transform, opacity" }} />
-        <div className="absolute top-40 right-20 w-96 h-96 bg-purple-500/30 rounded-full blur-3xl" style={{ willChange: "transform, opacity" }} />
-        <div className="absolute bottom-20 left-1/3 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl" style={{ willChange: "transform, opacity" }} />
-
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-blue-950 to-slate-950 text-white overflow-hidden">
+      {/* Animated Futuristic Background */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        {/* Gradient Orbs */}
+        <div className="absolute top-20 left-20 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl animate-float" />
+        <div className="absolute top-40 right-20 w-96 h-96 bg-purple-500/30 rounded-full blur-3xl animate-float-delayed" />
+        <div className="absolute bottom-20 left-1/3 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl animate-float-slow" />
+        
         {/* Grid Lines */}
-        <svg className="absolute inset-0 w-full h-full opacity-18" style={{ color: "rgba(96, 165, 250, 0.12)" }}>
+        <svg className="absolute inset-0 w-full h-full opacity-20">
           <defs>
-            <pattern id="grid2" width="48" height="48" patternUnits="userSpaceOnUse">
-              <path d="M 48 0 L 0 0 0 48" fill="none" stroke="currentColor" strokeWidth="0.6" />
+            <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
+              <path d="M 50 0 L 0 0 0 50" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-blue-400" />
             </pattern>
           </defs>
-          <rect width="100%" height="100%" fill="url(#grid2)" />
+          <rect width="100%" height="100%" fill="url(#grid)" />
         </svg>
-
-        {/* Particles managed by JS for smooth parallax */}
-        {particlesRef.current.length === 0 ? null : (
-          particlesRef.current.map((p, i) => (
-            <div
-              key={i}
-              ref={(el) => (elsRef.current[i] = el)}
-              className="absolute rounded-full bg-blue-400"
-              style={{
-                left: `${p.leftPct}%`,
-                top: `${p.topPct}%`,
-                width: `${2 + p.size}px`,
-                height: `${2 + p.size}px`,
-                transform: "translate3d(0,0,0)",
-                transition: "opacity 0.35s linear",
-                willChange: "transform, opacity",
-                pointerEvents: "none",
-                mixBlendMode: "screen",
-              }}
-            />
-          ))
-        )}
-
-        {/* subtle scanning lines as CSS animation (kept) */}
+        
+        {/* Floating Particles */}
+        {[...Array(30)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-2 h-2 bg-blue-400/40 rounded-full"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animation: `float-particle ${5 + Math.random() * 10}s infinite ease-in-out ${Math.random() * 5}s`
+            }}
+          />
+        ))}
+        
+        {/* Scanning Lines */}
         <div className="absolute inset-0">
-          <div className="absolute w-full h-px bg-gradient-to-r from-transparent via-blue-400/40 to-transparent animate-scan" />
-          <div className="absolute w-full h-px bg-gradient-to-r from-transparent via-purple-400/30 to-transparent animate-scan-delayed" />
+          <div className="absolute w-full h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent animate-scan" />
+          <div className="absolute w-full h-px bg-gradient-to-r from-transparent via-purple-400/50 to-transparent animate-scan-delayed" />
         </div>
-
-        {/* Some geometric shapes */}
-        <div className="absolute top-1/4 right-1/4 w-32 h-32 border border-blue-400/20 rotate-45" style={{ filter: "blur(0.2px)" }} />
-        <div className="absolute bottom-1/4 left-1/4 w-24 h-24 border border-purple-400/20" />
+        
+        {/* Geometric Shapes */}
+        <div className="absolute top-1/4 right-1/4 w-32 h-32 border border-blue-400/20 rotate-45 animate-spin-slow" />
+        <div className="absolute bottom-1/4 left-1/4 w-24 h-24 border border-purple-400/20 animate-spin-reverse" />
+        
+        {/* Circuit Lines */}
+        <svg className="absolute inset-0 w-full h-full opacity-10">
+          <line x1="10%" y1="20%" x2="30%" y2="20%" stroke="currentColor" strokeWidth="1" className="text-blue-400 animate-pulse" />
+          <circle cx="30%" cy="20%" r="3" fill="currentColor" className="text-blue-400" />
+          <line x1="30%" y1="20%" x2="30%" y2="40%" stroke="currentColor" strokeWidth="1" className="text-blue-400 animate-pulse" />
+          
+          <line x1="70%" y1="60%" x2="90%" y2="60%" stroke="currentColor" strokeWidth="1" className="text-purple-400 animate-pulse" />
+          <circle cx="70%" cy="60%" r="3" fill="currentColor" className="text-purple-400" />
+          <line x1="70%" y1="60%" x2="70%" y2="80%" stroke="currentColor" strokeWidth="1" className="text-purple-400 animate-pulse" />
+        </svg>
       </div>
 
-      {/* Navigation (use separate Navbar component file if you like) */}
+      {/* Navigation */}
       <nav className="relative z-50 flex items-center justify-between px-8 py-6">
         <div className="flex items-center space-x-2">
           <Sparkles className="w-6 h-6 text-blue-400" />
@@ -192,15 +114,17 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="relative z-10 px-8 pt-20 pb-32 text-center">
+        {/* Update Badge */}
         <div className="inline-flex items-center space-x-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full mb-8 backdrop-blur-sm">
           <Sparkles className="w-4 h-4 text-blue-400" />
           <span className="text-sm">Update 2.0 - AI Integration</span>
         </div>
 
+        {/* Main Heading */}
         <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
             Revolutionize
-          </span>{" "}
+          </span>{' '}
           your digital<br />
           saas products
         </h1>
@@ -209,12 +133,14 @@ export default function LandingPage() {
           Create stunning, professional-quality websites in record time with our powerful UI kit. Elevate your SAAS game today!
         </p>
 
-        {/* small dashboard preview omitted for brevity in this snippet */}
+        {/* Dashboard Preview */}
         <div className="max-w-5xl mx-auto relative">
-          <div className="absolute inset-0 bg-blue-500/12 blur-3xl rounded-full" />
+          {/* Glow effect */}
+          <div className="absolute inset-0 bg-blue-500/20 blur-3xl rounded-full" />
+          
           <div className="relative bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
-            {/* content retained from your original code (sidebar / cards) */}
             <div className="flex gap-8">
+              {/* Sidebar */}
               <div className="w-48 space-y-4">
                 <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center mb-8">
                   <BarChart3 className="w-6 h-6" />
@@ -226,22 +152,21 @@ export default function LandingPage() {
                 <NavItem icon={<CreditCard />} text="Payouts" />
                 <NavItem icon={<Settings />} text="Settings" />
               </div>
+
+              {/* Main Content */}
               <div className="flex-1">
+                {/* Header */}
                 <div className="flex items-center justify-between mb-8">
                   <div>
                     <p className="text-gray-400 text-sm mb-1">Good Morning</p>
                     <h2 className="text-2xl font-bold">Welcome</h2>
                   </div>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
-                    <input
-                      type="text"
-                      placeholder="Search"
-                      className="pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm w-64 focus:outline-none focus:border-blue-500"
-                    />
+                  <div className="absolute top-1/3 left-1/4 w-16 h-16 bg-gradient-to-br from-pink-400 to-rose-400 rounded-full animate-[orbit_8s_linear_infinite] shadow-lg shadow-pink-500/50 flex items-center justify-center text-2xl">
+                    ⭐
                   </div>
                 </div>
 
+                {/* Stats Cards */}
                 <div className="grid grid-cols-4 gap-4 mb-8">
                   <StatCard label="Activity" value="$540.50" trend="up" />
                   <StatCard label="Total Amount" value="$682.5" chart />
@@ -249,6 +174,7 @@ export default function LandingPage() {
                   <StatCard label="Active Now" value="$350.4" mini />
                 </div>
 
+                {/* Balance Section */}
                 <div className="bg-white/5 border border-white/10 rounded-xl p-6">
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center space-x-2">
@@ -258,51 +184,136 @@ export default function LandingPage() {
                         On track
                       </span>
                     </div>
-                    <select className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-sm">
-                      <option>Monthly</option>
-                    </select>
+                  ))}
+                </div>
+                
+                {/* Floating Particles */}
+                {[...Array(8)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute w-2 h-2 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full animate-[float_3s_ease-in-out_infinite]"
+                    style={{
+                      left: `${20 + Math.random() * 60}%`,
+                      top: `${20 + Math.random() * 60}%`,
+                      animationDelay: `${Math.random() * 2}s`
+                    }}
+                  ></div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="space-y-8 order-1 lg:order-2">
+              <div className="inline-block px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-sm font-medium text-purple-300 backdrop-blur-sm">
+                💰 Earn Passive Income
+              </div>
+              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight">
+                Investing In{' '}
+                <span className="relative inline-block">
+                  <span className="absolute -inset-1 bg-gradient-to-r from-pink-500 to-purple-500 blur-2xl opacity-50"></span>
+                  <span className="relative bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    Staking
+                  </span>
+                </span>
+                <br />
+                Get Passive Income
+              </h2>
+              <p className="text-gray-400 text-lg leading-relaxed">
+                Amet Minim Mollit Non Deserunt Ullamco Est Sit Aliqua Dolor Do Amet Sint. Velit Officia Consequat Duis Enim Velit Mollit. Exercitation Veniam.
+              </p>
+              <div className="flex flex-wrap gap-4">
+                <button className="group relative px-8 py-4 font-bold text-lg rounded-xl overflow-hidden transform hover:scale-105 transition-all duration-300">
+                  <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 bg-[length:200%_100%] animate-[gradient_3s_ease_infinite]"></div>
+                  <span className="relative z-10 flex items-center gap-2">
+                    Start Stake
+                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </span>
+                </button>
+                <button className="px-8 py-4 font-bold text-lg rounded-xl bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 hover:border-purple-400/50 transition-all duration-300 backdrop-blur-sm">
+                  Learn More
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Team Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+            <div className="inline-block px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-sm font-medium text-purple-300 backdrop-blur-sm mb-6">
+              👥 Our Leadership
+            </div>
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight">
+              Meet With Our
+              <br />
+              <span className="relative inline-block mt-2">
+                <span className="absolute -inset-1 bg-gradient-to-r from-pink-500 to-purple-500 blur-2xl opacity-50"></span>
+                <span className="relative bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  Team
+                </span>
+              </span>
+            </h2>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {team.map((member, i) => (
+              <div
+                key={i}
+                className={`group transition-all duration-700 transform hover:scale-105 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}
+                style={{ transitionDelay: `${i * 200}ms` }}
+              >
+                <div className="relative h-full">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 rounded-3xl opacity-0 group-hover:opacity-100 blur-xl transition duration-500 animate-[gradient_3s_ease_infinite] bg-[length:200%_100%]"></div>
+                  <div className="relative h-full bg-gradient-to-br from-purple-950/80 via-purple-900/50 to-pink-900/50 rounded-3xl overflow-hidden border border-purple-500/20 backdrop-blur-xl">
+                    {/* Top Gradient Bar */}
+                    <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-br from-pink-500 via-purple-500 to-pink-500 bg-[length:200%_100%] animate-[gradient_3s_ease_infinite]"></div>
+                    
+                    {/* Content */}
+                    <div className="relative p-8 flex flex-col items-center pt-20">
+                      {/* Profile Image */}
+                      <div className="relative mb-6 group-hover:scale-110 transition-transform duration-500">
+                        <div className="absolute -inset-2 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full blur-lg opacity-50"></div>
+                        <div className="relative w-28 h-28 rounded-full border-4 border-purple-900/50 overflow-hidden ring-4 ring-purple-500/20">
+                          <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                        </div>
+                        {/* Online Status Dot */}
+                        <div className="absolute bottom-2 right-2 w-4 h-4 bg-green-400 rounded-full border-2 border-purple-900 animate-pulse"></div>
+                      </div>
+                      
+                      {/* Name & Role */}
+                      <h3 className="text-xl font-black mb-1 text-white">{member.name}</h3>
+                      <p className="text-sm font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent mb-6">{member.role}</p>
+                      
+                      {/* Description */}
+                      <p className="text-sm text-gray-400 text-center leading-relaxed mb-6">
+                        Amet Minim Mollit Non Deserunt Ullamco Est Sit Aliqua Dolor Do Amet Sint. Velit Mollit. Exercitation Veniam Consequat Sunt Nostrud Amet.
+                      </p>
+                      
+                      {/* Social Links */}
+                      <div className="flex gap-2">
+                        {[Twitter, MessageCircle, Send].map((Icon, idx) => (
+                          <button
+                            key={idx}
+                            className="p-2 bg-purple-500/10 hover:bg-purple-500/20 rounded-lg transition-all duration-300 transform hover:scale-110 border border-purple-500/20"
+                          >
+                            <Icon size={16} className="text-purple-300" />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-4 mb-6">
-                    <div>
-                      <p className="text-gray-400 text-xs mb-1">Total Balance</p>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-2xl font-bold">43.50%</span>
-                        <span className="flex items-center text-green-400 text-xs">
-                          <TrendingUp className="w-3 h-3 mr-1" />
-                          +4.5%
-                        </span>
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-gray-400 text-xs mb-1">Income</p>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-xl font-semibold">$52,422</span>
-                        <span className="flex items-center text-red-400 text-xs">
-                          <TrendingDown className="w-3 h-3 mr-1" />
-                          -2.4%
-                        </span>
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-gray-400 text-xs mb-1">Expenses</p>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-xl font-semibold">$52,422</span>
-                        <span className="flex items-center text-red-400 text-xs">
-                          <TrendingDown className="w-3 h-3 mr-1" />
-                          -1.2%
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
+                  {/* Chart */}
                   <div className="relative h-32">
                     <div className="absolute inset-0 flex items-center justify-center">
                       <button className="w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/20 transition">
                         <Play className="w-5 h-5 ml-1" />
                       </button>
                     </div>
-                    <svg className="w-full h-full" viewBox="0 0 600 120" preserveAspectRatio="none">
+                    <svg className="w-full h-full" viewBox="0 0 600 120">
                       <path
                         d="M 0,80 Q 50,70 100,75 T 200,60 T 300,50 T 400,70 T 500,65 T 600,55"
                         fill="none"
@@ -319,6 +330,7 @@ export default function LandingPage() {
                   </div>
                 </div>
 
+                {/* Timeline Cards */}
                 <div className="grid grid-cols-2 gap-4 mt-6">
                   <TimelineCard title="Your Timeline" value="$25,216" />
                   <TimelineCard title="Your Timeline" value="$25,216" />
@@ -328,6 +340,7 @@ export default function LandingPage() {
           </div>
         </div>
 
+        {/* Partner Logos */}
         <div className="flex items-center justify-center space-x-12 mt-20 opacity-50">
           <span className="text-sm font-semibold">SQUARESPACE</span>
           <span className="text-sm font-semibold">maze</span>
@@ -337,14 +350,14 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features Section - keep same as before */}
+      {/* Features Section */}
       <section className="relative z-10 px-8 py-20">
         <div className="text-center mb-16">
           <p className="text-blue-400 text-sm uppercase tracking-wider mb-4">HOW IT WORKS</p>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-orange-400">
               Powerful
-            </span>{" "}
+            </span>{' '}
             growth solutions
           </h2>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
@@ -358,7 +371,6 @@ export default function LandingPage() {
             title="Expert Guidance"
             description="Create stunning, professional-quality websites in record time with our powerful UI kit."
           />
-          {/* other feature cards... */}
           <FeatureCard
             icon={<div className="relative w-24 h-24">
               <div className="absolute inset-0 border-4 border-blue-500 rounded-full" />
@@ -369,11 +381,59 @@ export default function LandingPage() {
             title="Fast and Easy Setup"
             description="Create stunning, professional-quality websites in record time with our powerful UI kit."
           />
+          <FeatureCard
+            icon={<div className="relative w-24 h-24">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-lg transform -rotate-12" />
+              <BarChart3 className="absolute inset-0 m-auto w-12 h-12 text-pink-400" />
+            </div>}
+            title="Advanced Analytics"
+            description="Create stunning, professional-quality websites in record time with our powerful UI kit."
+          />
+          <FeatureCard
+            icon={<div className="relative w-24 h-24">
+              <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900 rounded-lg" />
+              <div className="absolute top-4 left-4 right-4 h-1 bg-slate-600 rounded" />
+              <div className="absolute top-8 left-4 right-8 h-1 bg-slate-600 rounded" />
+              <div className="absolute bottom-12 left-4 right-4 h-12 bg-gradient-to-b from-slate-600 to-slate-700 rounded" />
+            </div>}
+            title="Seamless Integration"
+            description="Create stunning, professional-quality websites in record time with our powerful UI kit."
+            badge="AI Integration"
+            cta="Get Started"
+          />
+          <FeatureCard
+            icon={<div className="relative w-24 h-24">
+              <div className="absolute top-0 left-4 w-12 h-16 bg-gradient-to-br from-pink-400 to-purple-500 rounded-lg transform rotate-12" />
+              <div className="absolute top-8 left-0 w-12 h-16 bg-slate-700 rounded-lg" />
+              <div className="absolute top-4 right-4 w-12 h-12 bg-gradient-to-br from-slate-600 to-slate-800 rounded-lg transform -rotate-12" />
+            </div>}
+            title="Customizable Solutions"
+            description="Create stunning, professional-quality websites in record time with our powerful UI kit."
+          />
         </div>
-      </section>
+      </footer>
 
-      {/* inline css animations kept for subtle effects */}
       <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33% { transform: translate(30px, -30px) scale(1.1); }
+          66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+        @keyframes float-delayed {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33% { transform: translate(-40px, 30px) scale(1.15); }
+          66% { transform: translate(30px, -20px) scale(0.85); }
+        }
+        @keyframes float-slow {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(20px, -40px) scale(1.05); }
+        }
+        @keyframes float-particle {
+          0%, 100% { transform: translate(0, 0); opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { transform: translate(100px, -100px); opacity: 0; }
+        }
         @keyframes scan {
           0% { top: -2px; opacity: 0; }
           50% { opacity: 1; }
@@ -384,22 +444,44 @@ export default function LandingPage() {
           50% { opacity: 1; }
           100% { top: 100%; opacity: 0; }
         }
+        @keyframes spin-slow {
+          from { transform: rotate(45deg); }
+          to { transform: rotate(405deg); }
+        }
+        @keyframes spin-reverse {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(-360deg); }
+        }
+        .animate-float {
+          animation: float 20s ease-in-out infinite;
+        }
+        .animate-float-delayed {
+          animation: float-delayed 25s ease-in-out infinite;
+        }
+        .animate-float-slow {
+          animation: float-slow 30s ease-in-out infinite;
+        }
         .animate-scan {
-          animation: scan 10s linear infinite;
+          animation: scan 8s linear infinite;
         }
         .animate-scan-delayed {
-          animation: scan-delayed 10s linear infinite 3s;
+          animation: scan-delayed 8s linear infinite 4s;
+        }
+        .animate-spin-slow {
+          animation: spin-slow 30s linear infinite;
+        }
+        .animate-spin-reverse {
+          animation: spin-reverse 25s linear infinite;
         }
       `}</style>
     </div>
   );
 }
 
-/* helper subcomponents (the same as you used) */
-function NavItem({ icon, text, active }: { icon: React.ReactNode; text: string; active?: boolean }) {
+function NavItem({ icon, text, active }) {
   return (
     <div className={`flex items-center space-x-3 px-4 py-2 rounded-lg cursor-pointer transition ${
-      active ? "bg-white/10 text-white" : "text-gray-400 hover:text-white hover:bg-white/5"
+      active ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'
     }`}>
       <div className="w-5 h-5">{icon}</div>
       <span className="text-sm">{text}</span>
@@ -407,7 +489,7 @@ function NavItem({ icon, text, active }: { icon: React.ReactNode; text: string; 
   );
 }
 
-function StatCard({ label, value, trend, chart, mini }: any) {
+function StatCard({ label, value, trend, chart, mini }) {
   return (
     <div className="bg-white/5 border border-white/10 rounded-xl p-4">
       <p className="text-gray-400 text-xs mb-2">{label}</p>
@@ -432,7 +514,7 @@ function StatCard({ label, value, trend, chart, mini }: any) {
   );
 }
 
-function TimelineCard({ title, value }: any) {
+function TimelineCard({ title, value }) {
   return (
     <div className="bg-white/5 border border-white/10 rounded-xl p-4">
       <div className="flex items-start space-x-2 mb-4">
@@ -447,7 +529,7 @@ function TimelineCard({ title, value }: any) {
   );
 }
 
-function FeatureCard({ icon, title, description, badge, cta }: any) {
+function FeatureCard({ icon, title, description, badge, cta }) {
   return (
     <div className="bg-slate-900/50 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:border-blue-500/50 transition group">
       {badge && (
