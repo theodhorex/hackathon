@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ChevronRight, Shield, Lock, Zap, Home, Check, AlertCircle, Clock, Bell, TrendingUp, Flame, Heart } from "lucide-react";
+// import { ChevronRight, Shield, Lock, Zap, Home, Check, AlertCircle, Clock, Bell, TrendingUp, Flame, Heart } from "lucide-react";
 
 export default function IPShieldExtension() {
   const [currentPage, setCurrentPage] = useState("main");
