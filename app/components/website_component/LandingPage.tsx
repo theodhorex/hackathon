@@ -41,41 +41,59 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-blue-950 to-slate-950 text-white overflow-hidden">
-      {/* Animated Futuristic Background */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {/* Gradient Orbs */}
-        <div className="absolute top-20 left-20 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl animate-float" />
-        <div className="absolute top-40 right-20 w-96 h-96 bg-purple-500/30 rounded-full blur-3xl animate-float-delayed" />
-        <div className="absolute bottom-20 left-1/3 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl animate-float-slow" />
-        
-        {/* Grid Lines */}
-        <svg className="absolute inset-0 w-full h-full opacity-20">
-          <defs>
-            <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
-              <path d="M 50 0 L 0 0 0 50" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-blue-400" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-        </svg>
-        
-        {/* Floating Particles */}
-        {[...Array(30)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-2 h-2 bg-blue-400/40 rounded-full"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animation: `float-particle ${5 + Math.random() * 10}s infinite ease-in-out ${Math.random() * 5}s`
-            }}
-          />
-        ))}
-        
-        {/* Scanning Lines */}
-        <div className="absolute inset-0">
-          <div className="absolute w-full h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent animate-scan" />
-          <div className="absolute w-full h-px bg-gradient-to-r from-transparent via-purple-400/50 to-transparent animate-scan-delayed" />
+    <div className="min-h-screen bg-[#0a0118] text-white overflow-hidden relative">
+      {/* Animated Background Canvas */}
+      <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0" />
+      
+      {/* Grid Overlay */}
+      <div className="fixed inset-0 bg-[linear-gradient(rgba(139,92,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.03)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none z-0" />
+
+      {/* Navigation */}
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-700 ${scrollY > 50 ? 'bg-[#0a0118]/95 backdrop-blur-xl border-b border-purple-500/20 shadow-lg shadow-purple-500/5' : 'bg-transparent'} ${isVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="relative group cursor-pointer">
+              <div className="absolute -inset-2 bg-gradient-to-r from-pink-500 to-purple-500 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
+              <div className="relative text-2xl font-black bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                Genesis
+              </div>
+            </div>
+            
+            {/* Desktop Menu */}
+            <div className="hidden lg:flex space-x-8">
+              {['Home', 'Swap', 'Liquidity', 'Lock', 'Vote', 'Rewards'].map((item, i) => (
+                <a
+                  key={item}
+                  href="#"
+                  className="text-sm font-medium text-gray-300 hover:text-white transition-all duration-300 relative group"
+                  style={{ transitionDelay: `${i * 50}ms` }}
+                >
+                  {item}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-500 to-purple-500 group-hover:w-full transition-all duration-300"></span>
+                </a>
+              ))}
+              <button className="text-sm font-medium text-gray-300 hover:text-white transition-all duration-300 flex items-center gap-1">
+                More <ChevronDown size={16} />
+              </button>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button className="hidden sm:block p-2.5 bg-purple-500/10 hover:bg-purple-500/20 rounded-xl transition-all duration-300 transform hover:scale-110 hover:rotate-3 border border-purple-500/20">
+                <Twitter size={18} className="text-purple-300" />
+              </button>
+              <button className="hidden sm:block p-2.5 bg-pink-500/10 hover:bg-pink-500/20 rounded-xl transition-all duration-300 transform hover:scale-110 hover:-rotate-3 border border-pink-500/20">
+                <Send size={18} className="text-pink-300" />
+              </button>
+              <button className="relative px-6 py-2.5 font-semibold text-sm rounded-xl overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 bg-[length:200%_100%] animate-[gradient_3s_ease_infinite]"></div>
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 transition-opacity duration-300"></div>
+                <span className="relative z-10">Swap Now</span>
+              </button>
+              <button className="lg:hidden p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
+          </div>
         </div>
         
         {/* Geometric Shapes */}
