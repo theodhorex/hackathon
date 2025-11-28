@@ -55,7 +55,7 @@ export default function LandingPage() {
             <div className="relative group cursor-pointer">
               <div className="absolute -inset-2 bg-gradient-to-r from-pink-500 to-purple-500 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
               <div className="relative text-2xl font-black bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Genesis
+                IP Shields
               </div>
             </div>
             
