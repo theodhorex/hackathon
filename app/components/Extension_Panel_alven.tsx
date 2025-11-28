@@ -1,125 +1,344 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { ChevronRight, Shield, Lock, Zap, Home, Check, AlertCircle, Clock, Bell, TrendingUp, Flame, Heart } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { ChevronRight, Shield, Lock, Zap, Home, Check, AlertCircle, Clock, Bell, TrendingUp, Flame, Heart, Sparkles, Cpu, Code, BookOpen, X, Menu, Aperture, FileText, Loader2, Link as LinkIcon, Power, Activity, Search, Globe, ShieldCheck, AlertTriangle, DollarSign, PenTool, StopCircle } from "lucide-react";
+
+// =================================================================
+// KOMPONEN LOGO CUSTOM
+// =================================================================
+const IPShieldLogo = ({ size = 24, className = "" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <defs>
+      <linearGradient id="shieldGradient" x1="12" y1="2" x2="12" y2="22" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stopColor="#22d3ee" />
+        <stop offset="100%" stopColor="#0891b2" />
+      </linearGradient>
+      <filter id="glow" x="-4" y="-4" width="32" height="32" filterUnits="userSpaceOnUse">
+        <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+        <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="url(#shieldGradient)" stroke="#a5f3fc" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" filter="url(#glow)"/>
+    <path d="M12 6v6m0 0l3-3m-3 3l-3-3m3 8v-2" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.8"/>
+  </svg>
+);
+
+// =================================================================
+// KONFIGURASI TEMA
+// =================================================================
+const THEME_COLORS = {
+  YAKOA_GRADIENT: "from-blue-500/90 to-cyan-500/90",
+  STORY_GRADIENT: "from-purple-500/90 to-pink-500/90",
+  EMERALD_GRADIENT: "from-emerald-500/90 to-green-500/90", 
+  BASE_DARK: 'bg-[#0a0f1d]',
+};
+
+// =================================================================
+// DATA MOCK UNTUK DROPDOWN & STATUS (P0-2)
+// =================================================================
+const LICENSE_OPTIONS = [
+    { id: 'COMMERCIAL_USE', label: 'Commercial Use', desc: 'Allow commercial use with royalty', icon: <DollarSign className="w-3.5 h-3.5" />, royaltyEnabled: true },
+    { id: 'NON_COMMERCIAL', label: 'Non-Commercial Only', desc: 'Free for personal use only', icon: <PenTool className="w-3.5 h-3.5" />, royaltyEnabled: false },
+    { id: 'NO_DERIVATIVES', label: 'No Derivatives', desc: 'Cannot be modified or remixed', icon: <StopCircle className="w-3.5 h-3.5" />, royaltyEnabled: false },
+];
+const TYPE_OPTIONS = [
+    { id: 'IMAGE', label: 'Image', icon: <Aperture className="w-3.5 h-3.5" /> },
+    { id: 'AUDIO', label: 'Audio', icon: <Bell className="w-3.5 h-3.5" /> },
+    { id: 'VIDEO', label: 'Video', icon: <Zap className="w-3.5 h-3.5" /> },
+    { id: 'TEXT', label: 'Text/Book', icon: <FileText className="w-3.5 h-3.5" /> },
+];
+
+const STATUS_COLORS = {
+  ORIGINAL: {
+    bg: 'bg-emerald-500/90 border-emerald-400/30',
+    text: 'text-white',
+    icon: <Check className="w-3 h-3" />,
+    label: 'Original'
+  },
+  BRAND_IP_DETECTED: {
+    bg: 'bg-orange-500/90 border-orange-400/30',
+    text: 'text-white',
+    icon: <AlertTriangle className="w-3 h-3" />,
+    label: 'Brand IP'
+  },
+  ALREADY_REGISTERED: {
+    bg: 'bg-red-500/90 border-red-400/30',
+    text: 'text-white',
+    icon: <Lock className="w-3 h-3" />,
+    label: 'Registered'
+  },
+  PROCESSING: {
+    bg: 'bg-blue-500/90 border-blue-400/30',
+    text: 'text-white',
+    icon: <Loader2 className="w-3 h-3 animate-spin" />,
+    label: 'Analyzing'
+  },
+  PROTECTED: { // New status for registered local file
+    bg: 'bg-purple-500/90 border-purple-400/30',
+    text: 'text-white',
+    icon: <ShieldCheck className="w-3 h-3" />,
+    label: 'Protected'
+  }
+};
+
 
 export default function IPShieldExtension() {
+  // =================================================================
+  // STATE MANAGEMENT
+  // =================================================================
   const [currentPage, setCurrentPage] = useState("main");
   const [activeTab, setActiveTab] = useState("content");
-  const [showSidebar, setShowSidebar] = useState(false);
-  const [selectedContent, setSelectedContent] = useState(null);
-  const [alerts, setAlerts] = useState([]);
+  
+  // Views States
+  const [showSidebar, setShowSidebar] = useState(false);       
+  const [showAnalysisView, setShowAnalysisView] = useState(false); 
+  const [showRegisterView, setShowRegisterView] = useState(false); 
+  
+  // Data State
+  const [activeContent, setActiveContent] = useState(null); // Konten yang sedang diproses (dari halaman web)
+  const [isMonitoring, setIsMonitoring] = useState(true);
   const [notificationQueue, setNotificationQueue] = useState([]);
-  const [isMonitoring, setIsMonitoring] = useState(false);
+  const [isSidebarClosing, setIsSidebarClosing] = useState(false);
+  const canvasRef = useRef(null);
+  
+  // NEW STATES for Quick Protect
+  const [showQuickProtectSuccess, setShowQuickProtectSuccess] = useState(false);
+  const [quickProtectSuccessData, setQuickProtectSuccessData] = useState(null);
 
-  // Mock alerts data with timestamps
+  // =================================================================
+  // DATA MOCK (Sesuai P0 & P2)
+  // =================================================================
   const mockAlerts = [
-    {
-      id: 1,
-      type: "infringement",
-      severity: "high",
-      title: "Infringement Detected!",
-      description: "Your artwork 'Digital Dream' found on unauthorized platform",
-      detailedInfo: "Detected on pinterest.com/user/unknown - 95% similarity match",
-      timestamp: new Date(Date.now() - 5 * 60000),
-      ipId: "0x123...abc",
-      action: "View Details",
-      icon: "⚠️",
-      color: "from-red-500 to-orange-500",
-    },
-    {
-      id: 2,
-      type: "registered",
-      severity: "low",
-      title: "Registration Successful!",
-      description: "Your NFT 'Original Art #47' is now on Story Protocol",
-      detailedInfo: "Transaction hash: 0x8f4e2c3a9b7d1e5f...",
-      timestamp: new Date(Date.now() - 15 * 60000),
-      ipId: "0x456...def",
-      action: "View on Explorer",
-      icon: "✅",
-      color: "from-green-500 to-emerald-500",
-    },
-    {
-      id: 3,
-      type: "new_registration",
-      severity: "medium",
-      title: "Similar Content Found",
-      description: "Content similar to your work detected in Yakoa network",
-      detailedInfo: "89% similarity - registered by 0x789...ghi",
-      timestamp: new Date(Date.now() - 45 * 60000),
-      ipId: "0x789...ghi",
-      action: "Check Now",
-      icon: "🔍",
-      color: "from-blue-500 to-cyan-500",
-    },
-    {
-      id: 4,
-      type: "earning",
-      severity: "low",
-      title: "Royalty Earned!",
-      description: "You received $12.45 in royalties from 'Photography Series'",
-      detailedInfo: "Earned from 3 license uses this week",
-      timestamp: new Date(Date.now() - 2 * 3600000),
-      ipId: "0xabc...jkl",
-      action: "View Earnings",
-      icon: "💰",
-      color: "from-amber-500 to-yellow-500",
-    },
+    { id: 1, type: "infringement", severity: "high", title: "🚨 New Infringement Detected", description: "Your artwork 'Neon City' appeared on OpenSea", detailedInfo: "Similarity: 98% (Exact Match) - User: 0xBad...Actor", timestamp: new Date(Date.now() - 5 * 60000), ipId: "0x123...abc", action: "View Report", icon: "⚠️", color: "from-red-500 via-rose-500 to-red-600" },
+    { id: 2, type: "registered", severity: "low", title: "✅ IP Asset Minted", description: "Successfully registered 'Character Design #04'", detailedInfo: "Story Protocol Tx: 0x8f4e2...99a", timestamp: new Date(Date.now() - 15 * 60000), ipId: "0x456...def", action: "View on Explorer", icon: "⛓️", color: "from-purple-500 via-fuchsia-500 to-pink-600" },
+    { id: 3, type: "earning", severity: "low", title: "💰 Royalty Received", description: "You earned 50 USDC from Commercial License", detailedInfo: "License bought by: CreativeAgency_DAO", timestamp: new Date(Date.now() - 2 * 3600000), ipId: "0xabc...jkl", action: "Claim", icon: "💸", color: "from-amber-500 via-yellow-500 to-amber-600" },
   ];
 
-  const detectedContent = [
-    { id: 1, url: "https://via.placeholder.com/400x300/1a4d3a/ffffff?text=Image+1", type: "image", status: "original", confidence: 98, size: "1920x1080" },
-    { id: 2, url: "https://via.placeholder.com/400x300/27835c/ffffff?text=Image+2", type: "image", status: "brand_ip", confidence: 95, brand: "Nike", size: "1280x720" },
-    { id: 3, url: "https://via.placeholder.com/400x300/8dc9b0/ffffff?text=Image+3", type: "image", status: "registered", confidence: 87, owner: "0x742d...5678", size: "2560x1440" },
-  ];
+  // Data konten simulasi hasil scan halaman (P0 - Auto Content Detection & Smart IP Analysis)
+  const [detectedContent, setDetectedContent] = useState([
+    { id: 1, url: "https://via.placeholder.com/400x300/100030/ffffff?text=Original+Art", type: "image", status: "ORIGINAL", confidence: 100, size: "1920x1080", title: "Cyber Punk Character", alt: "Cyber Punk Character" },
+    { id: 2, url: "https://via.placeholder.com/400x300/200040/ffffff?text=Nike+Logo+Detect", type: "image", status: "BRAND_IP_DETECTED", brand: "Nike Inc.", confidence: 95, size: "800x600", title: "Sneaker Concept", alt: "Sneaker Concept" },
+    { id: 3, url: "https://via.placeholder.com/400x300/300050/ffffff?text=Registered+Asset", type: "image", status: "ALREADY_REGISTERED", owner: "0x742d...5678", confidence: 100, size: "2560x1440", title: "Abstract Wave", alt: "Abstract Wave" },
+    { id: 4, url: "https://via.placeholder.com/400x300/400060/ffffff?text=My+Music+Track", type: "audio", status: "ORIGINAL", confidence: 100, size: "3:45 min", title: "Synthwave Track 01", alt: "Synthwave Track 01" },
+  ]);
 
-  const protectedIPs = [
-    { id: 1, url: "https://via.placeholder.com/200x150/1a4d3a/ffffff?text=Protected+1", title: "Original Artwork #1", status: "protected", earnings: "$12.45", storyId: "0x123...abc" },
-    { id: 2, url: "https://via.placeholder.com/200x150/27835c/ffffff?text=Protected+2", title: "Photography Series", status: "protected", earnings: "$34.20", storyId: "0x456...def" },
-    { id: 3, url: "https://via.placeholder.com/200x150/8dc9b0/ffffff?text=Protected+3", title: "Design Concept", status: "pending", earnings: "$0.00", storyId: "0x789...ghi" },
-    { id: 4, url: "https://via.placeholder.com/200x150/1a4d3a/ffffff?text=Protected+4", title: "Brand Identity", status: "protected", earnings: "$56.80", storyId: "0xabc...jkl" },
-  ];
+  // UBAH: protectedIPs menjadi state agar bisa ditambahkan item baru
+  const [protectedIPs, setProtectedIPs] = useState([
+    { id: 1, url: "https://via.placeholder.com/200x150/100030/ffffff?text=Protected+1", title: "Neon City v2", status: "protected", earnings: "$45.20", alerts: 0, storyId: "0x123...abc" },
+    { id: 2, url: "https://via.placeholder.com/200x150/200040/ffffff?text=Protected+2", title: "Photo Collection", status: "protected", earnings: "$124.50", alerts: 2, storyId: "0x456...def" },
+    { id: 3, url: "https://via.placeholder.com/200x150/400060/ffffff?text=Protected+3", title: "Brand Logo", status: "protected", earnings: "$890.00", alerts: 0, storyId: "0xabc...jkl" },
+  ]);
 
   const tabs = [
-    { id: "content", title: "Detect", icon: "📸", description: "Scan for original content" },
-    { id: "ip", title: "Analyze", icon: "🔍", description: "Deep IP analysis" },
-    { id: "register", title: "Register", icon: "✍️", description: "Story registration" },
+    { 
+      id: "content", 
+      title: "Detect & Protect", 
+      actionLabel: "Start Detection", 
+      icon: <Zap className="w-5 h-5" />, 
+      description: "Auto-scan page content & analyze with Yakoa.", 
+      gradient: THEME_COLORS.YAKOA_GRADIENT 
+    },
+    { 
+      id: "ip", 
+      title: "IP Analysis", 
+      actionLabel: "Start IP Analysis", 
+      icon: <Cpu className="w-5 h-5" />, 
+      description: "Deep content fingerprinting & risk assessment.", 
+      gradient: "from-teal-500/90 to-cyan-500/90" 
+    },
+    { 
+      id: "register", 
+      title: "Register IP", 
+      actionLabel: "Start Registration", 
+      icon: <Code className="w-5 h-5" />, 
+      description: "One-click registration to Story Protocol.", 
+      gradient: THEME_COLORS.STORY_GRADIENT 
+    },
   ];
-
-  // Simulate monitoring
-  useEffect(() => {
-    if (isMonitoring) {
-      const interval = setInterval(() => {
-        const randomAlert = mockAlerts[Math.floor(Math.random() * mockAlerts.length)];
-        const newAlert = { ...randomAlert, id: Date.now() };
-        setNotificationQueue((prev) => [...prev, newAlert]);
-        
-        // Auto remove notification after 6 seconds
-        setTimeout(() => {
-          setNotificationQueue((prev) => prev.filter((a) => a.id !== newAlert.id));
-        }, 6000);
-      }, 8000);
-
-      return () => clearInterval(interval);
-    }
-  }, [isMonitoring]);
 
   const currentTab = tabs.find((t) => t.id === activeTab);
 
-  // ============= NOTIFICATION TOAST =============
+  // =================================================================
+  // LOGIC & EFFECTS
+  // =================================================================
+
+  // ... [Animasi Background Effect - Tidak diubah] ...
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    canvas.width = 400;
+    canvas.height = 600;
+    
+    const particles = [];
+    const MAX_PARTICLES = 80;
+    
+    for (let i = 0; i < MAX_PARTICLES; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        size: Math.random() * 1.5 + 0.3,
+        opacity: Math.random() * 0.4 + 0.1
+      });
+    }
+    
+    let animationId;
+    const animate = () => {
+      ctx.fillStyle = 'rgba(10, 15, 25, 0.2)'; 
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      particles.forEach((p, i) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+        
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 3);
+        gradient.addColorStop(0, `rgba(100, 255, 255, ${p.opacity})`);
+        gradient.addColorStop(1, 'rgba(100, 255, 255, 0)');
+        ctx.fillStyle = gradient;
+        ctx.fill();
+        
+        particles.slice(i + 1).forEach(p2 => {
+          const dx = p2.x - p.x;
+          const dy = p2.y - p.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          if (dist < 90) {
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = `rgba(100, 255, 255, ${(1 - dist / 90) * 0.15})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        });
+      });
+      
+      animationId = requestAnimationFrame(animate);
+    };
+    animate();
+    return () => cancelAnimationFrame(animationId);
+  }, []);
+  // ... [Monitoring Background Process - Tidak diubah] ...
+  useEffect(() => {
+    let interval;
+    if (isMonitoring) {
+      interval = setInterval(() => {
+        setNotificationQueue((prevQueue) => {
+          if (prevQueue.length === 0) {
+            const randomAlert = mockAlerts[Math.floor(Math.random() * mockAlerts.length)];
+            const newAlert = { ...randomAlert, id: Date.now() };
+            setTimeout(() => {
+                setNotificationQueue((currentQueue) => currentQueue.filter((a) => a.id !== newAlert.id));
+            }, 5000);
+            return [...prevQueue, newAlert];
+          }
+          return prevQueue;
+        });
+      }, 10000); // Check every 10s
+    } else {
+        setNotificationQueue([]);
+    }
+    return () => clearInterval(interval);
+  }, [isMonitoring]);
+
+  // Handlers
+  const closeAllOverlays = () => {
+    setIsSidebarClosing(true);
+    setTimeout(() => {
+        setShowSidebar(false);
+        setShowRegisterView(false);
+        setShowAnalysisView(false);
+        setIsSidebarClosing(false);
+        setActiveContent(null);
+    }, 300);
+  };
+
+  const openRegisterForContent = (content) => {
+    setActiveContent(content); // Set konten spesifik
+    setShowRegisterView(true); // Buka form
+  };
+  
+  const updateContentStatus = (id, newStatus) => {
+    setDetectedContent(prev => 
+        prev.map(content => 
+            content.id === id ? { ...content, status: newStatus } : content
+        )
+    );
+  };
+
+  // HANDLER: Add new IP to the dashboard list
+  const addProtectedIP = (ipData) => {
+    setProtectedIPs(prev => [
+        { 
+            id: Date.now(), // Unique ID
+            url: ipData.previewUrl || "https://via.placeholder.com/200x150/7000A0/ffffff?text=IP+NFT", // Gunakan URL preview atau placeholder
+            title: ipData.title, 
+            status: "protected", 
+            earnings: "$0.00", // Start with 0 earnings
+            alerts: 0, 
+            storyId: "0x" + Math.random().toString(16).substring(2, 8) + "..." // Mock ID
+        }, 
+        ...prev // Add new IP at the front
+    ]);
+  };
+  
+  // NEW HANDLER: Quick Protect for detected content (Skip form)
+  const quickProtect = (content) => {
+      // 1. Setup Status & Close Sidebar
+      setShowSidebar(false); // Close sidebar immediately
+      
+      const registeredIpData = {
+          title: content.title,
+          assetType: content.type.toUpperCase(),
+          previewUrl: content.url, 
+          status: 'PROCESSING' 
+      };
+      setQuickProtectSuccessData(registeredIpData);
+      setShowQuickProtectSuccess(true);
+
+
+      setTimeout(() => {
+          // 2. Add to Dashboard (Final Action)
+          addProtectedIP(registeredIpData); 
+
+          // 3. Update status in detected list
+          updateContentStatus(content.id, 'PROTECTED');
+          
+          // 4. Update status in success view
+          setQuickProtectSuccessData({...registeredIpData, status: 'PROTECTED'}); 
+
+      }, 2000); // 2 second delay for simulation
+  }
+
+  // =================================================================
+  // SUB-KOMPONEN
+  // =================================================================
+
   const NotificationToast = ({ alert, isFirst }) => (
-    <div className={`fixed ${isFirst ? "top-6 right-6" : "top-24 right-6"} z-50 max-w-sm animate-in slide-in-from-right-96 duration-300`}>
-      <div className={`bg-gradient-to-r ${alert.color} rounded-xl shadow-2xl overflow-hidden border border-white/20 backdrop-blur-xl`}>
-        <div className="p-4 text-white">
-          <div className="flex items-start gap-3">
-            <span className="text-3xl animate-bounce">{alert.icon}</span>
-            <div className="flex-1">
-              <h3 className="font-bold text-sm mb-0.5">{alert.title}</h3>
-              <p className="text-xs opacity-90 mb-2">{alert.description}</p>
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] opacity-75">Just now</span>
-                <button className="text-xs font-bold opacity-90 hover:opacity-100 underline">{alert.action}</button>
+    <div className={`fixed ${isFirst ? "top-6 right-6" : "top-24 right-6"} z-[60] max-w-sm animate-in slide-in-from-right-96 duration-300`}>
+      <div className="relative group cursor-pointer" onClick={() => setCurrentPage('alerts')}>
+        <div className={`absolute -inset-1 bg-gradient-to-r ${alert.color} rounded-2xl opacity-40 blur-lg group-hover:opacity-60 transition-opacity`}></div>
+        <div className={`relative bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 rounded-2xl shadow-2xl overflow-hidden border border-cyan-500/30 backdrop-blur-xl hover:scale-105 transition-transform duration-300`}>
+          <div className={`absolute inset-0 bg-gradient-to-r ${alert.color} opacity-5`}></div>
+          <div className="relative p-4 text-white">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl animate-pulse drop-shadow-[0_0_10px_rgba(100,255,255,0.5)]">{alert.icon}</span>
+              <div className="flex-1">
+                <h3 className="font-bold text-sm mb-0.5 text-cyan-50">{alert.title}</h3>
+                <p className="text-xs text-gray-300 mb-2">{alert.description}</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-cyan-400 font-medium">Just now</span>
+                  <span className="text-xs font-bold text-cyan-400 hover:text-cyan-300 underline transition-colors">{alert.action}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -128,413 +347,976 @@ export default function IPShieldExtension() {
     </div>
   );
 
-  // ============= MAIN PANEL VIEW =============
   const MainPanelView = () => (
-    <div className="w-full h-full bg-gradient-to-b from-[#e8dcbb] to-[#f5f5f0] rounded-xl shadow-2xl overflow-hidden border border-[#1a4d3a]/10 flex flex-col">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-[#1a4d3a] to-[#27835c] px-6 py-5 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-0 right-0 w-40 h-40 bg-white rounded-full blur-3xl"></div>
-        </div>
+    <div className="w-full h-full flex flex-col relative z-10">
+      <div className="relative px-6 pt-5 pb-4 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/10 via-transparent to-transparent"></div>
         <div className="relative z-10">
+          
+          {/* HEADER */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="bg-white/95 p-2 rounded-lg shadow-lg">
-                <Shield className="w-5 h-5 text-[#1a4d3a]" />
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl blur-md opacity-50 group-hover:opacity-75 transition-opacity"></div>
+                <div className="relative bg-gradient-to-br from-blue-500 to-cyan-600 p-2 rounded-xl shadow-lg group-hover:scale-110 transition-transform">
+                  <IPShieldLogo size={20} />
+                </div>
               </div>
               <div>
-                <h1 className="text-white font-bold text-base">IP Shield</h1>
-                <p className="text-[#8dc9b0] text-xs font-medium">Yakoa × Story</p>
+                <h1 className="text-white font-black text-xl tracking-tight bg-gradient-to-r from-cyan-300 to-white bg-clip-text text-transparent drop-shadow-[0_0_5px_rgba(100,255,255,0.5)]">IP Shield</h1>
+                <p className="text-cyan-400 text-xs font-bold flex items-center gap-1">Yakoa <span className="text-purple-400 mx-0.5">|</span> Story</p>
               </div>
             </div>
-            <button
-              onClick={() => setCurrentPage("alerts")}
-              className="relative flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-sm hover:bg-white/20 transition-all"
-            >
-              <Bell className="w-4 h-4 text-white" />
-              <span className="text-white text-xs font-medium">Alerts</span>
-              {notificationQueue.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-5 h-5 rounded-full flex items-center justify-center animate-pulse">
-                  {notificationQueue.length}
-                </span>
-              )}
-            </button>
+
+            <div className="flex items-center gap-2">
+                {/* TOGGLE MONITORING */}
+                <button
+                    onClick={() => setIsMonitoring(!isMonitoring)}
+                    className={`relative p-2 rounded-lg transition-all duration-300 group hover:scale-110 active:scale-95 ${
+                        isMonitoring 
+                        ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.2)]' 
+                        : 'bg-gray-800/50 border border-gray-700 text-gray-400 hover:bg-gray-700/50'
+                    }`}
+                    title={isMonitoring ? "Monitoring Active" : "Monitoring Paused"}
+                >
+                    {isMonitoring ? (
+                        <>
+                            <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_5px_rgba(52,211,153,0.8)]"></span>
+                            <Activity className="w-4 h-4" />
+                        </>
+                    ) : (
+                        <Power className="w-4 h-4" />
+                    )}
+                </button>
+
+                {/* BELL */}
+                <button
+                    onClick={() => setCurrentPage("alerts")}
+                    className="relative flex items-center gap-2 group hover:scale-105 transition-transform active:scale-95"
+                >
+                    <div className="absolute -inset-2 bg-cyan-500/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="relative bg-gray-800/50 backdrop-blur-lg px-3 py-1.5 rounded-full border border-cyan-500/30 group-hover:border-cyan-400/50 transition-all">
+                        <div className="flex items-center gap-2">
+                        <Bell className={`w-4 h-4 text-cyan-400 ${isMonitoring ? 'group-hover:rotate-12 transition-transform' : ''}`} />
+                        <span className="text-cyan-50 text-xs font-medium">Alerts</span>
+                        </div>
+                    </div>
+                    {(mockAlerts.length > 0 || notificationQueue.length > 0) && (
+                        <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-orange-500 text-white text-[9px] font-bold w-5 h-5 rounded-full flex items-center justify-center animate-pulse shadow-lg shadow-red-500/50">
+                        {mockAlerts.length + notificationQueue.length}
+                        </span>
+                    )}
+                </button>
+            </div>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-3">
             {[
-              { label: "Detected", value: "12", icon: "📸" },
-              { label: "Protected", value: "8", icon: "🛡️" },
-              { label: "Alerts", value: mockAlerts.length, icon: "⚠️" },
+              { label: "Detected (Y)", value: detectedContent.length, icon: "📸", color: "from-blue-500 to-cyan-600" },
+              { label: "Protected (S)", value: protectedIPs.length, icon: "⛓️", color: "from-purple-500 to-pink-600" },
+              { label: "Alerts", value: mockAlerts.length, icon: "⚠️", color: "from-amber-500 to-yellow-600" },
             ].map((stat) => (
-              <div key={stat.label} className="bg-white/10 backdrop-blur-sm rounded-lg p-2.5 text-center border border-white/10">
-                <p className="text-[#8dc9b0] text-[10px] font-medium mb-1">{stat.label}</p>
-                <p className="text-white font-bold text-sm">{stat.value}</p>
+              <div key={stat.label} className="relative group cursor-pointer hover:scale-[1.05] transition-transform duration-300">
+                <div className={`absolute -inset-0.5 bg-gradient-to-r ${stat.color} rounded-xl opacity-20 blur group-hover:opacity-40 transition-opacity`}></div>
+                <div className="relative bg-gray-900/40 backdrop-blur-md rounded-xl p-2.5 text-center border border-cyan-500/20 group-hover:border-cyan-400/40 transition-all shadow-xl shadow-gray-950">
+                  <p className="text-cyan-400 text-[10px] font-bold mb-1 uppercase tracking-wider">{stat.label}</p>
+                  <p className="text-white font-black text-sm drop-shadow-[0_0_10px_rgba(100,255,255,0.3)]">{stat.value}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="px-6 pt-5 pb-4">
-        <div className="bg-white/60 backdrop-blur-sm rounded-lg p-1.5 flex gap-1.5 border border-white/50">
+      <div className="px-6 pt-3 pb-4">
+        <div className="relative bg-gray-900/30 backdrop-blur-md rounded-xl p-1.5 flex gap-1.5 border border-cyan-500/20">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex flex-col items-center gap-1.5 py-2.5 px-2 rounded-md font-medium text-xs transition-all duration-300 ${
-                activeTab === tab.id
-                  ? "bg-gradient-to-r from-[#1a4d3a] to-[#27835c] text-white shadow-lg scale-105"
-                  : "text-[#1a4d3a]/60 hover:text-[#1a4d3a]/80"
+              className={`relative flex-1 flex flex-col items-center gap-1.5 py-2.5 px-2 rounded-lg font-medium text-xs transition-all duration-300 overflow-hidden group hover:scale-[1.02] active:scale-95 ${
+                activeTab === tab.id ? "text-white shadow-xl shadow-cyan-900/50" : "text-gray-400 hover:text-cyan-300"
               }`}
             >
-              <span className="text-lg">{tab.icon}</span>
-              <span>{tab.title}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Content Area */}
-      <div className="flex-1 px-6 pb-5 overflow-y-auto">
-        <div className="flex flex-col gap-4">
-          <div className="flex justify-center">
-            <span className="bg-[#8dc9b0]/20 text-[#1a4d3a] px-3 py-1 rounded-full text-xs font-bold border border-[#8dc9b0]/30">
-              {activeTab === "content" && "🎯 Yakoa Powered"}
-              {activeTab === "ip" && "🔬 AI Analysis"}
-              {activeTab === "register" && "⛓️ Story Protocol"}
-            </span>
-          </div>
-
-          <div className="flex justify-center">
-            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#1a4d3a] to-[#27835c] flex items-center justify-center shadow-xl">
-              <span className="text-4xl">{currentTab?.icon}</span>
-            </div>
-          </div>
-
-          <div className="text-center space-y-1.5">
-            <h2 className="text-[#1a4d3a] font-bold text-lg">{currentTab?.title}</h2>
-            <p className="text-[#1a4d3a]/60 text-xs leading-relaxed px-2">{currentTab?.description}</p>
-          </div>
-
-          <button
-            onClick={() => {
-              if (activeTab === "content") setShowSidebar(true);
-            }}
-            className="w-full py-3 rounded-lg font-bold text-sm text-white bg-gradient-to-r from-[#1a4d3a] to-[#27835c] hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 group shadow-lg"
-          >
-            <span>Start {currentTab?.title}</span>
-            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </button>
-
-          <div className="bg-white/40 backdrop-blur-sm border border-[#1a4d3a]/10 rounded-lg p-3.5 space-y-2">
-            <div className="flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-[#27835c] flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-[#1a4d3a] font-bold text-[10px] uppercase tracking-wider mb-1">How it works</p>
-                <p className="text-[#1a4d3a]/70 text-xs leading-relaxed">
-                  {activeTab === "content" && "Automatically scan pages for images, videos & audio with instant Yakoa originality checks."}
-                  {activeTab === "ip" && "Detect IP infringements, brand matches & existing registrations with confidence scoring."}
-                  {activeTab === "register" && "Register your original content on Story Protocol blockchain with one-click licensing."}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div className="px-6 py-3 border-t border-[#1a4d3a]/10 flex items-center justify-between text-[10px] text-[#1a4d3a]/50">
-        <span className="font-medium">v1.0.0</span>
-        <button
-          onClick={() => setCurrentPage("dashboard")}
-          className="text-[#27835c] font-bold hover:text-[#1a4d3a] transition-colors flex items-center gap-1 group"
-        >
-          Dashboard <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-        </button>
-      </div>
-    </div>
-  );
-
-  // ============= CONTENT DETECTION SIDEBAR =============
-  const ContentSidebarView = () => (
-    <div className="w-full h-full bg-gradient-to-b from-[#e8dcbb] to-[#f5f5f0] rounded-xl shadow-2xl overflow-hidden border border-[#1a4d3a]/10 flex flex-col">
-      <div className="bg-gradient-to-r from-[#1a4d3a] to-[#27835c] px-5 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setShowSidebar(false)}
-            className="text-white bg-white/10 p-1.5 rounded-lg hover:bg-white/20 transition-all"
-          >
-            <ChevronRight className="w-4 h-4 rotate-180" />
-          </button>
-          <div>
-            <h2 className="text-white font-bold text-sm">Detected Content</h2>
-            <p className="text-[#8dc9b0] text-xs">Current Page</p>
-          </div>
-        </div>
-        <span className="bg-white/20 text-white px-2.5 py-1 rounded-full text-xs font-bold border border-white/30">{detectedContent.length}</span>
-      </div>
-
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-[#f5f5f0]">
-        {detectedContent.map((content) => (
-          <div
-            key={content.id}
-            className="bg-white rounded-xl overflow-hidden border border-[#1a4d3a]/10 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group"
-          >
-            <div className="relative w-full h-32 bg-gradient-to-br from-[#8dc9b0]/10 to-[#1a4d3a]/5 overflow-hidden">
-              <img src={content.url} alt="content" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
-              <div className="absolute top-2.5 right-2.5">
-                {content.status === "original" && (
-                  <div className="bg-[#27835c] text-white px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1.5 shadow-lg">
-                    <Check className="w-3 h-3" />
-                    Original
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="p-3 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[#1a4d3a] font-semibold text-xs">{content.size}</span>
-                <div className="flex items-center gap-2">
-                  <div className="w-12 h-1.5 bg-[#8dc9b0]/30 rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-[#27835c]"
-                      style={{ width: `${content.confidence}%` }}
-                    />
-                  </div>
-                  <span className="text-[#1a4d3a] font-bold text-xs w-8">{content.confidence}%</span>
-                </div>
-              </div>
-
-              {content.status === "original" && (
-                <button className="w-full mt-2 bg-gradient-to-r from-[#1a4d3a] to-[#27835c] text-white py-2 rounded-lg text-xs font-bold hover:shadow-lg transition-all">
-                  🛡️ Protect This
-                </button>
+              {activeTab === tab.id && (
+                <>
+                  <div className={`absolute inset-0 bg-gradient-to-r ${tab.gradient} opacity-80`}></div>
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.1),transparent_70%)]"></div>
+                  <div className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-4/5 h-0.5 bg-white shadow-[0_0_15px_rgba(255,255,255,0.7)] rounded-full"></div>
+                </>
               )}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="px-4 py-3 bg-white border-t border-[#1a4d3a]/10">
-        <button className="w-full bg-gradient-to-r from-[#1a4d3a] to-[#27835c] text-white py-2.5 rounded-lg font-bold text-sm hover:shadow-lg transition-all flex items-center justify-center gap-2">
-          🛡️ Protect All Original ({detectedContent.filter((c) => c.status === "original").length})
-        </button>
-      </div>
-    </div>
-  );
-
-  // ============= DASHBOARD VIEW =============
-  const DashboardView = () => (
-    <div className="w-full h-full bg-gradient-to-b from-[#e8dcbb] to-[#f5f5f0] rounded-xl shadow-2xl overflow-hidden border border-[#1a4d3a]/10 flex flex-col">
-      <div className="bg-gradient-to-r from-[#1a4d3a] to-[#27835c] px-6 py-5">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <button onClick={() => setCurrentPage("main")} className="text-white bg-white/10 p-2 rounded-lg hover:bg-white/20 transition-all">
-              <ChevronRight className="w-4 h-4 rotate-180" />
+              <span className={`relative text-lg group-hover:scale-110 transition-transform ${activeTab === tab.id ? 'drop-shadow-[0_0_10px_rgba(100,255,255,0.5)]' : ''}`}>{tab.icon}</span>
+              <span className="relative">{tab.title}</span>
             </button>
-            <div>
-              <h1 className="text-white font-bold text-base">Protected Assets</h1>
-              <p className="text-[#8dc9b0] text-xs font-medium">Your IP Shield</p>
-            </div>
-          </div>
-          <Home className="w-5 h-5 text-white" />
-        </div>
-
-        <div className="grid grid-cols-4 gap-2">
-          {[
-            { label: "Total", value: "47", icon: "📊" },
-            { label: "Protected", value: "45", icon: "🛡️" },
-            { label: "Earnings", value: "$234", icon: "💰" },
-            { label: "Pending", value: "2", icon: "⏳" },
-          ].map((stat) => (
-            <div key={stat.label} className="bg-white/10 backdrop-blur-sm rounded-lg p-2.5 text-center border border-white/10">
-              <p className="text-white text-lg mb-1">{stat.icon}</p>
-              <p className="text-white font-bold text-sm">{stat.value}</p>
-              <p className="text-[#8dc9b0] text-[9px] font-medium">{stat.label}</p>
-            </div>
           ))}
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 py-5">
-        <div className="grid grid-cols-2 gap-4">
-          {protectedIPs.map((ip) => (
-            <div key={ip.id} className="bg-white rounded-xl overflow-hidden border border-[#1a4d3a]/10 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group">
-              <div className="relative w-full h-32 bg-gradient-to-br from-[#8dc9b0]/10 to-[#1a4d3a]/5 overflow-hidden">
-                <img src={ip.url} alt={ip.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
-                <div className="absolute top-2 right-2">
-                  {ip.status === "protected" ? (
-                    <div className="bg-[#27835c] text-white px-2 py-0.5 rounded-full text-[9px] font-bold flex items-center gap-1">
-                      <Check className="w-2.5 h-2.5" />
-                      Protected
-                    </div>
-                  ) : (
-                    <div className="bg-[#f97316] text-white px-2 py-0.5 rounded-full text-[9px] font-bold flex items-center gap-1">
-                      <Clock className="w-2.5 h-2.5" />
-                      Pending
-                    </div>
-                  )}
-                </div>
-              </div>
+      <div className="flex-1 px-6 pb-5 overflow-y-auto custom-scrollbar">
+        <div className="flex flex-col gap-5">
+            <div className="flex justify-center">
+              <span className={`bg-gradient-to-r ${activeTab === 'register' ? 'from-purple-500/20 to-pink-500/20 text-purple-400' : 'from-blue-500/20 to-cyan-500/20 text-cyan-400'} px-3 py-1 rounded-full text-xs font-bold border border-current/30 backdrop-blur-sm`}>
+                {activeTab === "content" && "🎯 Yakoa Integration: Real-time"}
+                {activeTab === "ip" && "🔬 AI-Powered IP Deep Analysis"}
+                {activeTab === "register" && "⛓️ Story Protocol: IP NFT"}
+              </span>
+            </div>
 
-              <div className="p-3 space-y-2">
-                <h3 className="text-[#1a4d3a] font-bold text-xs line-clamp-1">{ip.title}</h3>
-                <div className="flex items-center justify-between">
-                  <span className="text-[#1a4d3a]/60 text-[9px]">{ip.storyId}</span>
-                  <span className="text-[#27835c] font-bold text-xs">{ip.earnings}</span>
+            <div className="flex justify-center">
+              <div className="relative group">
+                <div className={`absolute -inset-3 bg-gradient-to-r ${currentTab?.gradient} rounded-3xl blur-xl opacity-30 group-hover:opacity-50 transition-opacity`}></div>
+                <div className={`relative w-28 h-28 rounded-2xl bg-gradient-to-br ${currentTab?.gradient} flex items-center justify-center shadow-2xl group-hover:scale-105 transition-transform duration-500`}>
+                  <span className="text-4xl drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]">{currentTab?.icon}</span>
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.2),transparent_70%)] rounded-2xl"></div>
                 </div>
-                <button className="w-full text-[#1a4d3a] hover:text-[#27835c] text-xs font-bold transition-colors border-t border-[#1a4d3a]/10 pt-2">
-                  View on Story →
-                </button>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
 
-      <div className="px-6 py-4 bg-white border-t border-[#1a4d3a]/10 flex gap-2">
-        <button className="flex-1 bg-gradient-to-r from-[#1a4d3a] to-[#27835c] text-white py-2.5 rounded-lg font-bold text-xs hover:shadow-lg transition-all">
-          <Zap className="w-3.5 h-3.5 inline mr-2" />
-          Detect New Content
-        </button>
-        <button className="flex-1 border-2 border-[#1a4d3a] text-[#1a4d3a] py-2 rounded-lg font-bold text-xs hover:bg-[#1a4d3a]/5 transition-all">
-          Settings
-        </button>
-      </div>
-    </div>
-  );
+            <div className="text-center space-y-1.5">
+              <h2 className="text-white font-black text-xl tracking-wide drop-shadow-[0_0_10px_rgba(100,255,255,0.3)]">{currentTab?.title}</h2>
+              <p className="text-gray-400 text-sm leading-relaxed px-2">{currentTab?.description}</p>
+            </div>
 
-  // ============= ALERTS CENTER VIEW =============
-  const AlertsView = () => (
-    <div className="w-full h-full bg-gradient-to-b from-[#e8dcbb] to-[#f5f5f0] rounded-xl shadow-2xl overflow-hidden border border-[#1a4d3a]/10 flex flex-col">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-[#1a4d3a] to-[#27835c] px-6 py-5">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <button onClick={() => setCurrentPage("main")} className="text-white bg-white/10 p-2 rounded-lg hover:bg-white/20 transition-all">
-              <ChevronRight className="w-4 h-4 rotate-180" />
+            {/* !!! TOMBOL UTAMA DENGAN LOGO BARU !!! */}
+            <button
+              onClick={() => {
+                if (activeTab === "content") setShowSidebar(true);
+                if (activeTab === "register") {
+                    // Default ke konten pertama yang ORIGINAL (P0-3 flow)
+                    const originalContent = detectedContent.find(c => c.status === 'ORIGINAL');
+                    const contentToRegister = originalContent || null; // Tidak ada konten terdeteksi = null
+                    setActiveContent(contentToRegister); 
+                    setShowRegisterView(true);
+                }
+                if (activeTab === "ip") setShowAnalysisView(true);
+              }}
+              className={`relative w-full py-3 rounded-xl font-bold text-base text-white overflow-hidden group transition-all duration-300 hover:scale-[1.02] active:scale-95 mt-2`}
+            >
+              <div className={`absolute inset-0 bg-gradient-to-r ${currentTab?.gradient}`}></div>
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.1),transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <span className="relative flex items-center justify-center gap-2 drop-shadow-[0_0_5px_rgba(0,0,0,0.5)]">
+                <IPShieldLogo size={20} className="group-hover:rotate-12 transition-transform duration-500" />
+                <span>{currentTab?.actionLabel}</span>
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </span>
             </button>
-            <div>
-              <h1 className="text-white font-bold text-base">Alert Center</h1>
-              <p className="text-[#8dc9b0] text-xs font-medium">Real-time monitoring</p>
-            </div>
-          </div>
-          <Bell className="w-5 h-5 text-white animate-pulse" />
-        </div>
 
-        {/* Monitoring Toggle */}
-        <div className="flex items-center gap-3 bg-white/10 p-3 rounded-lg border border-white/20">
-          <div className="flex-1">
-            <p className="text-white font-bold text-xs mb-0.5">Background Monitoring</p>
-            <p className="text-[#8dc9b0] text-[10px]">Scans every hour for infringements</p>
-          </div>
+            <div className="relative group">
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-xl opacity-0 group-hover:opacity-100 blur transition-opacity duration-500"></div>
+              <div className="relative bg-gray-900/30 backdrop-blur-lg border border-cyan-500/20 rounded-xl p-4 space-y-2.5">
+                <div className="flex items-start gap-3">
+                  <BookOpen className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5 drop-shadow-[0_0_5px_rgba(100,255,255,0.5)]" />
+                  <div>
+                    <p className="text-white font-bold text-sm tracking-wide mb-1">IP & Web3 Ecosystem</p>
+                    <p className="text-gray-400 text-xs leading-relaxed">
+                      {activeTab === "content" && "Didukung oleh Yakoa, ekstensi ini memindai secara mendalam untuk melindungi konten original Anda dari penyalahgunaan digital."}
+                      {activeTab === "ip" && "Menggunakan machine learning canggih untuk memverifikasi kepemilikan dan potensi pelanggaran di seluruh web."}
+                      {activeTab === "register" && "Integrasi Story Protocol memungkinkan pencetakan 'IP NFT' untuk melacak silsilah, lisensi, dan royalti di blockchain."}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+
+      <div className="relative px-6 py-3 border-t border-cyan-500/20 bg-gray-950/20 backdrop-blur-sm">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
+        <div className="flex items-center justify-between text-[10px] text-gray-500">
+          <span className={`font-medium flex items-center gap-1.5 ${isMonitoring ? 'text-emerald-400' : 'text-gray-500'}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${isMonitoring ? 'bg-emerald-400 animate-pulse' : 'bg-gray-600'}`}></span>
+            {isMonitoring ? "System Active" : "System Paused"}
+          </span>
           <button
-            onClick={() => setIsMonitoring(!isMonitoring)}
-            className={`px-4 py-2 rounded-lg font-bold text-xs transition-all ${
-              isMonitoring
-                ? "bg-green-500 text-white shadow-lg"
-                : "bg-white/20 text-white hover:bg-white/30"
-            }`}
+            onClick={() => setCurrentPage("dashboard")}
+            className="text-purple-400 font-bold hover:text-purple-300 transition-colors flex items-center gap-1 group hover:scale-105 transition-transform active:scale-95"
           >
-            {isMonitoring ? "🔴 Active" : "⚪ Inactive"}
+            IP Dashboard <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
           </button>
         </div>
       </div>
+    </div>
+  );
 
-      {/* Alert Stats */}
-      <div className="px-6 pt-5 pb-4 grid grid-cols-4 gap-2">
-        {[
-          { label: "Total", value: mockAlerts.length, icon: "📊", color: "from-blue-500 to-blue-600" },
-          { label: "High", value: mockAlerts.filter((a) => a.severity === "high").length, icon: "🔴", color: "from-red-500 to-red-600" },
-          { label: "Medium", value: mockAlerts.filter((a) => a.severity === "medium").length, icon: "🟡", color: "from-yellow-500 to-yellow-600" },
-          { label: "Low", value: mockAlerts.filter((a) => a.severity === "low").length, icon: "🟢", color: "from-green-500 to-green-600" },
-        ].map((stat) => (
-          <div key={stat.label} className={`bg-gradient-to-br ${stat.color} rounded-lg p-3 text-white border border-white/20 shadow-lg`}>
-            <p className="text-2xl mb-1">{stat.icon}</p>
-            <p className="font-bold text-sm">{stat.value}</p>
-            <p className="text-[9px] opacity-90">{stat.label}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Alerts List */}
-      <div className="flex-1 overflow-y-auto px-6 pb-5 space-y-3">
-        {mockAlerts.map((alert) => (
-          <div
-            key={alert.id}
-            className={`bg-gradient-to-r ${alert.color} rounded-xl overflow-hidden border border-white/20 shadow-lg hover:shadow-2xl hover:scale-102 transition-all duration-300 cursor-pointer group`}
-          >
-            <div className="p-4 text-white">
-              <div className="flex items-start gap-3">
-                <span className="text-3xl animate-pulse group-hover:animate-bounce">{alert.icon}</span>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <h3 className="font-bold text-sm">{alert.title}</h3>
-                    <span className="text-[10px] opacity-75 font-medium">
-                      {Math.round((Date.now() - alert.timestamp) / 60000)} min ago
-                    </span>
-                  </div>
-                  <p className="text-xs opacity-90 mb-2">{alert.description}</p>
-                  <p className="text-[10px] opacity-75 mb-3 bg-white/10 p-2 rounded-lg border border-white/20">
-                    {alert.detailedInfo}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[9px] font-mono bg-white/10 px-2 py-1 rounded">{alert.ipId}</span>
-                    <button className="text-xs font-bold opacity-90 hover:opacity-100 underline">
-                      {alert.action} →
-                    </button>
-                  </div>
+  // --- CONTENT SIDEBAR VIEW (P0 - Auto Detection & Analysis) ---
+  // MENERIMA PROP quickProtect
+  const ContentSidebarView = ({ quickProtect }) => (
+    <div className={`w-[400px] h-[600px] absolute inset-0 transition-transform duration-300 z-50 ${isSidebarClosing ? 'translate-x-full' : 'translate-x-0'} ${THEME_COLORS.BASE_DARK}`}>
+      <div className="absolute inset-0 bg-gradient-to-br from-[#0a0f1d] via-teal-900/20 to-[#0a0f1d] z-0 opacity-95"></div>
+      
+      <div className="relative z-10 w-full h-full flex flex-col">
+        <div className="relative px-5 py-4 overflow-hidden border-b border-cyan-500/20">
+            <div className="relative flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={closeAllOverlays}
+                  className="relative group p-1.5 text-white bg-gray-900/50 backdrop-blur-md rounded-lg border border-teal-500/30 hover:border-teal-400/50 transition-all hover:scale-110 active:scale-95"
+                >
+                  <ChevronRight className="w-4 h-4 rotate-180" />
+                </button>
+                <div>
+                  <h2 className="text-white font-black text-sm">Detected Content</h2>
+                  <p className="text-teal-400 text-xs font-bold">Yakoa Live Scan</p>
                 </div>
               </div>
+              <span className="bg-teal-500/20 text-teal-300 px-2.5 py-1 rounded-full text-xs font-bold border border-teal-500/30 backdrop-blur-sm">{detectedContent.length} Items</span>
             </div>
-          </div>
-        ))}
-      </div>
+        </div>
 
-      {/* Footer CTA */}
-      <div className="px-6 py-4 bg-white border-t border-[#1a4d3a]/10 flex gap-2">
-        <button className="flex-1 bg-gradient-to-r from-[#1a4d3a] to-[#27835c] text-white py-2.5 rounded-lg font-bold text-xs hover:shadow-lg transition-all">
-          <TrendingUp className="w-3.5 h-3.5 inline mr-2" />
-          View Full History
-        </button>
-        <button className="flex-1 border-2 border-[#1a4d3a] text-[#1a4d3a] py-2 rounded-lg font-bold text-xs hover:bg-[#1a4d3a]/5 transition-all">
-          Clear All
-        </button>
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 custom-scrollbar">
+            {detectedContent.map((content) => {
+                const statusInfo = STATUS_COLORS[content.status] || STATUS_COLORS.PROCESSING;
+                // Hanya izinkan aksi jika status ORIGINAL
+                const actionDisabled = content.status !== "ORIGINAL"; 
+
+                return (
+                    <div key={content.id} className="relative group cursor-pointer hover:scale-[1.01] transition-transform duration-300">
+                        <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-500/30 to-cyan-500/30 rounded-xl opacity-0 group-hover:opacity-60 blur-sm transition-opacity"></div>
+                        <div className="relative bg-gray-900/40 backdrop-blur-md rounded-xl overflow-hidden border border-teal-500/20 group-hover:border-teal-400/40 transition-all duration-300">
+                            {/* Gambar / Preview */}
+                            <div className="relative w-full h-32 bg-gradient-to-br from-teal-900/20 to-cyan-900/10 overflow-hidden">
+                                <img src={content.url} alt="content" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300 opacity-60" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent"></div>
+                                
+                                {/* STATUS BADGE - SESUAI P0-2 */}
+                                <div className="absolute top-2.5 right-2.5">
+                                    <span className={`flex items-center gap-1 ${statusInfo.bg} ${statusInfo.text} text-[10px] font-bold px-2 py-1 rounded-full shadow-lg backdrop-blur-sm`}>
+                                        {statusInfo.icon} {statusInfo.label} ({content.confidence}%)
+                                    </span>
+                                </div>
+                                
+                                <div className="absolute bottom-2.5 left-2.5">
+                                    <span className="text-[10px] font-medium bg-black/60 text-white px-2 py-0.5 rounded backdrop-blur-sm">{content.size}</span>
+                                </div>
+                            </div>
+
+                            <div className="p-3">
+                                <h4 className="text-white text-sm font-bold truncate mb-1">{content.title}</h4>
+                                <p className="text-gray-400 text-[10px] mb-3 truncate">
+                                    {content.status === 'BRAND_IP_DETECTED' ? `Match: ${content.brand}` : 
+                                     content.status === 'ALREADY_REGISTERED' ? `Owner: ${content.owner}` : 
+                                     'No matches found in Yakoa DB'}
+                                </p>
+                                
+                                {/* ACTION BUTTON - UBAH LOGIKA UNTUK QUICK PROTECT */}
+                                <button 
+                                    onClick={() => quickProtect(content)} // LANGSUNG PANGGIL quickProtect
+                                    disabled={actionDisabled}
+                                    className={`relative w-full py-2 rounded-lg text-xs font-bold text-white overflow-hidden group/btn hover:scale-[1.02] active:scale-95 transition-transform ${actionDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                >
+                                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-green-600"></div>
+                                <span className="relative flex items-center justify-center gap-1.5">
+                                    <Shield className="w-3.5 h-3.5" />
+                                    {content.status === "ORIGINAL" ? "Protect This (Quick)" : "Cannot Protect"}
+                                </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            })}
+        </div>
+
+        <div className="relative px-4 py-3 border-t border-teal-500/20 bg-gray-950/20 backdrop-blur-sm">
+          <button className="relative w-full py-2.5 rounded-lg font-bold text-sm text-white overflow-hidden group hover:scale-[1.02] active:scale-95 transition-transform">
+            <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-cyan-600"></div>
+            <span className="relative flex items-center justify-center gap-2">
+              <Aperture className="w-4 h-4 group-hover:rotate-90 transition-transform" />
+              Full Page Deep Scan
+            </span>
+          </button>
+        </div>
       </div>
     </div>
   );
 
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#f5f5f0] to-[#e8dcbb] p-4 gap-6">
-      {/* Main Panel */}
-      <div className="w-96 h-screen max-h-[800px]">
-        {currentPage === "main" && <MainPanelView />}
-        {currentPage === "dashboard" && <DashboardView />}
-        {currentPage === "alerts" && <AlertsView />}
-      </div>
+  // --- IP ANALYSIS VIEW (Visual Demo) - Tidak Berubah ---
+  const IPAnalysisView = () => {
+    // ... [Kode tetap sama] ...
+    const [status, setStatus] = useState("scanning"); 
+    const [progress, setProgress] = useState(0);
+    const [scanText, setScanText] = useState("Initializing scan...");
 
-      {/* Sidebar (when showing detected content) */}
-      {showSidebar && (
-        <div className="w-96 h-screen max-h-[800px] animate-in slide-in-from-right-96">
-          <ContentSidebarView />
+    useEffect(() => {
+        if(status === 'scanning') {
+            const timer = setInterval(() => {
+                setProgress(prev => {
+                    if (prev >= 100) {
+                        clearInterval(timer);
+                        setStatus('result');
+                        return 100;
+                    }
+                    if(prev < 30) setScanText("Checking Domain Reputation...");
+                    else if(prev < 60) setScanText("Verifying Blockchain Records...");
+                    else if(prev < 90) setScanText("Analyzing Content Fingerprint...");
+                    return prev + 2;
+                });
+            }, 60);
+            return () => clearInterval(timer);
+        }
+    }, [status]);
+
+    return (
+        <div className={`w-[400px] h-[600px] absolute inset-0 transition-transform duration-300 z-50 ${isSidebarClosing ? 'translate-x-full' : 'translate-x-0'} ${THEME_COLORS.BASE_DARK}`}>
+             <div className="absolute inset-0 bg-gradient-to-br from-[#0a0f1d] via-teal-900/30 to-[#0a0f1d] z-0 opacity-95"></div>
+             
+             <div className="relative z-10 w-full h-full flex flex-col">
+                <div className="relative px-5 py-4 overflow-hidden border-b border-teal-500/20">
+                    <div className="relative flex items-center gap-3">
+                        <button onClick={closeAllOverlays} className="relative group p-1.5 text-white bg-gray-900/50 backdrop-blur-md rounded-lg border border-teal-500/30 hover:border-teal-400/50 transition-all hover:scale-110 active:scale-95">
+                            <ChevronRight className="w-4 h-4 rotate-180" />
+                        </button>
+                        <div>
+                            <h2 className="text-white font-black text-sm">Deep Analysis</h2>
+                            <p className="text-teal-400 text-xs font-bold">Security & Trust Score</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex-1 p-6 flex flex-col items-center justify-center">
+                    {status === 'scanning' ? (
+                        <div className="text-center space-y-6">
+                            <div className="relative w-40 h-40 flex items-center justify-center">
+                                <div className="absolute inset-0 border-4 border-gray-800 rounded-full"></div>
+                                <div className="absolute inset-0 border-4 border-teal-500 rounded-full border-t-transparent animate-spin"></div>
+                                <span className="text-2xl font-black text-white">{progress}%</span>
+                            </div>
+                            <p className="text-sm font-bold text-teal-400 animate-pulse">{scanText}</p>
+                        </div>
+                    ) : (
+                        <div className="w-full space-y-6 animate-in fade-in zoom-in duration-500">
+                            <div className="bg-gray-900/50 border border-teal-500/30 rounded-2xl p-6 text-center relative overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-b from-teal-500/10 to-transparent"></div>
+                                <p className="text-gray-400 text-xs font-bold uppercase mb-2">Security Score</p>
+                                <h1 className="text-5xl font-black text-white mb-2">92<span className="text-lg text-gray-500">/100</span></h1>
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold border border-emerald-500/30">
+                                    <ShieldCheck className="w-3 h-3" /> Safe to Use
+                                </span>
+                            </div>
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between p-3 rounded-xl bg-gray-900/40 border border-gray-700">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400"><Globe className="w-4 h-4" /></div>
+                                        <div className="text-left">
+                                            <p className="text-xs text-gray-400 font-bold">Domain Check</p>
+                                            <p className="text-sm text-white font-bold">Verified</p>
+                                        </div>
+                                    </div>
+                                    <Check className="w-5 h-5 text-emerald-500" />
+                                </div>
+                                <div className="flex items-center justify-between p-3 rounded-xl bg-gray-900/40 border border-gray-700">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-purple-500/20 rounded-lg text-purple-400"><Code className="w-4 h-4" /></div>
+                                        <div className="text-left">
+                                            <p className="text-xs text-gray-400 font-bold">IP Registry</p>
+                                            <p className="text-sm text-white font-bold">3 Assets Found</p>
+                                        </div>
+                                    </div>
+                                    <Search className="w-5 h-5 text-purple-500" />
+                                </div>
+                            </div>
+                            <button onClick={() => setStatus('scanning')} className="w-full py-3 bg-teal-600/20 border border-teal-500/50 hover:bg-teal-600/30 rounded-xl font-bold text-sm text-teal-300 transition-colors active:scale-95">
+                                Re-Scan Page
+                            </button>
+                        </div>
+                    )}
+                </div>
+             </div>
         </div>
-      )}
+    );
+  }
 
-      {/* Notifications Queue */}
-      <div className="fixed top-6 right-6 z-50 space-y-3">
-        {notificationQueue.map((alert, index) => (
-          <NotificationToast key={alert.id} alert={alert} isFirst={index === 0} />
-        ))}
-      </div>
+  // --- REGISTER IP VIEW (P0-3: ONE-CLICK REGISTRATION) - Tidak Berubah Logika Form ---
+  const RegisterIPView = ({ addProtectedIP, updateContentStatus, activeContent: initialActiveContent }) => {
+    const [isLoading, setIsLoading] = useState(false);
+    const [step, setStep] = useState(1);
+    
+    // Gunakan activeContent dari prop
+    const activeContent = initialActiveContent; 
 
-      {/* Responsive hint */}
-      <div className="text-center text-xs text-[#1a4d3a]/50 absolute bottom-4 left-4">
-        💡 Extension UI - Responsive Design
+    // Default form data pre-filled based on detected content (P0-3)
+    const initialFormData = {
+        title: activeContent?.title || activeContent?.alt || "Untitled Asset",
+        description: activeContent?.id ? `Original content detected by IP Shield from current page.` : "Manually uploaded asset for IP registration.",
+        assetType: activeContent?.type?.toUpperCase() || TYPE_OPTIONS[0].id, // Default ke 'IMAGE' atau yang terdeteksi
+        licenseType: 'COMMERCIAL_USE', // Default ke Commercial Use
+        royaltyPercentage: 10 // Default 10%
+    };
+
+    const [formData, setFormData] = useState(initialFormData);
+    // NEW STATES for local file upload
+    const [localFile, setLocalFile] = useState(null);
+    const [previewUrl, setPreviewUrl] = useState(activeContent?.url || null);
+    
+    // Logic untuk mendapatkan label
+    const selectedAssetType = TYPE_OPTIONS.find(t => t.id === formData.assetType)?.label || 'Type';
+    const selectedLicense = LICENSE_OPTIONS.find(l => l.id === formData.licenseType);
+    
+    // Find the icon based on current asset type
+    const assetIcon = TYPE_OPTIONS.find(t => t.id === formData.assetType)?.icon || <Aperture className="w-3.5 h-3.5" />;
+
+    // NEW HANDLER: Mengambil file lokal dari device user
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setLocalFile(file);
+            setPreviewUrl(URL.createObjectURL(file));
+
+            // Deteksi tipe aset berdasarkan MIME type file
+            let detectedType = 'TEXT';
+            if (file.type.startsWith('image/')) detectedType = 'IMAGE';
+            else if (file.type.startsWith('audio/')) detectedType = 'AUDIO';
+            else if (file.type.startsWith('video/')) detectedType = 'VIDEO';
+            
+            // Set title dari nama file (hapus ekstensi)
+            const fileNameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+
+            setFormData(prev => ({
+                ...prev,
+                assetType: detectedType,
+                title: fileNameWithoutExt,
+            }));
+            
+        } else {
+            setLocalFile(null);
+            setPreviewUrl(null);
+            setFormData(initialFormData); 
+        }
+    };
+    
+    // NEW HANDLER: Membersihkan file yang diupload
+    const clearLocalFile = () => {
+        setLocalFile(null);
+        setPreviewUrl(activeContent?.url || null);
+        setFormData(initialFormData); 
+    };
+
+
+    const handleRegister = (e) => {
+        e.preventDefault();
+        
+        // VALIDASI: Pastikan ada file lokal ATAU konten terdeteksi yang siap diregister
+        if (!localFile && !activeContent) {
+            alert("Please upload a file or select detected content first.");
+            return;
+        }
+
+        setIsLoading(true);
+        // Simulasi proses: Upload to IPFS + Register to Story Protocol
+        setTimeout(() => {
+            setIsLoading(false);
+            setStep(2);
+            
+            // Kumpulkan data IP yang baru didaftarkan
+            const registeredIpData = {
+                title: formData.title,
+                assetType: formData.assetType,
+                previewUrl: previewUrl, // URL lokal (dari localFile) atau URL content terdeteksi
+            };
+
+            // TAMBAHKAN IP BARU KE DAFTAR DASHBOARD
+            addProtectedIP(registeredIpData); 
+
+            // Update status konten yang baru saja didaftarkan (Jika dari web)
+            if (activeContent && !localFile) {
+                updateContentStatus(activeContent.id, 'PROTECTED');
+            }
+        }, 2500);
+    };
+
+    // Komponen simulasi dropdown
+    const CustomDropdown = ({ options, current, onSelect }) => {
+        const [isOpen, setIsOpen] = useState(false);
+        const ref = useRef(null);
+        
+        const selectedOption = options.find(opt => opt.id === current) || options[0];
+
+        useEffect(() => {
+            function handleClickOutside(event) {
+                if (ref.current && !ref.current.contains(event.target)) {
+                    setIsOpen(false);
+                }
+            }
+            document.addEventListener("mousedown", handleClickOutside);
+            return () => document.removeEventListener("mousedown", handleClickOutside);
+        }, [ref]);
+
+        return (
+            <div className="relative w-full" ref={ref}>
+                <button
+                    type="button"
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="w-full flex items-center justify-between bg-gray-900/50 border border-gray-700 hover:border-purple-500/50 p-3 rounded-xl text-white text-sm transition-all"
+                >
+                    <span className="flex items-center gap-2">
+                        {selectedOption?.icon}
+                        {selectedOption?.label}
+                    </span>
+                    <ChevronRight className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-90' : 'rotate-0'}`} />
+                </button>
+                
+                {isOpen && (
+                    <div className="absolute top-full mt-2 w-full bg-gray-900/95 backdrop-blur-md rounded-xl shadow-2xl border border-purple-500/30 z-20 animate-in slide-in-from-top-1">
+                        {options.map(option => (
+                            <button
+                                key={option.id}
+                                onClick={() => {
+                                    onSelect(option.id);
+                                    setIsOpen(false);
+                                }}
+                                className={`w-full text-left p-3 text-sm flex flex-col items-start gap-1 transition-all rounded-xl ${
+                                    current === option.id 
+                                    ? 'bg-purple-500/30 text-white font-bold' 
+                                    : 'text-gray-300 hover:bg-gray-800'
+                                }`}
+                            >
+                                <div className="flex items-center gap-2">
+                                    {option.icon}
+                                    <span>{option.label}</span>
+                                </div>
+                                <p className="text-[10px] text-gray-400 ml-5">{option.desc}</p>
+                            </button>
+                        ))}
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+
+    return (
+        <div className={`w-[400px] h-[600px] absolute inset-0 transition-transform duration-300 z-50 ${isSidebarClosing ? 'translate-x-full' : 'translate-x-0'} ${THEME_COLORS.BASE_DARK}`}>
+             <div className="absolute inset-0 bg-gradient-to-br from-[#0a0f1d] via-purple-900/30 to-[#0a0f1d] z-0 opacity-95"></div>
+             
+             <div className="relative z-10 w-full h-full flex flex-col">
+                {/* HEADER SESUAI GAMBAR */}
+                <div className="relative px-5 py-4 overflow-hidden border-b border-purple-500/20">
+                    <div className="relative flex items-center gap-3">
+                        <button
+                        onClick={closeAllOverlays}
+                        className="relative group p-1.5 text-white bg-gray-900/50 backdrop-blur-md rounded-lg border border-purple-500/30 hover:border-purple-400/50 transition-all hover:scale-110 active:scale-95"
+                        >
+                        <ChevronRight className="w-4 h-4 rotate-180" />
+                        </button>
+                        <div>
+                        <h2 className="text-white font-black text-xl">New IP Registration</h2>
+                        <p className="text-purple-400 text-xs font-bold">Story Protocol Mainnet</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex-1 p-5 overflow-y-auto custom-scrollbar">
+                    {step === 1 ? (
+                        <form onSubmit={handleRegister} className="space-y-5">
+                            
+                            {/* --- FILE UPLOAD & PREVIEW SECTION (MODIFIED) --- */}
+                            <div className="relative w-full rounded-xl overflow-hidden bg-gray-900/50 border border-purple-500/30">
+                                
+                                {/* Content Preview (Uses previewUrl) */}
+                                <div className="relative w-full h-40 bg-gray-900/50 flex items-center justify-center">
+                                    {/* 1. Jika file lokal bertipe IMAGE, tampilkan preview gambar */}
+                                    {(localFile && formData.assetType === 'IMAGE') ? (
+                                        <img src={previewUrl} alt="Asset Preview" className="w-full h-full object-cover opacity-70" />
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center h-full text-center p-4">
+                                            {/* 2. Jika ada file lokal (Audio/Video/Text), tampilkan nama file */}
+                                            {localFile ? (
+                                                <>
+                                                    <span className="text-4xl text-purple-400 mb-2">{assetIcon}</span>
+                                                    <p className="text-sm font-bold text-white mb-1">File Loaded: {localFile.name}</p>
+                                                    <p className="text-xs text-gray-400">Type: {formData.assetType} ({Math.round(localFile.size / 1024)} KB)</p>
+                                                </>
+                                            ) : activeContent ? (
+                                                /* 3. Jika ada content terdeteksi dari halaman web */
+                                                <>
+                                                    <p className="text-sm font-bold text-white mb-1">Content Detected: {activeContent.title}</p>
+                                                    <p className="text-xs text-gray-400">Source: Current Webpage</p>
+                                                </>
+                                            ) : (
+                                                /* 4. Jika tidak ada apa-apa */
+                                                <p className="text-sm font-bold text-gray-400">Upload your asset below</p>
+                                            )}
+                                        </div>
+                                    )}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-gray-950/70 to-transparent flex items-end p-3">
+                                        <p className="text-xs text-purple-300 font-bold flex items-center gap-1">
+                                            {assetIcon} {selectedAssetType}
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                {/* Upload Button & Input */}
+                                <div className="p-3 bg-gray-950/70 border-t border-purple-500/20">
+                                    <label htmlFor="file-upload" className="w-full relative py-2.5 rounded-lg font-bold text-sm text-white overflow-hidden group/upload cursor-pointer transition-all hover:scale-[1.02] active:scale-95">
+                                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500"></div>
+                                        <span className="relative flex items-center justify-center gap-2 drop-shadow-[0_0_5px_rgba(0,0,0,0.5)]">
+                                            <Aperture className="w-4 h-4 group-hover/upload:rotate-12 transition-transform" />
+                                            {localFile ? `Change File: ${localFile.name.substring(0, 15)}...` : "Upload Local File"}
+                                        </span>
+                                        <input 
+                                            id="file-upload" 
+                                            type="file" 
+                                            // Menerima Image, Audio, Video, dan Text documents
+                                            accept="image/*,audio/*,video/*,text/plain,.txt,.pdf,.doc,.docx" 
+                                            onChange={handleFileChange} 
+                                            className="hidden" 
+                                        />
+                                    </label>
+                                    {localFile && (
+                                        <button type="button" onClick={clearLocalFile} className="w-full mt-2 py-1 text-xs text-red-400 bg-red-900/20 rounded-lg hover:bg-red-900/30 transition-colors">
+                                            <X className="w-3 h-3 inline mr-1" /> Clear Upload
+                                        </button>
+                                    )}
+                                    {!localFile && activeContent && (
+                                        <p className="text-center text-xs text-gray-400 mt-2">Currently registering detected content. Uploading a local file will replace it.</p>
+                                    )}
+                                </div>
+                            </div>
+                            {/* --- END FILE UPLOAD & PREVIEW SECTION --- */}
+
+                            {/* Asset Title */}
+                            <div>
+                                <label htmlFor="asset-title" className="text-sm font-bold text-gray-300 mb-2 block">Asset Title</label>
+                                <input 
+                                    id="asset-title"
+                                    type="text" 
+                                    value={formData.title} 
+                                    onChange={(e) => setFormData({...formData, title: e.target.value})}
+                                    className="w-full bg-gray-900/50 border border-gray-700 focus:border-purple-500 focus:ring-0 text-white p-3 rounded-xl placeholder-gray-500 transition-all" 
+                                    placeholder="e.g. My Digital Art #01"
+                                    required
+                                />
+                            </div>
+                            
+                            {/* Type & License Dropdowns */}
+                            <div className="grid grid-cols-2 gap-3">
+                                {/* Asset Type Dropdown (Value otomatis terisi dari file, tapi bisa diubah manual) */}
+                                <div>
+                                    <label className="text-sm font-bold text-gray-300 mb-2 block">Asset Type</label>
+                                    <CustomDropdown 
+                                        options={TYPE_OPTIONS}
+                                        current={formData.assetType}
+                                        onSelect={(id) => setFormData({...formData, assetType: id})}
+                                    />
+                                </div>
+
+                                {/* License Dropdown (Existing) */}
+                                <div>
+                                    <label className="text-sm font-bold text-gray-300 mb-2 block">License Type</label>
+                                    <CustomDropdown 
+                                        options={LICENSE_OPTIONS}
+                                        current={formData.licenseType}
+                                        onSelect={(id) => setFormData({...formData, licenseType: id, royaltyPercentage: id === 'COMMERCIAL_USE' ? 10 : 0})}
+                                    />
+                                </div>
+                            </div>
+                            
+                            {/* Royalty Slider (P0-3) */}
+                            {selectedLicense?.royaltyEnabled && (
+                                <div className="p-4 bg-gray-900/50 rounded-xl border border-gray-700 space-y-3">
+                                    <label className="text-sm font-bold text-gray-300 block mb-1">Royalty Share: <span className="text-purple-400">{formData.royaltyPercentage}%</span></label>
+                                    <input
+                                        type="range"
+                                        min="5"
+                                        max="50"
+                                        step="1"
+                                        value={formData.royaltyPercentage}
+                                        onChange={(e) => setFormData({...formData, royaltyPercentage: parseInt(e.target.value)})}
+                                        className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer range-lg focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                                        style={{ accentColor: '#a855f7' }}
+                                    />
+                                    <p className="text-xs text-gray-400">Share of revenue from commercial usage rights.</p>
+                                </div>
+                            )}
+
+                            {/* Description */}
+                            <div>
+                                <label htmlFor="asset-description" className="text-sm font-bold text-gray-300 mb-2 block">Description</label>
+                                <textarea
+                                    id="asset-description"
+                                    rows={3}
+                                    value={formData.description}
+                                    onChange={(e) => setFormData({...formData, description: e.target.value})}
+                                    className="w-full bg-gray-900/50 border border-gray-700 focus:border-purple-500 focus:ring-0 text-white p-3 rounded-xl placeholder-gray-500 transition-all"
+                                    placeholder="Describe your IP asset..."
+                                />
+                            </div>
+                            
+                            {/* Story Protocol Info Box */}
+                            <div className="bg-purple-500/20 border border-purple-500/40 p-3 rounded-xl text-purple-300 flex items-start gap-3">
+                                <Sparkles className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                                <p className="text-xs leading-relaxed">
+                                    This action will mint a new **IP Asset NFT** on **Story Protocol** and register its metadata permanently.
+                                </p>
+                            </div>
+
+                            {/* Mint IP Asset Button */}
+                            <button 
+                                type="submit" 
+                                disabled={isLoading || !formData.title.trim() || (!localFile && !activeContent)} 
+                                className={`w-full py-3 rounded-xl font-bold text-base text-white overflow-hidden relative group mt-2 ${isLoading || !formData.title.trim() || (!localFile && !activeContent) ? 'opacity-70 cursor-not-allowed' : 'hover:scale-[1.02] active:scale-95 transition-transform'}`}
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600"></div>
+                                <span className="relative flex items-center justify-center gap-2 drop-shadow-[0_0_5px_rgba(0,0,0,0.5)]">
+                                    {isLoading ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                            Minting & Registering...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Code className="w-4 h-4" />
+                                            Register & Protect
+                                        </>
+                                    )}
+                                </span>
+                            </button>
+                        </form>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center h-full text-center space-y-5 animate-in fade-in zoom-in duration-500">
+                            <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.4)]">
+                                <Check className="w-10 h-10 text-white" />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-black text-white mb-2">Content Protected! 🎉</h3>
+                                <p className="text-sm text-gray-400">Your IP is now registered on Story Protocol.</p>
+                            </div>
+                            
+                            <div className="w-full bg-gray-900/50 border border-gray-700 rounded-xl p-4 text-left space-y-3">
+                                <div>
+                                    <p className="text-[10px] text-gray-500 uppercase font-bold">IP Asset ID</p>
+                                    <p className="text-sm font-mono text-purple-400">0x71C...9A23</p>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] text-gray-500 uppercase font-bold">Transaction Hash</p>
+                                    <a href="#" className="text-xs font-mono text-cyan-400 hover:underline flex items-center gap-1">
+                                        0x8f4e2c3a9b7d1e... <LinkIcon className="w-3 h-3" />
+                                    </a>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] text-gray-500 uppercase font-bold">Story Explorer</p>
+                                    <a href="#" className="text-xs font-mono text-cyan-400 hover:underline flex items-center gap-1">
+                                        View IP on Explorer <LinkIcon className="w-3 h-3" />
+                                    </a>
+                                </div>
+                            </div>
+
+                            <button 
+                                onClick={closeAllOverlays}
+                                className="w-full py-3 bg-gray-800 hover:bg-gray-700 rounded-xl font-bold text-sm text-white transition-colors active:scale-95"
+                            >
+                                Done
+                            </button>
+                        </div>
+                    )}
+                </div>
+             </div>
+        </div>
+    );
+  }
+
+  // NEW COMPONENT: Quick Protect Status Overlay
+  const QuickProtectSuccessView = ({ data, close }) => {
+    const isProtected = data.status === 'PROTECTED';
+
+    return (
+        <div className={`w-[400px] h-[600px] absolute inset-0 transition-opacity duration-300 z-[70] bg-[#0a0f1d]/95 backdrop-blur-lg flex items-center justify-center`}>
+            <div className="text-center p-8 w-80 bg-gray-900/90 rounded-2xl border border-purple-500/30 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-500">
+                <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center 
+                    ${isProtected 
+                        ? 'bg-gradient-to-br from-green-500 to-emerald-600 shadow-[0_0_20px_rgba(16,185,129,0.5)]' 
+                        : 'bg-gradient-to-br from-blue-500 to-cyan-600'
+                    }`}
+                >
+                    {isProtected ? (
+                        <Check className="w-8 h-8 text-white" />
+                    ) : (
+                        <Loader2 className="w-8 h-8 text-white animate-spin" />
+                    )}
+                </div>
+                
+                <div>
+                    <h3 className="text-xl font-black text-white mb-1">
+                        {isProtected ? "Protected Successfully!" : "Registering IP..."}
+                    </h3>
+                    <p className="text-sm text-gray-400">
+                        {isProtected 
+                            ? `IP Asset: "${data.title}" is now protected.` 
+                            : `Minting IP NFT for "${data.title}" on Story Protocol (2s).`}
+                    </p>
+                </div>
+
+                {isProtected && (
+                    <button 
+                        onClick={close}
+                        className="w-full py-2.5 bg-purple-600/50 hover:bg-purple-600/70 rounded-xl font-bold text-sm text-white transition-colors active:scale-95 mt-3"
+                    >
+                        View in Dashboard
+                    </button>
+                )}
+            </div>
+        </div>
+    );
+}
+
+  const DashboardView = () => {
+    // Mock total earnings, now based on protectedIPs length
+    const totalEarnings = protectedIPs.length * 100 + 90.00; 
+    const totalIPsProtected = protectedIPs.length;
+    const activeAlertsCount = 2; // Mock
+
+    return (
+      <div className={`w-[400px] h-[600px] p-5 relative overflow-hidden bg-transparent`}>
+        <div className="relative z-10 w-full h-full flex flex-col">
+          <div className="flex items-center justify-between mb-6">
+            <button 
+              onClick={() => setCurrentPage("main")} 
+              className="text-cyan-400 flex items-center font-bold hover:text-cyan-300 transition-colors group hover:translate-x-[-2px] transition-transform active:scale-95"
+            >
+              <ChevronRight className="w-5 h-5 rotate-180" /> Back
+            </button>
+            <h2 className="text-xl font-black text-white bg-gradient-to-r from-cyan-300 to-purple-400 bg-clip-text text-transparent drop-shadow-[0_0_5px_rgba(168,85,247,0.5)]">
+              Dashboard
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3 mb-5">
+            {[
+              { label: "Protected", value: totalIPsProtected, color: "from-purple-500/50 to-pink-500/50" },
+              { label: "Earnings", value: `$${totalEarnings.toFixed(2)}`, color: "from-amber-500/50 to-yellow-500/50" },
+              { label: "Alerts", value: activeAlertsCount, color: "from-red-500/50 to-orange-500/50" },
+            ].map((metric) => (
+              <div key={metric.label} className="relative group cursor-pointer hover:scale-[1.07] transition-transform duration-300">
+                <div className={`absolute -inset-0.5 bg-gradient-to-r ${metric.color} blur-md opacity-30 group-hover:opacity-50 transition-opacity`}></div>
+                <div className="relative p-3 rounded-xl bg-gray-900/50 border border-current/20 shadow-xl shadow-gray-950 group-hover:border-current/40 transition-all" style={{ borderColor: metric.color.split('/')[0].split('-')[1] }}>
+                  <p className="text-white font-black text-lg drop-shadow-[0_0_5px_rgba(255,255,255,0.2)]">{metric.value}</p>
+                  <p className="text-gray-400 text-[10px] uppercase font-bold tracking-wider mt-1">{metric.label}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+           <div className="flex-1 overflow-y-auto custom-scrollbar space-y-4">
+            <h3 className="text-white text-sm font-bold border-b border-cyan-500/30 pb-2 flex items-center gap-2">
+                <Shield className="w-4 h-4 text-cyan-400" /> Portfolio
+            </h3>
+            
+            <div className="space-y-3">
+            {protectedIPs.map((ip) => (
+                <div key={ip.id} className="relative p-3 rounded-xl bg-gray-900/40 border border-purple-500/20 shadow-lg group hover:border-purple-400/40 transition-all hover:bg-gray-800/50">
+                    <div className="flex items-center gap-3">
+                        <img src={ip.url} alt={ip.title} className="w-10 h-10 rounded bg-gray-800 object-cover" />
+                        <div className="flex-1 min-w-0">
+                            <p className="text-sm font-bold text-white truncate">{ip.title}</p>
+                            <p className="text-[10px] text-gray-400 flex items-center gap-2">
+                                <span className="text-amber-400">{ip.earnings} Earned</span>
+                                {ip.alerts > 0 && <span className="text-red-400 font-bold flex items-center gap-0.5"><AlertCircle className="w-3 h-3"/> {ip.alerts} Alerts</span>}
+                            </p>
+                        </div>
+                        <button className="p-2 bg-purple-500/10 rounded-lg text-purple-400 hover:bg-purple-500/20"><ChevronRight className="w-4 h-4"/></button>
+                    </div>
+                </div>
+            ))}
+            </div>
+           </div>
+        </div>
       </div>
-    </div>
+    );
+  };
+
+  // =================================================================
+  // RENDER UTAMA
+  // =================================================================
+  return (
+    <>
+      <div className={`relative font-sans antialiased text-white w-[400px] h-[600px] ${THEME_COLORS.BASE_DARK} overflow-hidden`}>
+        
+        {/* 1. BACKGROUND CANVAS */}
+        <canvas ref={canvasRef} className="absolute inset-0 z-0 opacity-80 pointer-events-none" />
+        
+        {/* OVERLAYS BACKGROUND */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0a0f1d] via-purple-900/20 to-[#0a0f1d] z-0 opacity-80 pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(100,255,255,0.15),transparent_50%)] z-0 pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(100,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(100,255,255,0.02)_1px,transparent_1px)] bg-[size:30px_30px] z-0 pointer-events-none"></div>
+
+        {/* 2. KONTEN */}
+        <div className="relative z-10 w-full h-full">
+            
+            {/* Main Panel */}
+            {currentPage === "main" && (
+                <>
+                    <MainPanelView />
+                    {notificationQueue.map((alert, index) => (
+                        <NotificationToast key={alert.id} alert={alert} isFirst={index === 0} />
+                    ))}
+                </>
+            )}
+
+            {/* Sidebar (Overlay) - Kirim prop quickProtect */}
+            {showSidebar && <ContentSidebarView quickProtect={quickProtect} />}
+
+            {/* Register View (Overlay) - Untuk Registrasi Manual */}
+            {showRegisterView && (
+                <RegisterIPView 
+                    addProtectedIP={addProtectedIP}
+                    updateContentStatus={updateContentStatus}
+                    activeContent={activeContent}
+                />
+            )}
+
+            {/* Analysis View (Overlay) */}
+            {showAnalysisView && <IPAnalysisView />}
+
+            {/* Dashboard View */}
+            {currentPage === "dashboard" && <DashboardView />}
+
+            {/* Alerts View */}
+            {currentPage === "alerts" && (
+                <div className={`w-[400px] h-[600px] p-5 relative bg-[#0a0f1d]/95 backdrop-blur-sm`}>
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#0a0f1d] via-red-900/20 to-[#0a0f1d] z-0 opacity-80"></div>
+                    <div className="relative z-10">
+                        <button onClick={() => setCurrentPage("main")} className="text-cyan-400 mb-4 flex items-center font-bold group hover:translate-x-[-2px] transition-transform active:scale-95">
+                          <ChevronRight className="w-4 h-4 rotate-180" /> Back to Main
+                        </button>
+                        <h2 className="text-2xl font-black mb-6 text-white drop-shadow-[0_0_5px_rgba(255,100,100,0.5)] bg-clip-text text-transparent bg-gradient-to-r from-red-400 to-white">Latest Alerts</h2>
+                        <div className="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar">
+                          {mockAlerts.map(alert => (
+                            <div key={alert.id} className="relative group p-4 rounded-xl bg-gray-900/50 backdrop-blur-lg border border-red-500/30 cursor-pointer hover:scale-[1.01] transition-transform duration-300">
+                               <div className={`absolute -inset-0.5 bg-gradient-to-r ${alert.color} rounded-xl opacity-20 blur group-hover:opacity-40 transition-opacity`}></div>
+                               <div className="relative flex items-start gap-3">
+                                    <span className="text-2xl">{alert.icon}</span>
+                                    <div className="flex-1">
+                                        <p className="text-sm font-bold text-white mb-0.5">{alert.title}</p>
+                                        <p className="text-xs text-gray-400">{alert.description}</p>
+                                        <p className="text-[10px] text-red-400 mt-1">{alert.detailedInfo}</p>
+                                    </div>
+                               </div>
+                            </div>
+                          ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+            
+            {/* Quick Protect Success View (Overlay) - TAMPILKAN SETELAH quickProtect DIPANGGIL */}
+            {showQuickProtectSuccess && (
+                <QuickProtectSuccessView 
+                    data={quickProtectSuccessData} 
+                    close={() => { 
+                        setShowQuickProtectSuccess(false); 
+                        setQuickProtectSuccessData(null); 
+                        setCurrentPage('dashboard'); // Arahkan ke dashboard setelah selesai
+                    }} 
+                />
+            )}
+        </div>
+      </div>
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(10, 15, 25, 0.5); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(100, 255, 255, 0.4); border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(100, 255, 255, 0.6); }
+      `}</style>
+    </>
   );
 }
