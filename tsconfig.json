@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-  ],
+, "app/extension/content.js", "app/extension/background.js"  ],
   "exclude": ["node_modules"]
 }

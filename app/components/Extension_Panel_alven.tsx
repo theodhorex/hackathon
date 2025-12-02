@@ -1,15 +1,30 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-// import { ChevronRight, Shield, Lock, Zap, Home, Check, AlertCircle, Clock, Bell, TrendingUp, Flame, Heart } from "lucide-react";
+import { ChevronRight, Shield, Lock, Zap, Home, Check, AlertCircle, Clock, Bell, TrendingUp, Flame, Heart } from "lucide-react";
 
-export default function IPShieldExtension() {
+interface Notification {
+  id: number;
+  type: string;
+  severity: string;
+  title: string;
+  description: string;
+  detailedInfo: string;
+  timestamp: Date;
+  ipId: string;
+  action: string;
+  icon: string;
+  color: string;
+}
+
+
+export default function Extension_Panel_alven() {
   const [currentPage, setCurrentPage] = useState("main");
   const [activeTab, setActiveTab] = useState("content");
   const [showSidebar, setShowSidebar] = useState(false);
   const [selectedContent, setSelectedContent] = useState(null);
   const [alerts, setAlerts] = useState([]);
-  const [notificationQueue, setNotificationQueue] = useState([]);
+  const [notificationQueue, setNotificationQueue] = useState<Notification[]>([]);
   const [isMonitoring, setIsMonitoring] = useState(false);
 
   // Mock alerts data with timestamps
@@ -108,7 +123,7 @@ export default function IPShieldExtension() {
   const currentTab = tabs.find((t) => t.id === activeTab);
 
   // ============= NOTIFICATION TOAST =============
-  const NotificationToast = ({ alert, isFirst }) => (
+  const NotificationToast = ({ alert, isFirst }: { alert: Notification; isFirst: boolean }) => (
     <div className={`fixed ${isFirst ? "top-6 right-6" : "top-24 right-6"} z-50 max-w-sm animate-in slide-in-from-right-96 duration-300`}>
       <div className={`bg-gradient-to-r ${alert.color} rounded-xl shadow-2xl overflow-hidden border border-white/20 backdrop-blur-xl`}>
         <div className="p-4 text-white">
@@ -475,7 +490,7 @@ export default function IPShieldExtension() {
                   <div className="flex items-center justify-between mb-1">
                     <h3 className="font-bold text-sm">{alert.title}</h3>
                     <span className="text-[10px] opacity-75 font-medium">
-                      {Math.round((Date.now() - alert.timestamp) / 60000)} min ago
+                      {Math.round((Date.now() - new Date(alert.timestamp).getTime()) / 60000)} min ago
                     </span>
                   </div>
                   <p className="text-xs opacity-90 mb-2">{alert.description}</p>
