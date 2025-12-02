@@ -1,492 +1,435 @@
-import React from 'react';
-import Nav from "./navbar"
+import React, { useState, useEffect } from 'react';
+import { Shield, Search, Lock, Zap, CheckCircle, Download, ArrowRight, Globe, Database, Users, Award } from 'lucide-react';
 
+export default function IPRegistryLanding() {
+  const [scrollY, setScrollY] = useState(0);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [isVisible, setIsVisible] = useState({});
 
-const { useState, useEffect, useRef } = React;
-
-
-// ============= ICONS COMPONENTS =============
-const Twitter = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/>
-  </svg>
-);
-
-const Send = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="22" y1="2" x2="11" y2="13"></line>
-    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-  </svg>
-);
-
-const Youtube = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path>
-    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
-  </svg>
-);
-
-const Instagram = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-  </svg>
-);
-
-const Users = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-    <circle cx="9" cy="7" r="4"></circle>
-    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-  </svg>
-);
-
-const Zap = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-  </svg>
-);
-
-const Shield = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-  </svg>
-);
-
-const TrendingUp = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-    <polyline points="17 6 23 6 23 12"></polyline>
-  </svg>
-);
-
-const Award = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="8" r="7"></circle>
-    <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
-  </svg>
-);
-
-const ChevronDown = ({ size = 18, className = "" }) => (
-  <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="6 9 12 15 18 9"></polyline>
-  </svg>
-);
-
-const X = ({ size = 26 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="18" y1="6" x2="6" y2="18"></line>
-    <line x1="6" y1="6" x2="18" y2="18"></line>
-  </svg>
-);
-
-const Target = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10"></circle>
-    <circle cx="12" cy="12" r="6"></circle>
-    <circle cx="12" cy="12" r="2"></circle>
-  </svg>
-);
-
-const Menu = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="3" y1="12" x2="21" y2="12"></line>
-    <line x1="3" y1="6" x2="21" y2="6"></line>
-    <line x1="3" y1="18" x2="21" y2="18"></line>
-  </svg>
-);
-
-// ============= NAVBAR COMPONENT =============
-const Navbar = ({ mobileMenuOpen, setMobileMenuOpen }) => {
-  return (
-    <>
-      <nav className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
-        <div className="text-2xl font-black bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-          Genesis
-        </div>
-        
-        {/* Desktop Menu */}
-        <div className="hidden md:flex gap-8 text-sm font-medium">
-          <a href="/" className="hover:text-pink-400 transition-colors">Home</a>
-          <a href="/features" className="hover:text-pink-400 transition-colors">Features</a>
-          <a href="/docs" className="hover:text-pink-400 transition-colors">Docs</a>
-          <a href="/about" className="text-pink-400">About</a>
-        </div>
-
-        {/* Mobile Menu Button */}
-        <button 
-          className="md:hidden hover:text-pink-400 transition-colors"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          <Menu />
-        </button>
-      </nav>
-
-      {/* Mobile Menu Overlay */}
-      <div 
-        className={`fixed inset-0 bg-black/70 backdrop-blur-sm z-30 transition-opacity duration-300 ${
-          mobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}
-        onClick={() => setMobileMenuOpen(false)}
-      >
-        <div 
-          className={`absolute top-0 right-0 w-64 h-full bg-[#140024] p-6 transition-transform duration-500 ease-out ${
-            mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-          }`}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <button 
-            onClick={() => setMobileMenuOpen(false)} 
-            className="mb-6 ml-auto block hover:text-pink-400 transition-colors"
-          >
-            <X size={26} />
-          </button>
-          <nav className="flex flex-col gap-4 text-sm">
-            <a href="/" className="hover:text-pink-400 transition-all transform hover:translate-x-2">Home</a>
-            <a href="/features" className="hover:text-pink-400 transition-all transform hover:translate-x-2">Features</a>
-            <a href="/docs" className="hover:text-pink-400 transition-all transform hover:translate-x-2">Docs</a>
-            <a href="/about" className="text-pink-400">About</a>
-          </nav>
-        </div>
-      </div>
-    </>
-  );
-};
-
-// ============= MAIN COMPONENT =============
-export default function AboutUs() {
-  const [isVisible, setIsVisible] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [visibleSections, setVisibleSections] = useState({});
-  const canvasRef = useRef(null);
-
-  // Animation on mount
   useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Canvas particle animation
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const particles = [];
-    for (let i = 0; i < 80; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        size: Math.random() * 2,
-      });
-    }
-
-    let animationId;
-    const animate = () => {
-      ctx.fillStyle = "rgba(10, 1, 24, 0.1)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      particles.forEach((p) => {
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(236, 72, 153, ${Math.random() * 0.5 + 0.3})`;
-        ctx.fill();
-      });
-
-      animationId = requestAnimationFrame(animate);
+    const handleScroll = () => setScrollY(window.scrollY);
+    const handleMouseMove = (e) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
     };
-    animate();
-
-    return () => cancelAnimationFrame(animationId);
+    
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('mousemove', handleMouseMove);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
   }, []);
 
-  // Intersection Observer for scroll animations
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setVisibleSections((prev) => ({
-              ...prev,
-              [entry.target.id]: true
-            }));
-          }
+          setIsVisible(prev => ({
+            ...prev,
+            [entry.target.id]: entry.isIntersecting
+          }));
         });
       },
-      { threshold: 0.1, rootMargin: '0px 0px -100px 0px' }
+      { threshold: 0.1 }
     );
 
-    const elements = document.querySelectorAll('[data-animate]');
-    elements.forEach((el) => observer.observe(el));
+    document.querySelectorAll('[id^="section-"]').forEach((el) => {
+      observer.observe(el);
+    });
 
     return () => observer.disconnect();
   }, []);
 
-  // Data
-  const values = [
+  const features = [
     {
-      icon: Shield,
-      title: "Security First",
-      description: "Built with industry-leading security protocols to protect your assets and ensure safe transactions.",
-      color: "from-blue-500 to-cyan-500",
+      icon: <Shield className="w-10 h-10" />,
+      title: "Secure Registration",
+      description: "Register your digital assets with military-grade encryption and blockchain verification",
+      number: "01"
     },
     {
-      icon: Zap,
+      icon: <Search className="w-10 h-10" />,
+      title: "Instant Verification",
+      description: "Check IP ownership and authenticity in real-time with our advanced search engine",
+      number: "02"
+    },
+    {
+      icon: <Lock className="w-10 h-10" />,
+      title: "Blockchain Protected",
+      description: "Immutable records stored on secure blockchain network with cryptographic proof",
+      number: "03"
+    },
+    {
+      icon: <Zap className="w-10 h-10" />,
       title: "Lightning Fast",
-      description: "Experience blazing-fast transactions powered by Arbitrum's Layer 2 technology.",
-      color: "from-purple-500 to-pink-500",
-    },
-    {
-      icon: Users,
-      title: "Community Driven",
-      description: "Governed by our community through transparent voting mechanisms and decentralized decisions.",
-      color: "from-pink-500 to-rose-500",
-    },
-    {
-      icon: TrendingUp,
-      title: "Scalable Infrastructure",
-      description: "Designed to scale globally for millions of users and creators.",
-      color: "from-green-500 to-emerald-500",
-    },
-    {
-      icon: Award,
-      title: "High Originality",
-      description: "Powered by advanced content authenticity scanning and metadata intelligence.",
-      color: "from-yellow-500 to-amber-500",
-    },
+      description: "Get results instantly with our optimized infrastructure and global CDN",
+      number: "04"
+    }
   ];
 
   const stats = [
-    { label: "Active Users", value: "10K+", icon: Users },
-    { label: "Transactions", value: "1M+", icon: TrendingUp },
-    { label: "Network Uptime", value: "99.9%", icon: Shield },
-    { label: "Countries", value: "50+", icon: Target },
+    { label: "ACTIVE USERS", value: "50K+", icon: <Users className="w-6 h-6" /> },
+    { label: "REGISTERED IPs", value: "2M+", icon: <Database className="w-6 h-6" /> },
+    { label: "COUNTRIES", value: "120+", icon: <Globe className="w-6 h-6" /> },
+    { label: "VERIFIED ASSETS", value: "5M+", icon: <Award className="w-6 h-6" /> }
+  ];
+
+  const benefits = [
+    {
+      title: "Real-time Protection",
+      description: "Monitor your intellectual property 24/7 with automated alerts and instant notifications when unauthorized use is detected.",
+      image: "🛡️"
+    },
+    {
+      title: "Global Coverage",
+      description: "Access a worldwide network of IP registries and databases. Verify ownership across multiple jurisdictions seamlessly.",
+      image: "🌍"
+    },
+    {
+      title: "Smart Analytics",
+      description: "Get detailed insights about your IP portfolio with advanced analytics, usage tracking, and comprehensive reporting tools.",
+      image: "📊"
+    },
+    {
+      title: "Legal Compliance",
+      description: "Stay compliant with international IP laws and regulations. Automatic updates ensure you're always protected legally.",
+      image: "⚖️"
+    }
   ];
 
   return (
-    <div className="relative min-h-screen text-white overflow-hidden bg-[#0A0118]">
-      {/* Background Canvas */}
-      <canvas ref={canvasRef} className="fixed inset-0 w-full h-full pointer-events-none z-0" />
-      
-      {/* Grid Background */}
-      <div className="fixed inset-0 bg-[linear-gradient(rgba(139,92,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.03)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none z-0" />
+    <div className="min-h-screen bg-black text-white overflow-hidden relative">
+      {/* Animated Gradient Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div 
+          className="absolute inset-0 opacity-50"
+          style={{
+            background: `radial-gradient(circle at ${mousePos.x}px ${mousePos.y}px, rgba(139, 92, 246, 0.15), transparent 50%)`
+          }}
+        />
+        <div 
+          className="absolute w-[800px] h-[800px] bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"
+          style={{ top: '0%', left: '0%' }}
+        />
+        <div 
+          className="absolute w-[800px] h-[800px] bg-gradient-to-r from-purple-600 to-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"
+          style={{ top: '30%', right: '0%' }}
+        />
+        <div 
+          className="absolute w-[800px] h-[800px] bg-gradient-to-r from-blue-600 to-cyan-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"
+          style={{ bottom: '0%', left: '30%' }}
+        />
+      </div>
 
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-20 border-b border-white/10 backdrop-blur-xl bg-[#0A0118]/50">
-        {/*<Navbar mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />*/}
-        <Nav mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
-      </header>
-
-      <div className="h-20"></div>
+      {/* Navigation */}
+      <nav className="relative z-50 px-6 py-6">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center space-x-3 group cursor-pointer">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl blur opacity-75 group-hover:opacity-100 transition-opacity"></div>
+              <div className="relative w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-300">
+                <Shield className="w-7 h-7" />
+              </div>
+            </div>
+            <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+              IPGuard
+            </span>
+          </div>
+          <div className="hidden md:flex items-center space-x-8">
+            <a href="#features" className="text-gray-300 hover:text-white transition-colors">Features</a>
+            <a href="#benefits" className="text-gray-300 hover:text-white transition-colors">Benefits</a>
+            <a href="#how" className="text-gray-300 hover:text-white transition-colors">How it works</a>
+            <a href="#pricing" className="text-gray-300 hover:text-white transition-colors">Pricing</a>
+          </div>
+          <button className="px-6 py-3 bg-white text-black rounded-full font-semibold hover:shadow-lg hover:shadow-white/50 transform hover:scale-105 transition-all duration-300">
+            Install Now
+          </button>
+        </div>
+      </nav>
 
       {/* Hero Section */}
-      <section className="relative z-10 max-w-6xl mx-auto px-6 py-24">
-        <div className="relative">
-          <div className="absolute -top-20 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-[120px] animate-pulse" />
-          <div className="absolute -top-10 right-1/4 w-80 h-80 bg-pink-500/20 rounded-full blur-[100px]" style={{ animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) 1s infinite' }} />
-
-          <div className={`relative transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}>
-            <div className="inline-block px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-sm font-medium text-purple-300 backdrop-blur-sm mb-6">
-              🚀 Welcome to Our Story
-            </div>
-
-            <h1 className="text-4xl md:text-7xl font-black max-w-4xl leading-[1.1] tracking-tight">
-              About Our{' '}
-              <span className="relative inline-block">
-                <span className="absolute -inset-1 bg-gradient-to-r from-pink-500 to-purple-500 blur-2xl opacity-50"></span>
-                <span className="relative bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent bg-[length:200%_100%]" style={{ animation: 'gradientText 3s ease infinite' }}>
-                  Technology
-                </span>
-              </span>
-              <br />& Vision
-            </h1>
-
-            <p className="text-white/70 text-lg mt-8 max-w-2xl leading-relaxed">
-              We build next-generation verification and ownership tools powered by advanced content authenticity analysis and decentralized registration.
-            </p>
-
-            <div className="flex flex-wrap gap-4 mt-10">
-              <a href="#values" className="group relative px-8 py-4 font-bold text-lg rounded-xl overflow-hidden transform hover:scale-105 transition-all duration-300">
-                <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 bg-[length:200%_100%]" style={{ animation: 'gradientMove 3s ease infinite' }}></div>
-                <span className="relative z-10 flex items-center gap-2">
-                  Explore Values
-                  <ChevronDown size={18} className="group-hover:translate-y-1 transition-transform" />
-                </span>
-              </a>
-              <a href="#stats" className="px-8 py-4 font-bold text-lg rounded-xl bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 hover:border-purple-400/50 transition-all duration-300 backdrop-blur-sm transform hover:scale-105">
-                View Stats
-              </a>
-            </div>
+      <section className="relative z-10 px-6 pt-20 pb-32 max-w-7xl mx-auto">
+        <div className="text-center mb-12">
+          <div className="inline-block px-4 py-2 bg-purple-500/20 border border-purple-500/30 rounded-full text-sm font-semibold mb-8 animate-fade-in backdrop-blur-sm">
+            <span className="text-purple-400">✨ Trusted by 50,000+ Creators</span>
+          </div>
+          
+          <h1 className="text-6xl md:text-8xl font-bold mb-8 leading-tight">
+            <span className="block text-white animate-slide-up">Protect Your</span>
+            <span className="block bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-slide-up animation-delay-200">
+              Intellectual Property
+            </span>
+          </h1>
+          
+          <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-4xl mx-auto leading-relaxed animate-fade-in animation-delay-400">
+            The most advanced browser extension for IP registration, verification, and monitoring. 
+            Powered by blockchain technology and trusted by creators worldwide.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in animation-delay-600">
+            <button className="group px-10 py-5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full font-bold text-lg hover:shadow-2xl hover:shadow-purple-500/50 transform hover:scale-105 transition-all duration-300 flex items-center space-x-3">
+              <Download className="w-6 h-6 group-hover:animate-bounce" />
+              <span>Get Started Free</span>
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </button>
+            <button className="px-10 py-5 border-2 border-purple-500/50 rounded-full font-bold text-lg hover:bg-purple-500/10 hover:border-purple-500 transform hover:scale-105 transition-all duration-300 backdrop-blur-sm">
+              Watch Demo
+            </button>
           </div>
         </div>
-      </section>
 
-      {/* Stats Section */}
-      <section id="stats" data-animate="stats" className="relative z-10 max-w-6xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat, i) => {
-            const StatIcon = stat.icon;
-            return (
-              <div
-                key={i}
-                className={`group relative transition-all duration-700 ${
-                  visibleSections.stats ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-                }`}
-                style={{ transitionDelay: `${i * 100}ms` }}
-              >
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-pink-500 to-purple-500 rounded-2xl opacity-0 group-hover:opacity-100 blur transition duration-500"></div>
-                <div className="relative p-6 bg-gradient-to-br from-purple-950/50 via-purple-900/30 to-pink-900/30 rounded-2xl border border-purple-500/20 backdrop-blur-xl hover:border-purple-400/50 transition-all duration-500 transform hover:scale-105 hover:-translate-y-2">
-                  <StatIcon />
-                  <div className="text-3xl font-black bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent mb-1 mt-3">
-                    {stat.value}
-                  </div>
-                  <div className="text-xs font-bold text-purple-300 uppercase tracking-wider">
-                    {stat.label}
-                  </div>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto mt-20">
+          {stats.map((stat, index) => (
+            <div
+              key={index}
+              className="group relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 transform hover:-translate-y-2 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/20"
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="relative">
+                <div className="text-purple-400 mb-3 group-hover:scale-110 transition-transform">
+                  {stat.icon}
+                </div>
+                <div className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-1">
+                  {stat.value}
+                </div>
+                <div className="text-xs text-gray-500 font-semibold tracking-wider">
+                  {stat.label}
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Values Section */}
-      <section id="values" data-animate="values" className="relative z-10 max-w-6xl mx-auto px-6 py-20">
-        <div className={`text-center mb-16 transition-all duration-1000 ${visibleSections.values ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-          <div className="inline-block px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-sm font-medium text-purple-300 backdrop-blur-sm mb-6">
-            💎 Our Principles
+      {/* Features Section */}
+      <section id="section-features" className="relative z-10 px-6 py-32 max-w-7xl mx-auto">
+        <div className={`transition-all duration-1000 ${isVisible['section-features'] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}>
+          <div className="text-center mb-20">
+            <div className="inline-block px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-full text-sm font-semibold mb-6 backdrop-blur-sm">
+              <span className="text-blue-400">CORE FEATURES</span>
+            </div>
+            <h2 className="text-5xl md:text-6xl font-bold mb-6">
+              Everything You Need
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              Advanced tools and features designed to give you complete control over your intellectual property
+            </p>
           </div>
-          <h2 className="text-4xl md:text-5xl font-black leading-tight">
-            Our Core{' '}
-            <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Values
-            </span>
-          </h2>
-        </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {values.map((v, i) => {
-            const ValueIcon = v.icon;
-            return (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {features.map((feature, index) => (
               <div
-                key={i}
-                className={`group relative transition-all duration-700 ${
-                  visibleSections.values ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'
-                }`}
-                style={{ transitionDelay: `${i * 150}ms` }}
+                key={index}
+                className="group relative bg-gradient-to-br from-white/5 to-white/[0.02] backdrop-blur-xl border border-white/10 rounded-3xl p-10 transform hover:-translate-y-2 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-500"
+                style={{ animationDelay: `${index * 150}ms` }}
               >
-                <div className="absolute -inset-1 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 rounded-3xl opacity-0 group-hover:opacity-100 blur-xl transition duration-500 bg-[length:200%_100%]" style={{ animation: 'gradientMove 3s ease infinite' }}></div>
-                <div className="relative h-full p-8 rounded-3xl bg-gradient-to-br from-purple-950/80 via-purple-900/50 to-pink-900/50 border border-purple-500/20 backdrop-blur-xl hover:border-purple-400/50 transition-all duration-500 transform hover:scale-105 hover:-translate-y-2">
-                  <div className="relative mb-6 inline-block">
-                    <div className={`absolute inset-0 bg-gradient-to-br ${v.color} opacity-20 blur-xl rounded-2xl`}></div>
-                    <div className={`relative w-16 h-16 bg-gradient-to-br ${v.color} p-3 rounded-2xl transform group-hover:rotate-6 transition-transform duration-500`}>
-                      <ValueIcon />
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-purple-500/0 group-hover:from-blue-500/5 group-hover:to-purple-500/5 rounded-3xl transition-all duration-500"></div>
+                
+                <div className="relative">
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl blur opacity-50 group-hover:opacity-75 transition-opacity"></div>
+                      <div className="relative w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                        {feature.icon}
+                      </div>
+                    </div>
+                    <div className="text-7xl font-bold text-white/5 group-hover:text-white/10 transition-colors">
+                      {feature.number}
                     </div>
                   </div>
-                  <h3 className="text-2xl font-black mb-3 text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-pink-400 group-hover:to-purple-400 group-hover:bg-clip-text transition-all duration-300">
-                    {v.title}
+                  
+                  <h3 className="text-2xl font-bold mb-4 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400 group-hover:bg-clip-text transition-all">
+                    {feature.title}
                   </h3>
-                  <p className="text-white/70 text-sm leading-relaxed">
-                    {v.description}
+                  <p className="text-gray-400 leading-relaxed text-lg">
+                    {feature.description}
                   </p>
-                  <div className="absolute top-4 right-4 w-12 h-12 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-full blur-xl"></div>
+                  
+                  <div className="mt-6 flex items-center text-purple-400 font-semibold group-hover:translate-x-2 transition-transform">
+                    Learn more <ArrowRight className="w-4 h-4 ml-2" />
+                  </div>
                 </div>
               </div>
-            );
-          })}
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Mission Section */}
-      <section id="mission" data-animate="mission" className="relative z-10 max-w-6xl mx-auto px-6 py-24">
-        <div className="relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-purple-500/10 rounded-3xl blur-3xl"></div>
-          <div className={`relative bg-gradient-to-br from-purple-950/50 via-purple-900/30 to-pink-900/30 rounded-3xl p-12 md:p-16 border-2 border-purple-500/20 backdrop-blur-xl overflow-hidden transition-all duration-1000 ${
-              visibleSections.mission ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'
-            }`}>
-            <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-pink-500/20 to-transparent rounded-full blur-3xl"></div>
-            <div className="absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-tl from-purple-500/20 to-transparent rounded-full blur-3xl"></div>
-            <div className="relative text-center space-y-6">
-              <div className="inline-block px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-sm font-medium text-purple-300 backdrop-blur-sm mb-4">
-                🎯 Our Mission
+      {/* Benefits Section */}
+      <section id="section-benefits" className="relative z-10 px-6 py-32 max-w-7xl mx-auto">
+        <div className={`transition-all duration-1000 ${isVisible['section-benefits'] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}>
+          <div className="text-center mb-20">
+            <div className="inline-block px-4 py-2 bg-purple-500/20 border border-purple-500/30 rounded-full text-sm font-semibold mb-6 backdrop-blur-sm">
+              <span className="text-purple-400">WHAT'S IN IT FOR YOU</span>
+            </div>
+            <h2 className="text-5xl md:text-6xl font-bold mb-6">
+              Why Choose IPGuard?
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              Join thousands of creators who trust us to protect their most valuable assets
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {benefits.map((benefit, index) => (
+              <div
+                key={index}
+                className="group relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-12 transform hover:-translate-y-2 transition-all duration-500 overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 text-9xl opacity-5 group-hover:opacity-10 transition-opacity group-hover:scale-110 transform duration-500">
+                  {benefit.image}
+                </div>
+                
+                <div className="relative">
+                  <h3 className="text-3xl font-bold mb-4 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400 group-hover:bg-clip-text transition-all">
+                    {benefit.title}
+                  </h3>
+                  <p className="text-gray-400 leading-relaxed text-lg">
+                    {benefit.description}
+                  </p>
+                </div>
               </div>
-              <h2 className="text-4xl md:text-5xl font-black leading-tight max-w-3xl mx-auto">
-                Building the Future of{' '}
-                <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                  Decentralized Finance
-                </span>
-              </h2>
-              <p className="text-white/70 text-lg leading-relaxed max-w-2xl mx-auto">
-                Our mission is to create a more accessible, transparent, and efficient financial system that empowers everyone to participate in the global economy.
-              </p>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section id="section-cta" className="relative z-10 px-6 py-32 max-w-7xl mx-auto">
+        <div className={`relative bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-[3rem] p-16 md:p-24 text-center transform hover:scale-[1.01] transition-all duration-500 overflow-hidden ${isVisible['section-cta'] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}>
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41IiBvcGFjaXR5PSIwLjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
+          
+          <div className="relative">
+            <h2 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+              Ready to Protect Your<br />Creative Work?
+            </h2>
+            <p className="text-xl md:text-2xl text-blue-100 mb-12 max-w-3xl mx-auto leading-relaxed">
+              Join 50,000+ creators who are already securing their intellectual property with IPGuard
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button className="group px-12 py-6 bg-white text-purple-600 rounded-full font-bold text-xl hover:shadow-2xl hover:shadow-white/30 transform hover:scale-105 transition-all duration-300 flex items-center space-x-3 mx-auto sm:mx-0">
+                <Download className="w-6 h-6 group-hover:animate-bounce" />
+                <span>Install Extension</span>
+              </button>
+              <button className="px-12 py-6 border-2 border-white rounded-full font-bold text-xl hover:bg-white/10 transform hover:scale-105 transition-all duration-300 mx-auto sm:mx-0">
+                Contact Sales
+              </button>
+            </div>
+            
+            <div className="mt-12 flex items-center justify-center space-x-8 text-sm">
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="w-5 h-5" />
+                <span>Free 14-day trial</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="w-5 h-5" />
+                <span>No credit card required</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="w-5 h-5" />
+                <span>Cancel anytime</span>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-white/10 py-16 mt-20 backdrop-blur-xl bg-[#0A0118]/50">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center space-y-8 mb-12">
-            <div className="relative inline-block group cursor-pointer">
-              <div className="absolute -inset-4 bg-gradient-to-r from-pink-500 to-purple-500 rounded-lg blur-xl opacity-20 group-hover:opacity-40 transition duration-500"></div>
-              <h3 className="relative text-5xl font-black bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent bg-[length:200%_100%]" style={{ animation: 'gradientMove 3s ease infinite' }}>
-                Genesis
-              </h3>
+      <footer className="relative z-10 px-6 py-16 max-w-7xl mx-auto border-t border-white/10">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+          <div>
+            <div className="flex items-center space-x-2 mb-4">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <Shield className="w-6 h-6" />
+              </div>
+              <span className="text-xl font-bold">IPGuard</span>
             </div>
-
-            <div className="flex justify-center gap-3">
-              {[
-                { Icon: Twitter, color: 'from-sky-400 to-blue-500' },
-                { Icon: Instagram, color: 'from-pink-400 to-purple-500' },
-                { Icon: Youtube, color: 'from-red-400 to-rose-500' },
-                { Icon: Send, color: 'from-blue-400 to-cyan-400' },
-              ].map(({ Icon, color }, i) => (
-                <button key={i} className="group relative p-4 rounded-xl transition-all duration-300 transform hover:scale-110 hover:-translate-y-1">
-                  <div className={`absolute inset-0 bg-gradient-to-br ${color} opacity-10 group-hover:opacity-20 rounded-xl transition-opacity duration-300`}></div>
-                  <div className={`absolute inset-0 bg-gradient-to-br ${color} opacity-0 group-hover:opacity-100 rounded-xl blur-lg transition-opacity duration-300`}></div>
-                  <Icon />
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex flex-wrap justify-center gap-6 text-sm mb-8">
-            {['Terms', 'Privacy', 'Security', 'Docs', 'Support'].map((link) => (
-              <a key={link} href="#" className="text-gray-500 hover:text-white transition-colors duration-300">
-                {link}
-              </a>
-            ))}
-          </div>
-
-          <div className="text-center">
-            <p className="text-xs text-gray-600">
-              © 2025 Genesis. All rights reserved. Built on Arbitrum Chain.
+            <p className="text-gray-400">
+              Protecting creative assets with blockchain technology
             </p>
           </div>
+          <div>
+            <h4 className="font-bold mb-4">Product</h4>
+            <ul className="space-y-2 text-gray-400">
+              <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Security</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold mb-4">Company</h4>
+            <ul className="space-y-2 text-gray-400">
+              <li><a href="#" className="hover:text-white transition-colors">About</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold mb-4">Legal</h4>
+            <ul className="space-y-2 text-gray-400">
+              <li><a href="#" className="hover:text-white transition-colors">Privacy</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Terms</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Security</a></li>
+            </ul>
+          </div>
+        </div>
+        <div className="pt-8 border-t border-white/10 text-center text-gray-400">
+          <p>&copy; 2025 IPGuard. All rights reserved.</p>
         </div>
       </footer>
 
-      <style>{`
-        @keyframes gradientMove {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
+      <style jsx>{`
+        @keyframes blob {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          25% { transform: translate(20px, -50px) scale(1.1); }
+          50% { transform: translate(-20px, 20px) scale(0.9); }
+          75% { transform: translate(50px, 50px) scale(1.05); }
         }
-        @keyframes gradientText {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
+        
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slide-up {
+          from { opacity: 0; transform: translateY(30px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-blob {
+          animation: blob 7s infinite;
+        }
+        
+        .animate-fade-in {
+          animation: fade-in 1s ease-out;
+        }
+        
+        .animate-slide-up {
+          animation: slide-up 1s ease-out;
+        }
+        
+        .animation-delay-200 {
+          animation-delay: 200ms;
+        }
+        
+        .animation-delay-400 {
+          animation-delay: 400ms;
+        }
+        
+        .animation-delay-600 {
+          animation-delay: 600ms;
+        }
+        
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        
+        .animation-delay-4000 {
+          animation-delay: 4s;
         }
       `}</style>
     </div>
