@@ -98,6 +98,26 @@ export default function IPRegistryLanding() {
     }
   ];
 
+  const handleClick = () => {
+    const link = getExtensionLink();
+    window.open(link, "_blank");
+  };
+
+  const getExtensionLink = () => {
+    const ua = navigator.userAgent;
+
+    if (ua.includes("Chrome")) {
+      return "https://chrome.google.com/webstore/detail/metamask/...";
+    }
+    if (ua.includes("Firefox")) {
+      return "https://addons.mozilla.org/en-US/firefox/addon/metamask/";
+    }
+    if (ua.includes("Edg")) {
+      return "https://microsoftedge.microsoft.com/addons/detail/metamask/...";
+    }
+    return "https://metamask.io/download/";
+  };
+
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden relative">
       {/* Animated Gradient Background */}
@@ -142,7 +162,7 @@ export default function IPRegistryLanding() {
             <a href="#how" className="text-gray-300 hover:text-white transition-colors">How it works</a>
             <a href="#pricing" className="text-gray-300 hover:text-white transition-colors">Pricing</a>
           </div>
-          <button className="px-6 py-3 bg-white text-black rounded-full font-semibold hover:shadow-lg hover:shadow-white/50 transform hover:scale-105 transition-all duration-300">
+          <button onClick={handleClick} className="px-6 py-3 bg-white text-black rounded-full font-semibold hover:shadow-lg hover:shadow-white/50 transform hover:scale-105 transition-all duration-300">
             Install Now
           </button>
         </div>
