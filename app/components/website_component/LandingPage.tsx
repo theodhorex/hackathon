@@ -11,10 +11,10 @@ export default function IPRegistryLanding() {
     const handleMouseMove = (e) => {
       setMousePos({ x: e.clientX, y: e.clientY });
     };
-    
+
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('mousemove', handleMouseMove);
-    
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('mousemove', handleMouseMove);
@@ -122,21 +122,21 @@ export default function IPRegistryLanding() {
     <div className="min-h-screen bg-black text-white overflow-hidden relative">
       {/* Animated Gradient Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div 
+        <div
           className="absolute inset-0 opacity-50"
           style={{
             background: `radial-gradient(circle at ${mousePos.x}px ${mousePos.y}px, rgba(139, 92, 246, 0.15), transparent 50%)`
           }}
         />
-        <div 
+        <div
           className="absolute w-[800px] h-[800px] bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"
           style={{ top: '0%', left: '0%' }}
         />
-        <div 
+        <div
           className="absolute w-[800px] h-[800px] bg-gradient-to-r from-purple-600 to-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"
           style={{ top: '30%', right: '0%' }}
         />
-        <div 
+        <div
           className="absolute w-[800px] h-[800px] bg-gradient-to-r from-blue-600 to-cyan-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"
           style={{ bottom: '0%', left: '30%' }}
         />
@@ -171,24 +171,30 @@ export default function IPRegistryLanding() {
       {/* Hero Section */}
       <section className="relative z-10 px-6 pt-20 pb-32 max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <div className="inline-block px-4 py-2 bg-purple-500/20 border border-purple-500/30 rounded-full text-sm font-semibold mb-8 animate-fade-in backdrop-blur-sm">
-            <span className="text-purple-400">✨ Trusted by 50,000+ Creators</span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/20 border border-purple-500/30 rounded-full text-sm font-semibold mb-8 animate-fade-in backdrop-blur-sm">
+            <span className="text-purple-400">Powered By</span>
+            <img
+              className="w-5 h-5 rounded-full"
+              src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAAAM1BMVEUFByEEByEAABAAAB2Li5IgITI+Pkt4eYEAAAHFxcn///+3uLzb290NDyfz8/SoqK1kZG4P39DiAAAAAXRSTlPGMuG/4wAAAKBJREFUeAGk0IEKwyAMBNDqqTvTavv/X7vUMCClAWAHyOFTUbcthYnM8jdmDazi7g6Lpi5F0/oxNWQXkZ2rHlodYoimQa1oOeiO/c3ZqgqHiVMnC9f5J5PHfIkG9ziJB9pF+tThyumJaGLpfPkh7oYDLwgsK0we/XMcuq0NAQ59Yq6IcLLHeDWJsHbOGHFKgKqj9z4CTCCJ76iV+shL8gwAQlcIgai/2sUAAAAASUVORK5CYII="
+              alt="Yakoa Logo"
+            />
+            <b className="text-white">Yakoa</b>
           </div>
-          
+
+
           <h1 className="text-6xl md:text-8xl font-bold mb-8 leading-tight">
-            <span className="block text-white animate-slide-up">Protect Your</span>
+            <span className="block text-white animate-slide-up">One Click</span>
             <span className="block bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-slide-up animation-delay-200">
-              Intellectual Property
+              Secure IP Verification
             </span>
           </h1>
-          
+
           <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-4xl mx-auto leading-relaxed animate-fade-in animation-delay-400">
-            The most advanced browser extension for IP registration, verification, and monitoring. 
-            Powered by blockchain technology and trusted by creators worldwide.
+            A browser extension that detects your IP, verifies license status, and ensures only authorized addresses gain access
           </p>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in animation-delay-600">
-            <button className="group px-10 py-5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full font-bold text-lg hover:shadow-2xl hover:shadow-purple-500/50 transform hover:scale-105 transition-all duration-300 flex items-center space-x-3">
+            <button onClick={handleClick} className="group px-10 py-5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full font-bold text-lg hover:shadow-2xl hover:shadow-purple-500/50 transform hover:scale-105 transition-all duration-300 flex items-center space-x-3">
               <Download className="w-6 h-6 group-hover:animate-bounce" />
               <span>Get Started Free</span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -247,7 +253,7 @@ export default function IPRegistryLanding() {
                 style={{ animationDelay: `${index * 150}ms` }}
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-purple-500/0 group-hover:from-blue-500/5 group-hover:to-purple-500/5 rounded-3xl transition-all duration-500"></div>
-                
+
                 <div className="relative">
                   <div className="flex items-start justify-between mb-6">
                     <div className="relative">
@@ -260,14 +266,14 @@ export default function IPRegistryLanding() {
                       {feature.number}
                     </div>
                   </div>
-                  
+
                   <h3 className="text-2xl font-bold mb-4 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400 group-hover:bg-clip-text transition-all">
                     {feature.title}
                   </h3>
                   <p className="text-gray-400 leading-relaxed text-lg">
                     {feature.description}
                   </p>
-                  
+
                   <div className="mt-6 flex items-center text-purple-400 font-semibold group-hover:translate-x-2 transition-transform">
                     Learn more <ArrowRight className="w-4 h-4 ml-2" />
                   </div>
@@ -302,7 +308,7 @@ export default function IPRegistryLanding() {
                 <div className="absolute top-0 right-0 text-9xl opacity-5 group-hover:opacity-10 transition-opacity group-hover:scale-110 transform duration-500">
                   {benefit.image}
                 </div>
-                
+
                 <div className="relative">
                   <h3 className="text-3xl font-bold mb-4 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400 group-hover:bg-clip-text transition-all">
                     {benefit.title}
@@ -321,7 +327,7 @@ export default function IPRegistryLanding() {
       <section id="section-cta" className="relative z-10 px-6 py-32 max-w-7xl mx-auto">
         <div className={`relative bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-[3rem] p-16 md:p-24 text-center transform hover:scale-[1.01] transition-all duration-500 overflow-hidden ${isVisible['section-cta'] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}>
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41IiBvcGFjaXR5PSIwLjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
-          
+
           <div className="relative">
             <h2 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
               Ready to Protect Your<br />Creative Work?
@@ -329,7 +335,7 @@ export default function IPRegistryLanding() {
             <p className="text-xl md:text-2xl text-blue-100 mb-12 max-w-3xl mx-auto leading-relaxed">
               Join 50,000+ creators who are already securing their intellectual property with IPGuard
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button onClick={handleClick} className="group px-12 py-6 bg-white text-purple-600 rounded-full font-bold text-xl hover:shadow-2xl hover:shadow-white/30 transform hover:scale-105 transition-all duration-300 flex items-center space-x-3 mx-auto sm:mx-0">
                 <Download className="w-6 h-6 group-hover:animate-bounce" />
@@ -339,7 +345,7 @@ export default function IPRegistryLanding() {
                 Contact Sales
               </button>
             </div>
-            
+
             <div className="mt-12 flex items-center justify-center space-x-8 text-sm">
               <div className="flex items-center space-x-2">
                 <CheckCircle className="w-5 h-5" />
