@@ -1,646 +1,492 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Twitter, Send, MessageCircle, Youtube, Instagram, ChevronDown, Menu, X } from 'lucide-react';
+import React from 'react';
+import Nav from "./navbar"
 
-export default function GenesisLanding() {
+
+const { useState, useEffect, useRef } = React;
+
+
+// ============= ICONS COMPONENTS =============
+const Twitter = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/>
+  </svg>
+);
+
+const Send = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="22" y1="2" x2="11" y2="13"></line>
+    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+  </svg>
+);
+
+const Youtube = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path>
+    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+  </svg>
+);
+
+const Instagram = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+  </svg>
+);
+
+const Users = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+    <circle cx="9" cy="7" r="4"></circle>
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+  </svg>
+);
+
+const Zap = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+  </svg>
+);
+
+const Shield = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+  </svg>
+);
+
+const TrendingUp = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+    <polyline points="17 6 23 6 23 12"></polyline>
+  </svg>
+);
+
+const Award = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="8" r="7"></circle>
+    <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+  </svg>
+);
+
+const ChevronDown = ({ size = 18, className = "" }) => (
+  <svg width={size} height={size} className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="6 9 12 15 18 9"></polyline>
+  </svg>
+);
+
+const X = ({ size = 26 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"></line>
+    <line x1="6" y1="6" x2="18" y2="18"></line>
+  </svg>
+);
+
+const Target = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"></circle>
+    <circle cx="12" cy="12" r="6"></circle>
+    <circle cx="12" cy="12" r="2"></circle>
+  </svg>
+);
+
+const Menu = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="3" y1="12" x2="21" y2="12"></line>
+    <line x1="3" y1="6" x2="21" y2="6"></line>
+    <line x1="3" y1="18" x2="21" y2="18"></line>
+  </svg>
+);
+
+// ============= NAVBAR COMPONENT =============
+const Navbar = ({ mobileMenuOpen, setMobileMenuOpen }) => {
+  return (
+    <>
+      <nav className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
+        <div className="text-2xl font-black bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+          Genesis
+        </div>
+        
+        {/* Desktop Menu */}
+        <div className="hidden md:flex gap-8 text-sm font-medium">
+          <a href="/" className="hover:text-pink-400 transition-colors">Home</a>
+          <a href="/features" className="hover:text-pink-400 transition-colors">Features</a>
+          <a href="/docs" className="hover:text-pink-400 transition-colors">Docs</a>
+          <a href="/about" className="text-pink-400">About</a>
+        </div>
+
+        {/* Mobile Menu Button */}
+        <button 
+          className="md:hidden hover:text-pink-400 transition-colors"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        >
+          <Menu />
+        </button>
+      </nav>
+
+      {/* Mobile Menu Overlay */}
+      <div 
+        className={`fixed inset-0 bg-black/70 backdrop-blur-sm z-30 transition-opacity duration-300 ${
+          mobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={() => setMobileMenuOpen(false)}
+      >
+        <div 
+          className={`absolute top-0 right-0 w-64 h-full bg-[#140024] p-6 transition-transform duration-500 ease-out ${
+            mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button 
+            onClick={() => setMobileMenuOpen(false)} 
+            className="mb-6 ml-auto block hover:text-pink-400 transition-colors"
+          >
+            <X size={26} />
+          </button>
+          <nav className="flex flex-col gap-4 text-sm">
+            <a href="/" className="hover:text-pink-400 transition-all transform hover:translate-x-2">Home</a>
+            <a href="/features" className="hover:text-pink-400 transition-all transform hover:translate-x-2">Features</a>
+            <a href="/docs" className="hover:text-pink-400 transition-all transform hover:translate-x-2">Docs</a>
+            <a href="/about" className="text-pink-400">About</a>
+          </nav>
+        </div>
+      </div>
+    </>
+  );
+};
+
+// ============= MAIN COMPONENT =============
+export default function AboutUs() {
   const [isVisible, setIsVisible] = useState(false);
-  const [activeTab, setActiveTab] = useState('swap');
-  const [scrollY, setScrollY] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [visibleSections, setVisibleSections] = useState({});
+  const canvasRef = useRef(null);
 
+  // Animation on mount
   useEffect(() => {
-    setIsVisible(true);
-    
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll);
-    
-    // Particle animation
+    const timer = setTimeout(() => setIsVisible(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Canvas particle animation
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    
+
+    const ctx = canvas.getContext("2d");
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    
-    const particles: Array<{x: number, y: number, vx: number, vy: number, size: number}> = [];
-    for (let i = 0; i < 50; i++) {
+
+    const particles = [];
+    for (let i = 0; i < 80; i++) {
       particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
         vx: (Math.random() - 0.5) * 0.5,
         vy: (Math.random() - 0.5) * 0.5,
-        size: Math.random() * 2
+        size: Math.random() * 2,
       });
     }
-    
-    let animationId: number;
+
+    let animationId;
     const animate = () => {
-      ctx.fillStyle = 'rgba(10, 1, 24, 0.1)';
+      ctx.fillStyle = "rgba(10, 1, 24, 0.1)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      particles.forEach(p => {
+
+      particles.forEach((p) => {
         p.x += p.vx;
         p.y += p.vy;
-        
         if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
         if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-        
+
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(236, 72, 153, ${Math.random() * 0.5 + 0.3})`;
         ctx.fill();
       });
-      
+
       animationId = requestAnimationFrame(animate);
     };
     animate();
-    
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      cancelAnimationFrame(animationId);
-    };
+
+    return () => cancelAnimationFrame(animationId);
   }, []);
 
+  // Intersection Observer for scroll animations
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setVisibleSections((prev) => ({
+              ...prev,
+              [entry.target.id]: true
+            }));
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -100px 0px' }
+    );
+
+    const elements = document.querySelectorAll('[data-animate]');
+    elements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Data
+  const values = [
+    {
+      icon: Shield,
+      title: "Security First",
+      description: "Built with industry-leading security protocols to protect your assets and ensure safe transactions.",
+      color: "from-blue-500 to-cyan-500",
+    },
+    {
+      icon: Zap,
+      title: "Lightning Fast",
+      description: "Experience blazing-fast transactions powered by Arbitrum's Layer 2 technology.",
+      color: "from-purple-500 to-pink-500",
+    },
+    {
+      icon: Users,
+      title: "Community Driven",
+      description: "Governed by our community through transparent voting mechanisms and decentralized decisions.",
+      color: "from-pink-500 to-rose-500",
+    },
+    {
+      icon: TrendingUp,
+      title: "Scalable Infrastructure",
+      description: "Designed to scale globally for millions of users and creators.",
+      color: "from-green-500 to-emerald-500",
+    },
+    {
+      icon: Award,
+      title: "High Originality",
+      description: "Powered by advanced content authenticity scanning and metadata intelligence.",
+      color: "from-yellow-500 to-amber-500",
+    },
+  ];
+
   const stats = [
-    { label: 'TOTAL VALUE LOCKED', value: '$99,233,374', color: 'from-pink-500 to-rose-500' },
-    { label: 'CIRCULATING SUPPLY', value: '18,021,367', color: 'from-purple-500 to-pink-500' },
-    { label: 'CIRCULATING MARKET CAP', value: '$5,768,639', color: 'from-blue-500 to-purple-500' },
-    { label: 'THE PRICE', value: '$0.32', color: 'from-cyan-500 to-blue-500' },
-  ];
-
-  const bottomStats = [
-    { label: 'EPOCH ENDS IN', value: '$5,454,114', color: 'from-violet-500 to-purple-500' },
-    { label: '24H VOLUME', value: '2D 10H 18M', color: 'from-fuchsia-500 to-pink-500' },
-  ];
-
-  const team = [
-    {
-      name: 'Brooklyn Simmons',
-      role: 'Founder',
-      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop',
-    },
-    {
-      name: 'Guy Hawkins',
-      role: 'Ceo',
-      image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop',
-    },
-    {
-      name: 'Courtney Henry',
-      role: 'Manager',
-      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop',
-    },
+    { label: "Active Users", value: "10K+", icon: Users },
+    { label: "Transactions", value: "1M+", icon: TrendingUp },
+    { label: "Network Uptime", value: "99.9%", icon: Shield },
+    { label: "Countries", value: "50+", icon: Target },
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0118] text-white overflow-hidden relative">
-      {/* Animated Background Canvas */}
-      <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0" />
+    <div className="relative min-h-screen text-white overflow-hidden bg-[#0A0118]">
+      {/* Background Canvas */}
+      <canvas ref={canvasRef} className="fixed inset-0 w-full h-full pointer-events-none z-0" />
       
-      {/* Grid Overlay */}
+      {/* Grid Background */}
       <div className="fixed inset-0 bg-[linear-gradient(rgba(139,92,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.03)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none z-0" />
 
-      {/* Navigation */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-700 ${scrollY > 50 ? 'bg-[#0a0118]/95 backdrop-blur-xl border-b border-purple-500/20 shadow-lg shadow-purple-500/5' : 'bg-transparent'} ${isVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="relative group cursor-pointer">
-              <div className="absolute -inset-2 bg-gradient-to-r from-pink-500 to-purple-500 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
-              <div className="relative text-2xl font-black bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                IP Shieldsssss
-              </div>
-            </div>
-            
-            {/* Desktop Menu */}
-            <div className="hidden lg:flex space-x-8">
-              {['Home', 'Swap', 'Liquidity', 'Lock', 'Vote', 'Rewards'].map((item, i) => (
-                <a
-                  key={item}
-                  href="#"
-                  className="text-sm font-medium text-gray-300 hover:text-white transition-all duration-300 relative group"
-                  style={{ transitionDelay: `${i * 50}ms` }}
-                >
-                  {item}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-500 to-purple-500 group-hover:w-full transition-all duration-300"></span>
-                </a>
-              ))}
-              <button className="text-sm font-medium text-gray-300 hover:text-white transition-all duration-300 flex items-center gap-1">
-                More <ChevronDown size={16} />
-              </button>
-            </div>
+      {/* Header */}
+      <header className="fixed top-0 left-0 right-0 z-20 border-b border-white/10 backdrop-blur-xl bg-[#0A0118]/50">
+        {/*<Navbar mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />*/}
+        <Nav mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
+      </header>
 
-            <div className="flex items-center gap-3">
-              <button className="hidden sm:block p-2.5 bg-purple-500/10 hover:bg-purple-500/20 rounded-xl transition-all duration-300 transform hover:scale-110 hover:rotate-3 border border-purple-500/20">
-                <Twitter size={18} className="text-purple-300" />
-              </button>
-              <button className="hidden sm:block p-2.5 bg-pink-500/10 hover:bg-pink-500/20 rounded-xl transition-all duration-300 transform hover:scale-110 hover:-rotate-3 border border-pink-500/20">
-                <Send size={18} className="text-pink-300" />
-              </button>
-              <button className="relative px-6 py-2.5 font-semibold text-sm rounded-xl overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 bg-[length:200%_100%] animate-[gradient_3s_ease_infinite]"></div>
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 transition-opacity duration-300"></div>
-                <span className="relative z-10">Swap Now</span>
-              </button>
-              <button className="lg:hidden p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-              </button>
-            </div>
-          </div>
-        </div>
-        
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden bg-[#0a0118]/98 backdrop-blur-xl border-t border-purple-500/20">
-            <div className="px-4 py-6 space-y-4">
-              {['Home', 'Swap', 'Liquidity', 'Lock', 'Vote', 'Rewards', 'More'].map((item) => (
-                <a key={item} href="#" className="block text-sm font-medium text-gray-300 hover:text-white transition-colors">
-                  {item}
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
-      </nav>
+      <div className="h-20"></div>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className={`space-y-8 transition-all duration-1000 delay-200 ${isVisible ? 'translate-x-0 opacity-100' : '-translate-x-20 opacity-0'}`}>
-              <div className="inline-block px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-sm font-medium text-purple-300 backdrop-blur-sm">
-                🚀 Welcome to Genesis DEX
-              </div>
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight">
-                The{' '}
-                <span className="relative inline-block">
-                  <span className="absolute -inset-1 bg-gradient-to-r from-pink-500 to-purple-500 blur-2xl opacity-50"></span>
-                  <span className="relative bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-[gradient_3s_ease_infinite] bg-[length:200%_100%]">
-                    Native DEX
-                  </span>
-                </span>{' '}
-                of<br />
-                Arbitrum Chain
-              </h1>
-              <p className="text-gray-400 text-lg leading-relaxed max-w-xl">
-                Amet Minim Mollit Non Deserunt Ullamco Est Sit Aliqua Dolor Do Amet Sint. Velit Officia Consequat Duis Enim Velit Mollit. Exercitation Veniam Eum Deserunt Ullamco.
-              </p>
-              <button className="group relative px-8 py-4 font-bold text-lg rounded-xl overflow-hidden transform hover:scale-105 transition-all duration-300">
-                <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 bg-[length:200%_100%] animate-[gradient_3s_ease_infinite]"></div>
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.2)_0%,transparent_70%)] transition-opacity duration-300"></div>
-                <span className="relative z-10 flex items-center gap-2">
-                  Swap Now
-                  <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
-                </span>
-              </button>
-            </div>
-            
-            {/* 3D Floating Elements */}
-            <div className={`relative transition-all duration-1000 delay-500 ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-20 opacity-0'}`}>
-              <div className="relative w-full h-[500px] flex items-center justify-center">
-                {/* Glow Effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-pink-500/30 via-purple-500/30 to-blue-500/30 rounded-full blur-[100px] animate-pulse"></div>
-                
-                {/* Floating 3D Objects */}
-                <div className="relative w-full h-full">
-                  {/* Main Crystal/Diamond */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 animate-[float_6s_ease-in-out_infinite]">
-                    <div className="relative w-full h-full">
-                      <div className="absolute inset-0 bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 rounded-3xl rotate-45 transform-gpu animate-[spin_20s_linear_infinite] shadow-2xl shadow-purple-500/50"></div>
-                      <div className="absolute inset-4 bg-gradient-to-tl from-pink-300 via-purple-300 to-blue-300 rounded-3xl rotate-45 transform-gpu animate-[spin_15s_linear_infinite_reverse] opacity-80"></div>
-                    </div>
-                  </div>
-                  
-                  {/* Orbiting Icons */}
-                  <div className="absolute top-1/4 right-1/4 w-20 h-20 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-2xl animate-[orbit_10s_linear_infinite] shadow-lg shadow-blue-500/50 flex items-center justify-center text-3xl rotate-12">
-                    💎
-                  </div>
-                  <div className="absolute bottom-1/4 left-1/4 w-24 h-24 bg-gradient-to-br from-purple-400 to-pink-400 rounded-2xl animate-[orbit_12s_linear_infinite_reverse] shadow-lg shadow-pink-500/50 flex items-center justify-center text-4xl -rotate-12">
-                    🪙
-                  </div>
-                  <div className="absolute top-1/3 left-1/4 w-16 h-16 bg-gradient-to-br from-pink-400 to-rose-400 rounded-full animate-[orbit_8s_linear_infinite] shadow-lg shadow-pink-500/50 flex items-center justify-center text-2xl">
-                    ⭐
-                  </div>
-                </div>
-                
-                {/* Floating Badge */}
-                <div className="absolute top-20 right-10 px-4 py-2 bg-purple-500/20 backdrop-blur-xl border border-purple-400/30 rounded-full animate-[float_4s_ease-in-out_infinite] shadow-lg">
-                  <span className="text-sm font-bold bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">Backed</span>
-                </div>
-              </div>
-            </div>
-          </div>
+      <section className="relative z-10 max-w-6xl mx-auto px-6 py-24">
+        <div className="relative">
+          <div className="absolute -top-20 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-[120px] animate-pulse" />
+          <div className="absolute -top-10 right-1/4 w-80 h-80 bg-pink-500/20 rounded-full blur-[100px]" style={{ animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) 1s infinite' }} />
 
-          {/* Wave Line Animation */}
-          <div className="mt-16 relative h-24">
-            <svg className="w-full h-full" viewBox="0 0 1440 100" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#ec4899" />
-                  <stop offset="50%" stopColor="#8b5cf6" />
-                  <stop offset="100%" stopColor="#3b82f6" />
-                </linearGradient>
-              </defs>
-              <path
-                d="M0,50 Q360,10 720,50 T1440,50"
-                fill="none"
-                stroke="url(#waveGradient)"
-                strokeWidth="3"
-                opacity="0.6"
-              >
-                <animate
-                  attributeName="d"
-                  values="M0,50 Q360,10 720,50 T1440,50;M0,50 Q360,90 720,50 T1440,50;M0,50 Q360,10 720,50 T1440,50"
-                  dur="4s"
-                  repeatCount="indefinite"
-                />
-              </path>
-            </svg>
+          <div className={`relative transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}>
+            <div className="inline-block px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-sm font-medium text-purple-300 backdrop-blur-sm mb-6">
+              🚀 Welcome to Our Story
+            </div>
+
+            <h1 className="text-4xl md:text-7xl font-black max-w-4xl leading-[1.1] tracking-tight">
+              About Our{' '}
+              <span className="relative inline-block">
+                <span className="absolute -inset-1 bg-gradient-to-r from-pink-500 to-purple-500 blur-2xl opacity-50"></span>
+                <span className="relative bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent bg-[length:200%_100%]" style={{ animation: 'gradientText 3s ease infinite' }}>
+                  Technology
+                </span>
+              </span>
+              <br />& Vision
+            </h1>
+
+            <p className="text-white/70 text-lg mt-8 max-w-2xl leading-relaxed">
+              We build next-generation verification and ownership tools powered by advanced content authenticity analysis and decentralized registration.
+            </p>
+
+            <div className="flex flex-wrap gap-4 mt-10">
+              <a href="#values" className="group relative px-8 py-4 font-bold text-lg rounded-xl overflow-hidden transform hover:scale-105 transition-all duration-300">
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 bg-[length:200%_100%]" style={{ animation: 'gradientMove 3s ease infinite' }}></div>
+                <span className="relative z-10 flex items-center gap-2">
+                  Explore Values
+                  <ChevronDown size={18} className="group-hover:translate-y-1 transition-transform" />
+                </span>
+              </a>
+              <a href="#stats" className="px-8 py-4 font-bold text-lg rounded-xl bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 hover:border-purple-400/50 transition-all duration-300 backdrop-blur-sm transform hover:scale-105">
+                View Stats
+              </a>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 relative">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            {stats.map((stat, i) => (
+      <section id="stats" data-animate="stats" className="relative z-10 max-w-6xl mx-auto px-6 py-16">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          {stats.map((stat, i) => {
+            const StatIcon = stat.icon;
+            return (
               <div
                 key={i}
-                className={`group relative transition-all duration-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
+                className={`group relative transition-all duration-700 ${
+                  visibleSections.stats ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+                }`}
                 style={{ transitionDelay: `${i * 100}ms` }}
               >
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-pink-500 to-purple-500 rounded-2xl opacity-0 group-hover:opacity-100 blur transition duration-500"></div>
-                <div className="relative p-6 bg-gradient-to-br from-purple-950/50 via-purple-900/30 to-pink-900/30 rounded-2xl border border-purple-500/20 backdrop-blur-xl hover:border-purple-400/50 transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 shadow-xl">
-                  <div className="text-xs font-bold text-purple-300 mb-3 uppercase tracking-wider">{stat.label}</div>
-                  <div className={`text-3xl font-black bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
+                <div className="relative p-6 bg-gradient-to-br from-purple-950/50 via-purple-900/30 to-pink-900/30 rounded-2xl border border-purple-500/20 backdrop-blur-xl hover:border-purple-400/50 transition-all duration-500 transform hover:scale-105 hover:-translate-y-2">
+                  <StatIcon />
+                  <div className="text-3xl font-black bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent mb-1 mt-3">
                     {stat.value}
                   </div>
-                  <div className="absolute top-2 right-2 w-12 h-12 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-full blur-xl"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
-            {bottomStats.map((stat, i) => (
-              <div
-                key={i}
-                className={`group relative transition-all duration-700 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
-                style={{ transitionDelay: `${(i + 4) * 100}ms` }}
-              >
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl opacity-0 group-hover:opacity-100 blur transition duration-500"></div>
-                <div className="relative p-6 bg-gradient-to-br from-purple-950/50 via-purple-900/30 to-pink-900/30 rounded-2xl border border-purple-500/20 backdrop-blur-xl hover:border-purple-400/50 transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 shadow-xl">
-                  <div className="text-xs font-bold text-purple-300 mb-3 uppercase tracking-wider">{stat.label}</div>
-                  <div className={`text-3xl font-black bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
-                    {stat.value}
+                  <div className="text-xs font-bold text-purple-300 uppercase tracking-wider">
+                    {stat.label}
                   </div>
-                  <div className="absolute top-2 right-2 w-12 h-12 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-full blur-xl"></div>
                 </div>
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
       </section>
 
-      {/* Tabs Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex flex-wrap justify-center gap-4 mb-8">
-            {['Swap', 'Staking', 'Vote'].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab.toLowerCase())}
-                className={`relative px-10 py-4 font-bold text-lg rounded-xl transition-all duration-500 transform hover:scale-105 ${
-                  activeTab === tab.toLowerCase()
-                    ? 'text-white shadow-2xl'
-                    : 'text-gray-400 hover:text-white'
+      {/* Values Section */}
+      <section id="values" data-animate="values" className="relative z-10 max-w-6xl mx-auto px-6 py-20">
+        <div className={`text-center mb-16 transition-all duration-1000 ${visibleSections.values ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+          <div className="inline-block px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-sm font-medium text-purple-300 backdrop-blur-sm mb-6">
+            💎 Our Principles
+          </div>
+          <h2 className="text-4xl md:text-5xl font-black leading-tight">
+            Our Core{' '}
+            <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+              Values
+            </span>
+          </h2>
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {values.map((v, i) => {
+            const ValueIcon = v.icon;
+            return (
+              <div
+                key={i}
+                className={`group relative transition-all duration-700 ${
+                  visibleSections.values ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'
                 }`}
+                style={{ transitionDelay: `${i * 150}ms` }}
               >
-                {activeTab === tab.toLowerCase() && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 rounded-xl animate-[gradient_3s_ease_infinite] bg-[length:200%_100%]"></div>
-                )}
-                {activeTab !== tab.toLowerCase() && (
-                  <div className="absolute inset-0 bg-purple-500/10 rounded-xl border border-purple-500/20 hover:bg-purple-500/20"></div>
-                )}
-                <span className="relative z-10">{tab}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Staking Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-900/10 to-transparent"></div>
-        <div className="max-w-7xl mx-auto relative">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div className="relative order-2 lg:order-1">
-              <div className="relative w-full h-[400px] flex items-center justify-center">
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 via-orange-500/20 to-pink-500/20 rounded-full blur-[120px] animate-pulse"></div>
-                
-                {/* Stacked Coins Animation */}
-                <div className="relative">
-                  {[...Array(5)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="absolute left-1/2 top-1/2 -translate-x-1/2 w-32 h-32 bg-gradient-to-br from-yellow-400 via-orange-400 to-yellow-500 rounded-full shadow-2xl shadow-yellow-500/50 border-4 border-yellow-300/50"
-                      style={{
-                        transform: `translate(-50%, -50%) translateY(${-i * 15}px) rotateX(60deg)`,
-                        animation: `float ${4 + i * 0.5}s ease-in-out infinite`,
-                        animationDelay: `${i * 0.2}s`,
-                        zIndex: 5 - i
-                      }}
-                    >
-                      <div className="w-full h-full rounded-full bg-gradient-to-br from-yellow-200/50 to-transparent"></div>
-                      <div className="absolute inset-0 flex items-center justify-center text-4xl font-black text-yellow-900">$</div>
-                    </div>
-                  ))}
-                </div>
-                
-                {/* Floating Particles */}
-                {[...Array(8)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="absolute w-2 h-2 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full animate-[float_3s_ease-in-out_infinite]"
-                    style={{
-                      left: `${20 + Math.random() * 60}%`,
-                      top: `${20 + Math.random() * 60}%`,
-                      animationDelay: `${Math.random() * 2}s`
-                    }}
-                  ></div>
-                ))}
-              </div>
-            </div>
-            
-            <div className="space-y-8 order-1 lg:order-2">
-              <div className="inline-block px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-sm font-medium text-purple-300 backdrop-blur-sm">
-                💰 Earn Passive Income
-              </div>
-              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight">
-                Investing In{' '}
-                <span className="relative inline-block">
-                  <span className="absolute -inset-1 bg-gradient-to-r from-pink-500 to-purple-500 blur-2xl opacity-50"></span>
-                  <span className="relative bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                    Staking
-                  </span>
-                </span>
-                <br />
-                Get Passive Income
-              </h2>
-              <p className="text-gray-400 text-lg leading-relaxed">
-                Amet Minim Mollit Non Deserunt Ullamco Est Sit Aliqua Dolor Do Amet Sint. Velit Officia Consequat Duis Enim Velit Mollit. Exercitation Veniam.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <button className="group relative px-8 py-4 font-bold text-lg rounded-xl overflow-hidden transform hover:scale-105 transition-all duration-300">
-                  <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 bg-[length:200%_100%] animate-[gradient_3s_ease_infinite]"></div>
-                  <span className="relative z-10 flex items-center gap-2">
-                    Start Stake
-                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                  </span>
-                </button>
-                <button className="px-8 py-4 font-bold text-lg rounded-xl bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20 hover:border-purple-400/50 transition-all duration-300 backdrop-blur-sm">
-                  Learn More
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Team Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 relative">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <div className="inline-block px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-sm font-medium text-purple-300 backdrop-blur-sm mb-6">
-              👥 Our Leadership
-            </div>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight">
-              Meet With Our
-              <br />
-              <span className="relative inline-block mt-2">
-                <span className="absolute -inset-1 bg-gradient-to-r from-pink-500 to-purple-500 blur-2xl opacity-50"></span>
-                <span className="relative bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                  Team
-                </span>
-              </span>
-            </h2>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {team.map((member, i) => (
-              <div
-                key={i}
-                className={`group transition-all duration-700 transform hover:scale-105 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}
-                style={{ transitionDelay: `${i * 200}ms` }}
-              >
-                <div className="relative h-full">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 rounded-3xl opacity-0 group-hover:opacity-100 blur-xl transition duration-500 animate-[gradient_3s_ease_infinite] bg-[length:200%_100%]"></div>
-                  <div className="relative h-full bg-gradient-to-br from-purple-950/80 via-purple-900/50 to-pink-900/50 rounded-3xl overflow-hidden border border-purple-500/20 backdrop-blur-xl">
-                    {/* Top Gradient Bar */}
-                    <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-br from-pink-500 via-purple-500 to-pink-500 bg-[length:200%_100%] animate-[gradient_3s_ease_infinite]"></div>
-                    
-                    {/* Content */}
-                    <div className="relative p-8 flex flex-col items-center pt-20">
-                      {/* Profile Image */}
-                      <div className="relative mb-6 group-hover:scale-110 transition-transform duration-500">
-                        <div className="absolute -inset-2 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full blur-lg opacity-50"></div>
-                        <div className="relative w-28 h-28 rounded-full border-4 border-purple-900/50 overflow-hidden ring-4 ring-purple-500/20">
-                          <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
-                        </div>
-                        {/* Online Status Dot */}
-                        <div className="absolute bottom-2 right-2 w-4 h-4 bg-green-400 rounded-full border-2 border-purple-900 animate-pulse"></div>
-                      </div>
-                      
-                      {/* Name & Role */}
-                      <h3 className="text-xl font-black mb-1 text-white">{member.name}</h3>
-                      <p className="text-sm font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent mb-6">{member.role}</p>
-                      
-                      {/* Description */}
-                      <p className="text-sm text-gray-400 text-center leading-relaxed mb-6">
-                        Amet Minim Mollit Non Deserunt Ullamco Est Sit Aliqua Dolor Do Amet Sint. Velit Mollit. Exercitation Veniam Consequat Sunt Nostrud Amet.
-                      </p>
-                      
-                      {/* Social Links */}
-                      <div className="flex gap-2">
-                        {[Twitter, MessageCircle, Send].map((Icon, idx) => (
-                          <button
-                            key={idx}
-                            className="p-2 bg-purple-500/10 hover:bg-purple-500/20 rounded-lg transition-all duration-300 transform hover:scale-110 border border-purple-500/20"
-                          >
-                            <Icon size={16} className="text-purple-300" />
-                          </button>
-                        ))}
-                      </div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 rounded-3xl opacity-0 group-hover:opacity-100 blur-xl transition duration-500 bg-[length:200%_100%]" style={{ animation: 'gradientMove 3s ease infinite' }}></div>
+                <div className="relative h-full p-8 rounded-3xl bg-gradient-to-br from-purple-950/80 via-purple-900/50 to-pink-900/50 border border-purple-500/20 backdrop-blur-xl hover:border-purple-400/50 transition-all duration-500 transform hover:scale-105 hover:-translate-y-2">
+                  <div className="relative mb-6 inline-block">
+                    <div className={`absolute inset-0 bg-gradient-to-br ${v.color} opacity-20 blur-xl rounded-2xl`}></div>
+                    <div className={`relative w-16 h-16 bg-gradient-to-br ${v.color} p-3 rounded-2xl transform group-hover:rotate-6 transition-transform duration-500`}>
+                      <ValueIcon />
                     </div>
                   </div>
+                  <h3 className="text-2xl font-black mb-3 text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-pink-400 group-hover:to-purple-400 group-hover:bg-clip-text transition-all duration-300">
+                    {v.title}
+                  </h3>
+                  <p className="text-white/70 text-sm leading-relaxed">
+                    {v.description}
+                  </p>
+                  <div className="absolute top-4 right-4 w-12 h-12 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-full blur-xl"></div>
                 </div>
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-900/10 to-transparent"></div>
-        <div className="max-w-5xl mx-auto relative">
-          <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 rounded-3xl opacity-30 group-hover:opacity-50 blur-2xl transition duration-1000 animate-[gradient_5s_ease_infinite] bg-[length:200%_100%]"></div>
-            <div className="relative bg-gradient-to-br from-purple-950/80 via-purple-900/50 to-pink-900/50 rounded-3xl p-12 md:p-16 border-2 border-purple-500/30 backdrop-blur-2xl overflow-hidden">
-              {/* Decorative Elements */}
-              <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-pink-500/20 to-transparent rounded-full blur-3xl"></div>
-              <div className="absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-tl from-purple-500/20 to-transparent rounded-full blur-3xl"></div>
-              
-              <div className="relative text-center space-y-8">
-                <div className="inline-block px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-sm font-medium text-purple-300 backdrop-blur-sm mb-4">
-                  🎯 Ready to Start?
-                </div>
-                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight">
-                  Get Ready{' '}
-                  <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                    & Start Now
-                  </span>
-                </h2>
-                <p className="text-gray-400 text-lg leading-relaxed max-w-2xl mx-auto">
-                  Amet Minim Mollit Non Deserunt Ullamco Est Sit Aliqua Dolor Do Amet Sint. Velit Officia Consequat Duis Enim Velit Mollit.
-                </p>
-                <div className="flex flex-wrap justify-center gap-4 pt-4">
-                  <button className="group relative px-10 py-4 font-bold text-lg rounded-xl overflow-hidden transform hover:scale-105 transition-all duration-300">
-                    <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 bg-[length:200%_100%] animate-[gradient_3s_ease_infinite]"></div>
-                    <span className="relative z-10 flex items-center gap-2">
-                      Swap Now
-                      <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                      </svg>
-                    </span>
-                  </button>
-                  <button className="px-10 py-4 font-bold text-lg rounded-xl bg-white/5 border border-purple-500/20 hover:bg-white/10 hover:border-purple-400/50 transition-all duration-300 backdrop-blur-sm">
-                    View Docs
-                  </button>
-                </div>
+      {/* Mission Section */}
+      <section id="mission" data-animate="mission" className="relative z-10 max-w-6xl mx-auto px-6 py-24">
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-purple-500/10 rounded-3xl blur-3xl"></div>
+          <div className={`relative bg-gradient-to-br from-purple-950/50 via-purple-900/30 to-pink-900/30 rounded-3xl p-12 md:p-16 border-2 border-purple-500/20 backdrop-blur-xl overflow-hidden transition-all duration-1000 ${
+              visibleSections.mission ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'
+            }`}>
+            <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-pink-500/20 to-transparent rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-tl from-purple-500/20 to-transparent rounded-full blur-3xl"></div>
+            <div className="relative text-center space-y-6">
+              <div className="inline-block px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-sm font-medium text-purple-300 backdrop-blur-sm mb-4">
+                🎯 Our Mission
               </div>
+              <h2 className="text-4xl md:text-5xl font-black leading-tight max-w-3xl mx-auto">
+                Building the Future of{' '}
+                <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  Decentralized Finance
+                </span>
+              </h2>
+              <p className="text-white/70 text-lg leading-relaxed max-w-2xl mx-auto">
+                Our mission is to create a more accessible, transparent, and efficient financial system that empowers everyone to participate in the global economy.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-16 px-4 sm:px-6 lg:px-8 border-t border-purple-500/10 relative">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center space-y-8">
-            {/* Logo */}
+      <footer className="relative z-10 border-t border-white/10 py-16 mt-20 backdrop-blur-xl bg-[#0A0118]/50">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center space-y-8 mb-12">
             <div className="relative inline-block group cursor-pointer">
               <div className="absolute -inset-4 bg-gradient-to-r from-pink-500 to-purple-500 rounded-lg blur-xl opacity-20 group-hover:opacity-40 transition duration-500"></div>
-              <h3 className="relative text-6xl font-black bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent bg-[length:200%_100%] animate-[gradient_3s_ease_infinite]">
+              <h3 className="relative text-5xl font-black bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent bg-[length:200%_100%]" style={{ animation: 'gradientMove 3s ease infinite' }}>
                 Genesis
               </h3>
             </div>
-            
-            {/* Social Icons */}
+
             <div className="flex justify-center gap-3">
               {[
-                { Icon: Send, color: 'from-blue-400 to-cyan-400' },
                 { Icon: Twitter, color: 'from-sky-400 to-blue-500' },
-                { Icon: MessageCircle, color: 'from-purple-400 to-pink-400' },
+                { Icon: Instagram, color: 'from-pink-400 to-purple-500' },
                 { Icon: Youtube, color: 'from-red-400 to-rose-500' },
-                { Icon: Instagram, color: 'from-pink-400 to-purple-500' }
+                { Icon: Send, color: 'from-blue-400 to-cyan-400' },
               ].map(({ Icon, color }, i) => (
-                <button
-                  key={i}
-                  className="group relative p-4 rounded-xl transition-all duration-300 transform hover:scale-110 hover:-translate-y-1"
-                >
+                <button key={i} className="group relative p-4 rounded-xl transition-all duration-300 transform hover:scale-110 hover:-translate-y-1">
                   <div className={`absolute inset-0 bg-gradient-to-br ${color} opacity-10 group-hover:opacity-20 rounded-xl transition-opacity duration-300`}></div>
                   <div className={`absolute inset-0 bg-gradient-to-br ${color} opacity-0 group-hover:opacity-100 rounded-xl blur-lg transition-opacity duration-300`}></div>
-                  <Icon size={22} className={`relative z-10 text-gray-400 group-hover:text-white transition-colors duration-300`} />
+                  <Icon />
                 </button>
               ))}
             </div>
-            
-            {/* Description */}
-            <p className="text-sm text-gray-500 max-w-2xl mx-auto leading-relaxed">
-              Amet Minim Mollit Non Deserunt Ullamco Est Sit Aliqua Dolor Do Amet Sint. Velit Officia Consequat Duis Enim Velit Mollit.
-            </p>
-            
-            {/* Links */}
-            <div className="flex flex-wrap justify-center gap-6 text-sm">
-              {['Terms', 'Privacy', 'Security', 'Docs', 'Support'].map((link) => (
-                <a key={link} href="#" className="text-gray-500 hover:text-white transition-colors duration-300">
-                  {link}
-                </a>
-              ))}
-            </div>
-            
-            {/* Copyright */}
-            <div className="pt-8 border-t border-purple-500/10">
-              <p className="text-xs text-gray-600">
-                © 2025 Genesis. All rights reserved. Built on Arbitrum Chain.
-              </p>
-            </div>
           </div>
-        </div>
 
-        {/* Animated Wave Background */}
-        <div className="mt-16 relative h-48 overflow-hidden opacity-30">
-          <svg className="w-full h-full" viewBox="0 0 1440 320" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="footerGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#ec4899" stopOpacity="0.3" />
-                <stop offset="50%" stopColor="#8b5cf6" stopOpacity="0.3" />
-                <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.3" />
-              </linearGradient>
-            </defs>
-            <path
-              d="M0,160 Q360,100 720,160 T1440,160 L1440,320 L0,320 Z"
-              fill="url(#footerGradient)"
-            >
-              <animate
-                attributeName="d"
-                values="M0,160 Q360,100 720,160 T1440,160 L1440,320 L0,320 Z;M0,160 Q360,220 720,160 T1440,160 L1440,320 L0,320 Z;M0,160 Q360,100 720,160 T1440,160 L1440,320 L0,320 Z"
-                dur="8s"
-                repeatCount="indefinite"
-              />
-            </path>
-            <path
-              d="M0,200 Q360,140 720,200 T1440,200 L1440,320 L0,320 Z"
-              fill="url(#footerGradient)"
-              opacity="0.5"
-            >
-              <animate
-                attributeName="d"
-                values="M0,200 Q360,140 720,200 T1440,200 L1440,320 L0,320 Z;M0,200 Q360,260 720,200 T1440,200 L1440,320 L0,320 Z;M0,200 Q360,140 720,200 T1440,200 L1440,320 L0,320 Z"
-                dur="10s"
-                repeatCount="indefinite"
-              />
-            </path>
-          </svg>
+          <div className="flex flex-wrap justify-center gap-6 text-sm mb-8">
+            {['Terms', 'Privacy', 'Security', 'Docs', 'Support'].map((link) => (
+              <a key={link} href="#" className="text-gray-500 hover:text-white transition-colors duration-300">
+                {link}
+              </a>
+            ))}
+          </div>
+
+          <div className="text-center">
+            <p className="text-xs text-gray-600">
+              © 2025 Genesis. All rights reserved. Built on Arbitrum Chain.
+            </p>
+          </div>
         </div>
       </footer>
 
-      {/* CSS Animations */}
-      <style jsx>{`
-        @keyframes gradient {
+      <style>{`
+        @keyframes gradientMove {
           0%, 100% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
         }
-        
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-        
-        @keyframes orbit {
-          0% { transform: rotate(0deg) translateX(150px) rotate(0deg); }
-          100% { transform: rotate(360deg) translateX(150px) rotate(-360deg); }
-        }
-        
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+        @keyframes gradientText {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
         }
       `}</style>
     </div>
