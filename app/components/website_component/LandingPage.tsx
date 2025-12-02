@@ -153,7 +153,7 @@ export default function IPRegistryLanding() {
               </div>
             </div>
             <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              IPGuard
+              IP Shield
             </span>
           </div>
           <div className="hidden md:flex items-center space-x-8">
@@ -331,7 +331,7 @@ export default function IPRegistryLanding() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="group px-12 py-6 bg-white text-purple-600 rounded-full font-bold text-xl hover:shadow-2xl hover:shadow-white/30 transform hover:scale-105 transition-all duration-300 flex items-center space-x-3 mx-auto sm:mx-0">
+              <button onClick={handleClick} className="group px-12 py-6 bg-white text-purple-600 rounded-full font-bold text-xl hover:shadow-2xl hover:shadow-white/30 transform hover:scale-105 transition-all duration-300 flex items-center space-x-3 mx-auto sm:mx-0">
                 <Download className="w-6 h-6 group-hover:animate-bounce" />
                 <span>Install Extension</span>
               </button>
