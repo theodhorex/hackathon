@@ -247,7 +247,7 @@ export default function IPShieldExtension() {
   const [detectedContent, setDetectedContent] = useState([
     {
       id: 1,
-      url: "https://via.placeholder.com/400x300/100030/ffffff?text=Original+Art",
+      url: "https://www.exitlag.com/blog/wp-content/uploads/2025/07/cyberpunk-2077-characters.jpeg",
       type: "image",
       status: "ORIGINAL",
       confidence: 100,
@@ -257,7 +257,7 @@ export default function IPShieldExtension() {
     },
     {
       id: 2,
-      url: "https://via.placeholder.com/400x300/200040/ffffff?text=Nike+Logo+Detect",
+      url: "https://static.nike.com/a/images/t_web_pdp_936_v2/f_auto/34604cb1-acc6-4a40-bf26-60185ca7da5c/NIKE+AIR+MAX+1+ESS.png",
       type: "image",
       status: "BRAND_IP_DETECTED",
       brand: "Nike Inc.",
@@ -268,7 +268,7 @@ export default function IPShieldExtension() {
     },
     {
       id: 3,
-      url: "https://via.placeholder.com/400x300/300050/ffffff?text=Registered+Asset",
+      url: "https://media.istockphoto.com/id/1471683196/vector/black-wavy-lines-isolated-on-white-abstract-background-design.jpg?s=612x612&w=0&k=20&c=OiEcsV3iKnIS96d2fHbVXQS-aWBeWaTfx5o_fY3Q_Rg=",
       type: "image",
       status: "ALREADY_REGISTERED",
       owner: "0x742d...5678",
@@ -279,7 +279,7 @@ export default function IPShieldExtension() {
     },
     {
       id: 4,
-      url: "https://via.placeholder.com/400x300/400060/ffffff?text=My+Music+Track",
+      url: "https://soundcloud.com/gabriele_romano/the-midnight-shadows?in=ferzrrn/sets/synthwave&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing",
       type: "audio",
       status: "ORIGINAL",
       confidence: 100,
@@ -293,7 +293,7 @@ export default function IPShieldExtension() {
   const [protectedIPs, setProtectedIPs] = useState([
     {
       id: 1,
-      url: "https://via.placeholder.com/200x150/100030/ffffff?text=Protected+1",
+      url: "https://elements-resized.envatousercontent.com/elements-video-cover-images/files/4f20f212-5478-465d-8d98-27a42ef37909/inline_image_preview.jpg?w=500&cf_fit=cover&q=85&format=auto&s=62214d33bae4cef68c427f56de52785aef2ca1c0225d464948bfab1846635570",
       title: "Neon City v2",
       status: "protected",
       earnings: "$45.20",
@@ -302,7 +302,7 @@ export default function IPShieldExtension() {
     },
     {
       id: 2,
-      url: "https://via.placeholder.com/200x150/200040/ffffff?text=Protected+2",
+      url: "https://images.pexels.com/photos/296649/pexels-photo-296649.jpeg?cs=srgb&dl=pexels-vladyslav-dukhin-296649.jpg&fm=jpg",
       title: "Photo Collection",
       status: "protected",
       earnings: "$124.50",
@@ -311,7 +311,7 @@ export default function IPShieldExtension() {
     },
     {
       id: 3,
-      url: "https://via.placeholder.com/200x150/400060/ffffff?text=Protected+3",
+      url: "https://www.pixartprinting.it/blog/wp-content/uploads/2023/12/1978-1024x561.jpg",
       title: "Brand Logo",
       status: "protected",
       earnings: "$890.00",
