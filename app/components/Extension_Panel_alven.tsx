@@ -15,7 +15,7 @@ import {
   TrendingUp,
   Flame,
   Heart,
-  Sparkles,
+
   Cpu,
   Code,
   BookOpen,
@@ -34,6 +34,7 @@ import {
   DollarSign,
   PenTool,
   StopCircle,
+  User,
 } from "lucide-react";
 
 // =================================================================
@@ -220,39 +221,39 @@ export default function IPShieldExtension() {
       id: 1,
       type: "infringement",
       severity: "high",
-      title: "🚨 New Infringement Detected",
+      title: "New Infringement Detected",
       description: "Your artwork 'Neon City' appeared on OpenSea",
       detailedInfo: "Similarity: 98% (Exact Match) - User: 0xBad...Actor",
       timestamp: new Date(Date.now() - 5 * 60000),
       ipId: "0x123...abc",
       action: "View Report",
-      icon: "⚠️",
+      icon: <AlertTriangle className="w-5 h-5" />,
       color: "from-red-500 via-rose-500 to-red-600",
     },
     {
       id: 2,
       type: "registered",
       severity: "low",
-      title: "✅ IP Asset Minted",
+      title: "IP Asset Minted",
       description: "Successfully registered 'Character Design #04'",
       detailedInfo: "Story Protocol Tx: 0x8f4e2...99a",
       timestamp: new Date(Date.now() - 15 * 60000),
       ipId: "0x456...def",
       action: "View on Explorer",
-      icon: "⛓️",
+      icon: <LinkIcon className="w-5 h-5" />,
       color: "from-purple-500 via-fuchsia-500 to-pink-600",
     },
     {
       id: 3,
       type: "earning",
       severity: "low",
-      title: "💰 Royalty Received",
+      title: "Royalty Received",
       description: "You earned 50 USDC from Commercial License",
       detailedInfo: "License bought by: CreativeAgency_DAO",
       timestamp: new Date(Date.now() - 2 * 3600000),
       ipId: "0xabc...jkl",
       action: "Claim",
-      icon: "💸",
+      icon: <DollarSign className="w-5 h-5" />,
       color: "from-amber-500 via-yellow-500 to-amber-600",
     },
   ];
@@ -678,7 +679,7 @@ export default function IPShieldExtension() {
                 <div className="absolute -inset-2 bg-purple-500/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div className="relative bg-gray-800/50 backdrop-blur-lg px-3 py-1.5 rounded-full border border-purple-500/30 group-hover:border-purple-400/50 transition-all">
                   <div className="flex items-center gap-2">
-                    <span className="text-lg leading-none">{currentUser?.avatar || "👤"}</span>
+                    <span className="text-lg leading-none">{currentUser?.avatar || <User className="w-4 h-4" />}</span>
                     <span className="text-purple-50 text-xs font-medium">
                       {currentUser?.username || "User"}
                     </span>
@@ -693,19 +694,19 @@ export default function IPShieldExtension() {
               {
                 label: "Detected (Y)",
                 value: detectedContent.length,
-                icon: "📸",
+                icon: <Aperture className="w-5 h-5" />,
                 color: "from-blue-500 to-cyan-600",
               },
               {
                 label: "Protected (S)",
                 value: protectedIPs.length,
-                icon: "⛓️",
+                icon: <LinkIcon className="w-5 h-5" />,
                 color: "from-purple-500 to-pink-600",
               },
               {
                 label: "Alerts",
                 value: mockAlerts.length,
-                icon: "⚠️",
+                icon: <AlertTriangle className="w-5 h-5" />,
                 color: "from-amber-500 to-yellow-600",
               },
             ].map((stat) => (
@@ -767,9 +768,9 @@ export default function IPShieldExtension() {
             <span
               className={`bg-gradient-to-r ${activeTab === "register" ? "from-purple-500/20 to-pink-500/20 text-purple-400" : "from-blue-500/20 to-cyan-500/20 text-cyan-400"} px-3 py-1 rounded-full text-xs font-bold border border-current/30 backdrop-blur-sm`}
             >
-              {activeTab === "content" && "🎯 Yakoa Integration: Real-time"}
-              {activeTab === "ip" && "🔬 AI-Powered IP Deep Analysis"}
-              {activeTab === "register" && "⛓️ Story Protocol: IP NFT"}
+              {activeTab === "content" && "Yakoa Integration: Real-time"}
+              {activeTab === "ip" && "AI-Powered IP Deep Analysis"}
+              {activeTab === "register" && "Story Protocol: IP NFT"}
             </span>
           </div>
 
@@ -840,11 +841,11 @@ export default function IPShieldExtension() {
                   </p>
                   <p className="text-gray-400 text-xs leading-relaxed">
                     {activeTab === "content" &&
-                      "Didukung oleh Yakoa, ekstensi ini memindai secara mendalam untuk melindungi konten original Anda dari penyalahgunaan digital."}
+                      "Powered by Yakoa, this extension performs deep scans to protect your original content from digital abuse."}
                     {activeTab === "ip" &&
-                      "Menggunakan machine learning canggih untuk memverifikasi kepemilikan dan potensi pelanggaran di seluruh web."}
+                      "Using advanced machine learning to verify ownership and potential infringement across the web."}
                     {activeTab === "register" &&
-                      "Integrasi Story Protocol memungkinkan pencetakan 'IP NFT' untuk melacak silsilah, lisensi, dan royalti di blockchain."}
+                      "Story Protocol integration enables the minting of 'IP NFTs' to track lineage, licensing, and royalties on the blockchain."}
                   </p>
                 </div>
               </div>
@@ -1521,7 +1522,6 @@ export default function IPShieldExtension() {
 
                 {/* Story Protocol Info Box */}
                 <div className="bg-purple-500/20 border border-purple-500/40 p-3 rounded-xl text-purple-300 flex items-start gap-3">
-                  <Sparkles className="w-5 h-5 flex-shrink-0 mt-0.5" />
                   <p className="text-xs leading-relaxed">
                     This action will mint a new **IP Asset NFT** on **Story
                     Protocol** and register its metadata permanently.
@@ -1561,7 +1561,7 @@ export default function IPShieldExtension() {
                 </div>
                 <div>
                   <h3 className="text-xl font-black text-white mb-2">
-                    Content Protected! 🎉
+                    Content Protected!
                   </h3>
                   <p className="text-sm text-gray-400">
                     Your IP is now registered on Story Protocol.
