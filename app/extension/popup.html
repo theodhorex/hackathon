@@ -1,24 +1,34 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="style.css" />
-  </head>
+    <title>IP Shield</title>
+    <link rel="stylesheet" href="popup-loader.css">
+</head>
 
-  <body>
-    <h2>IP Shield</h2>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading">
+        <div class="spinner"></div>
+        <div class="loading-text">Loading IP Shield...</div>
+    </div>
 
-    <label>Server Base URL</label>
-    <input id="serverBase" value="http://localhost:3000" />
+    <!-- Error Screen -->
+    <div id="error">
+        <div class="error-icon">⚠️</div>
+        <div class="error-title">Server Not Running</div>
+        <div class="error-message">
+            Please make sure the development server is running.<br>
+            Run <code>npm run dev</code> in the project directory.
+        </div>
+        <button class="error-button" id="retryButton">Retry</button>
+    </div>
 
-    <label>Image URL</label>
-    <input id="imageUrl" placeholder="Paste image URL" />
+    <!-- Main Content -->
+    <iframe id="extensionFrame" src="http://localhost:3000/extension-view"></iframe>
 
-    <button id="scanBtn">Scan</button>
-    <button id="pollBtn">Poll Result</button>
+    <script src="popup-loader.js"></script>
+</body>
 
-    <pre id="output"></pre>
-
-    <script src="popup.js"></script>
-  </body>
 </html>

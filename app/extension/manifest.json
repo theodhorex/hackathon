@@ -2,32 +2,35 @@
   "manifest_version": 3,
   "name": "IP Shield",
   "version": "1.0.0",
-  "description": "Scan images using Yakoa API",
-
+  "description": "Protect your digital content with Yakoa AI and Story Protocol",
   "permissions": [
     "activeTab",
     "scripting",
     "storage"
   ],
-
   "host_permissions": [
     "http://localhost:3000/*",
     "http://127.0.0.1:3000/*",
     "<all_urls>"
   ],
-
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; frame-src http://localhost:3000 http://127.0.0.1:3000;"
+  },
   "background": {
     "service_worker": "background.js"
   },
-
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_title": "IP Shield - Protect Your Content"
   },
-
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"]
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ]
     }
   ]
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { LoginScreen } from "./LoginScreen";
 import {
   ChevronRight,
   Shield,
@@ -175,7 +176,20 @@ const STATUS_COLORS = {
   },
 };
 
+// Dummy user credentials for login
+const DUMMY_USERS = [
+  { username: "admin", password: "admin123", name: "Admin User", email: "admin@ipshield.io", avatar: "" },
+  { username: "demo", password: "demo123", name: "Demo User", email: "demo@ipshield.io", avatar: "" }
+];
+
 export default function IPShieldExtension() {
+  // =================================================================
+  // AUTHENTICATION STATE
+  // =================================================================
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState<typeof DUMMY_USERS[0] | null>(null);
+  const [loginError, setLoginError] = useState("");
+
   // =================================================================
   // STATE MANAGEMENT
   // =================================================================
@@ -494,6 +508,25 @@ export default function IPShieldExtension() {
     ]);
   };
 
+  // Login handler
+  const handleLogin = (username: string, password: string) => {
+    const user = DUMMY_USERS.find(u => u.username === username && u.password === password);
+    if (user) {
+      setCurrentUser(user);
+      setIsLoggedIn(true);
+      setLoginError("");
+    } else {
+      setLoginError("Invalid username or password");
+    }
+  };
+
+  // Logout handler
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setIsLoggedIn(false);
+    setCurrentPage("main");
+  };
+
   // NEW HANDLER: Quick Protect for detected content (Skip form)
   const quickProtect = (content) => {
     // 1. Setup Status & Close Sidebar
@@ -597,11 +630,10 @@ export default function IPShieldExtension() {
               {/* TOGGLE MONITORING */}
               <button
                 onClick={() => setIsMonitoring(!isMonitoring)}
-                className={`relative p-2 rounded-lg transition-all duration-300 group hover:scale-110 active:scale-95 ${
-                  isMonitoring
-                    ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.2)]"
-                    : "bg-gray-800/50 border border-gray-700 text-gray-400 hover:bg-gray-700/50"
-                }`}
+                className={`relative p-2 rounded-lg transition-all duration-300 group hover:scale-110 active:scale-95 ${isMonitoring
+                  ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.2)]"
+                  : "bg-gray-800/50 border border-gray-700 text-gray-400 hover:bg-gray-700/50"
+                  }`}
                 title={isMonitoring ? "Monitoring Active" : "Monitoring Paused"}
               >
                 {isMonitoring ? (
@@ -635,6 +667,23 @@ export default function IPShieldExtension() {
                     {mockAlerts.length + notificationQueue.length}
                   </span>
                 )}
+              </button>
+
+              {/* LOGOUT BUTTON */}
+              <button
+                onClick={handleLogout}
+                className="relative flex items-center gap-2 group hover:scale-105 transition-transform active:scale-95 ml-1"
+                title="Logout"
+              >
+                <div className="absolute -inset-2 bg-purple-500/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative bg-gray-800/50 backdrop-blur-lg px-3 py-1.5 rounded-full border border-purple-500/30 group-hover:border-purple-400/50 transition-all">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg leading-none">{currentUser?.avatar || "👤"}</span>
+                    <span className="text-purple-50 text-xs font-medium">
+                      {currentUser?.username || "User"}
+                    </span>
+                  </div>
+                </div>
               </button>
             </div>
           </div>
@@ -687,11 +736,10 @@ export default function IPShieldExtension() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`relative flex-1 flex flex-col items-center gap-1.5 py-2.5 px-2 rounded-lg font-medium text-xs transition-all duration-300 overflow-hidden group hover:scale-[1.02] active:scale-95 ${
-                activeTab === tab.id
-                  ? "text-white shadow-xl shadow-cyan-900/50"
-                  : "text-gray-400 hover:text-cyan-300"
-              }`}
+              className={`relative flex-1 flex flex-col items-center gap-1.5 py-2.5 px-2 rounded-lg font-medium text-xs transition-all duration-300 overflow-hidden group hover:scale-[1.02] active:scale-95 ${activeTab === tab.id
+                ? "text-white shadow-xl shadow-cyan-900/50"
+                : "text-gray-400 hover:text-cyan-300"
+                }`}
             >
               {activeTab === tab.id && (
                 <>
@@ -1222,11 +1270,10 @@ export default function IPShieldExtension() {
                     onSelect(option.id);
                     setIsOpen(false);
                   }}
-                  className={`w-full text-left p-3 text-sm flex flex-col items-start gap-1 transition-all rounded-xl ${
-                    current === option.id
-                      ? "bg-purple-500/30 text-white font-bold"
-                      : "text-gray-300 hover:bg-gray-800"
-                  }`}
+                  className={`w-full text-left p-3 text-sm flex flex-col items-start gap-1 transition-all rounded-xl ${current === option.id
+                    ? "bg-purple-500/30 text-white font-bold"
+                    : "text-gray-300 hover:bg-gray-800"
+                    }`}
                 >
                   <div className="flex items-center gap-2">
                     {option.icon}
@@ -1579,11 +1626,10 @@ export default function IPShieldExtension() {
         <div className="text-center p-8 w-80 bg-gray-900/90 rounded-2xl border border-purple-500/30 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-500">
           <div
             className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center 
-                    ${
-                      isProtected
-                        ? "bg-gradient-to-br from-green-500 to-emerald-600 shadow-[0_0_20px_rgba(16,185,129,0.5)]"
-                        : "bg-gradient-to-br from-blue-500 to-cyan-600"
-                    }`}
+                    ${isProtected
+                ? "bg-gradient-to-br from-green-500 to-emerald-600 shadow-[0_0_20px_rgba(16,185,129,0.5)]"
+                : "bg-gradient-to-br from-blue-500 to-cyan-600"
+              }`}
           >
             {isProtected ? (
               <Check className="w-8 h-8 text-white" />
@@ -1748,94 +1794,100 @@ export default function IPShieldExtension() {
 
         {/* 2. KONTEN */}
         <div className="relative z-10 w-full h-full">
-          {/* Main Panel */}
-          {currentPage === "main" && (
+          {!isLoggedIn ? (
+            <LoginScreen onLogin={handleLogin} loginError={loginError} />
+          ) : (
             <>
-              <MainPanelView />
-              {notificationQueue.map((alert, index) => (
-                <NotificationToast
-                  key={alert.id}
-                  alert={alert}
-                  isFirst={index === 0}
-                />
-              ))}
-            </>
-          )}
-
-          {/* Sidebar (Overlay) - Kirim prop quickProtect */}
-          {showSidebar && <ContentSidebarView quickProtect={quickProtect} />}
-
-          {/* Register View (Overlay) - Untuk Registrasi Manual */}
-          {showRegisterView && (
-            <RegisterIPView
-              addProtectedIP={addProtectedIP}
-              updateContentStatus={updateContentStatus}
-              activeContent={activeContent}
-            />
-          )}
-
-          {/* Analysis View (Overlay) */}
-          {showAnalysisView && <IPAnalysisView />}
-
-          {/* Dashboard View */}
-          {currentPage === "dashboard" && <DashboardView />}
-
-          {/* Alerts View */}
-          {currentPage === "alerts" && (
-            <div
-              className={`w-[400px] h-[600px] p-5 relative bg-[#0a0f1d]/95 backdrop-blur-sm`}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-[#0a0f1d] via-red-900/20 to-[#0a0f1d] z-0 opacity-80"></div>
-              <div className="relative z-10">
-                <button
-                  onClick={() => setCurrentPage("main")}
-                  className="text-cyan-400 mb-4 flex items-center font-bold group hover:translate-x-[-2px] transition-transform active:scale-95"
-                >
-                  <ChevronRight className="w-4 h-4 rotate-180" /> Back to Main
-                </button>
-                <h2 className="text-2xl font-black mb-6 text-white drop-shadow-[0_0_5px_rgba(255,100,100,0.5)] bg-clip-text text-transparent bg-gradient-to-r from-red-400 to-white">
-                  Latest Alerts
-                </h2>
-                <div className="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar">
-                  {mockAlerts.map((alert) => (
-                    <div
+              {/* Main Panel */}
+              {currentPage === "main" && (
+                <>
+                  <MainPanelView />
+                  {notificationQueue.map((alert, index) => (
+                    <NotificationToast
                       key={alert.id}
-                      className="relative group p-4 rounded-xl bg-gray-900/50 backdrop-blur-lg border border-red-500/30 cursor-pointer hover:scale-[1.01] transition-transform duration-300"
-                    >
-                      <div
-                        className={`absolute -inset-0.5 bg-gradient-to-r ${alert.color} rounded-xl opacity-20 blur group-hover:opacity-40 transition-opacity`}
-                      ></div>
-                      <div className="relative flex items-start gap-3">
-                        <span className="text-2xl">{alert.icon}</span>
-                        <div className="flex-1">
-                          <p className="text-sm font-bold text-white mb-0.5">
-                            {alert.title}
-                          </p>
-                          <p className="text-xs text-gray-400">
-                            {alert.description}
-                          </p>
-                          <p className="text-[10px] text-red-400 mt-1">
-                            {alert.detailedInfo}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+                      alert={alert}
+                      isFirst={index === 0}
+                    />
                   ))}
-                </div>
-              </div>
-            </div>
-          )}
+                </>
+              )}
 
-          {/* Quick Protect Success View (Overlay) - TAMPILKAN SETELAH quickProtect DIPANGGIL */}
-          {showQuickProtectSuccess && (
-            <QuickProtectSuccessView
-              data={quickProtectSuccessData}
-              close={() => {
-                setShowQuickProtectSuccess(false);
-                setQuickProtectSuccessData(null);
-                setCurrentPage("dashboard"); // Arahkan ke dashboard setelah selesai
-              }}
-            />
+              {/* Sidebar (Overlay) - Kirim prop quickProtect */}
+              {showSidebar && <ContentSidebarView quickProtect={quickProtect} />}
+
+              {/* Register View (Overlay) - Untuk Registrasi Manual */}
+              {showRegisterView && (
+                <RegisterIPView
+                  addProtectedIP={addProtectedIP}
+                  updateContentStatus={updateContentStatus}
+                  activeContent={activeContent}
+                />
+              )}
+
+              {/* Analysis View (Overlay) */}
+              {showAnalysisView && <IPAnalysisView />}
+
+              {/* Dashboard View */}
+              {currentPage === "dashboard" && <DashboardView />}
+
+              {/* Alerts View */}
+              {currentPage === "alerts" && (
+                <div
+                  className={`w-[400px] h-[600px] p-5 relative bg-[#0a0f1d]/95 backdrop-blur-sm`}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#0a0f1d] via-red-900/20 to-[#0a0f1d] z-0 opacity-80"></div>
+                  <div className="relative z-10">
+                    <button
+                      onClick={() => setCurrentPage("main")}
+                      className="text-cyan-400 mb-4 flex items-center font-bold group hover:translate-x-[-2px] transition-transform active:scale-95"
+                    >
+                      <ChevronRight className="w-4 h-4 rotate-180" /> Back to Main
+                    </button>
+                    <h2 className="text-2xl font-black mb-6 text-white drop-shadow-[0_0_5px_rgba(255,100,100,0.5)] bg-clip-text text-transparent bg-gradient-to-r from-red-400 to-white">
+                      Latest Alerts
+                    </h2>
+                    <div className="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar">
+                      {mockAlerts.map((alert) => (
+                        <div
+                          key={alert.id}
+                          className="relative group p-4 rounded-xl bg-gray-900/50 backdrop-blur-lg border border-red-500/30 cursor-pointer hover:scale-[1.01] transition-transform duration-300"
+                        >
+                          <div
+                            className={`absolute -inset-0.5 bg-gradient-to-r ${alert.color} rounded-xl opacity-20 blur group-hover:opacity-40 transition-opacity`}
+                          ></div>
+                          <div className="relative flex items-start gap-3">
+                            <span className="text-2xl">{alert.icon}</span>
+                            <div className="flex-1">
+                              <p className="text-sm font-bold text-white mb-0.5">
+                                {alert.title}
+                              </p>
+                              <p className="text-xs text-gray-400">
+                                {alert.description}
+                              </p>
+                              <p className="text-[10px] text-red-400 mt-1">
+                                {alert.detailedInfo}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Quick Protect Success View (Overlay) - TAMPILKAN SETELAH quickProtect DIPANGGIL */}
+              {showQuickProtectSuccess && (
+                <QuickProtectSuccessView
+                  data={quickProtectSuccessData}
+                  close={() => {
+                    setShowQuickProtectSuccess(false);
+                    setQuickProtectSuccessData(null);
+                    setCurrentPage("dashboard"); // Arahkan ke dashboard setelah selesai
+                  }}
+                />
+              )}
+            </>
           )}
         </div>
       </div>
