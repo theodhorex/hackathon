@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-  ],
+, "app/components/website_component/LandingPage.tsx", "app/components/Extension_Panel_alven.tsx"  ],
   "exclude": ["node_modules"]
 }

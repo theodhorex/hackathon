@@ -4,11 +4,11 @@ import { Shield, Search, Lock, Zap, CheckCircle, Download, ArrowRight, Globe, Da
 export default function IPRegistryLanding() {
   const [scrollY, setScrollY] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [isVisible, setIsVisible] = useState({});
+  const [isVisible, setIsVisible] = useState<Record<string, any>>({});
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
-    const handleMouseMove = (e) => {
+    const handleMouseMove = (e: any) => {
       setMousePos({ x: e.clientX, y: e.clientY });
     };
 
