@@ -177,11 +177,29 @@ const STATUS_COLORS = {
   },
 };
 
-// Dummy user credentials for login
+// Dummy user credentials for login with roles
 const DUMMY_USERS = [
-  { username: "admin", password: "admin123", name: "Admin User", email: "admin@ipshield.io", avatar: "" },
-  { username: "demo", password: "demo123", name: "Demo User", email: "demo@ipshield.io", avatar: "" }
+  { username: "admin", password: "admin123", name: "Admin User", email: "admin@ipshield.io", avatar: "", role: "admin" },
+  { username: "demo", password: "demo123", name: "Demo User", email: "demo@ipshield.io", avatar: "", role: "demo" }
 ];
+
+// Role-based permissions
+const PERMISSIONS = {
+  admin: {
+    canEdit: true,
+    canDelete: true,
+    canViewAllData: true,
+    maxIPRegistrations: Infinity,
+    hasAdvancedAnalytics: true,
+  },
+  demo: {
+    canEdit: false,
+    canDelete: false,
+    canViewAllData: false,
+    maxIPRegistrations: 5,
+    hasAdvancedAnalytics: false,
+  }
+};
 
 export default function IPShieldExtension() {
   // =================================================================
@@ -212,6 +230,14 @@ export default function IPShieldExtension() {
   // NEW STATES for Quick Protect
   const [showQuickProtectSuccess, setShowQuickProtectSuccess] = useState(false);
   const [quickProtectSuccessData, setQuickProtectSuccessData] = useState(null);
+
+  // NEW STATES for Edit IP
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingIP, setEditingIP] = useState<any>(null);
+  const [editFormData, setEditFormData] = useState({
+    title: "",
+    earnings: "",
+  });
 
   // =================================================================
   // DATA MOCK (Sesuai P0 & P2)
@@ -491,8 +517,31 @@ export default function IPShieldExtension() {
     );
   };
 
-  // HANDLER: Add new IP to the dashboard list
+  // Helper: Get user permissions
+  const getUserPermissions = () => {
+    if (!currentUser) return PERMISSIONS.demo;
+    return PERMISSIONS[currentUser.role as keyof typeof PERMISSIONS] || PERMISSIONS.demo;
+  };
+
+  // Helper: Check if user can perform action
+  const canUserPerform = (action: 'edit' | 'delete' | 'register') => {
+    const perms = getUserPermissions();
+    if (action === 'edit') return perms.canEdit;
+    if (action === 'delete') return perms.canDelete;
+    if (action === 'register') return protectedIPs.length < perms.maxIPRegistrations;
+    return false;
+  };
+
+  // HANDLER: Add new IP to the dashboard list (with role-based limit)
   const addProtectedIP = (ipData) => {
+    const perms = getUserPermissions();
+
+    // Check if demo user has reached limit
+    if (protectedIPs.length >= perms.maxIPRegistrations) {
+      alert(`Registration Limit Reached!\n\nDemo users can only register up to ${perms.maxIPRegistrations} IP assets.\n\nUpgrade to Admin for unlimited registrations.`);
+      return;
+    }
+
     setProtectedIPs((prev) => [
       {
         id: Date.now(), // Unique ID
@@ -526,6 +575,36 @@ export default function IPShieldExtension() {
     setCurrentUser(null);
     setIsLoggedIn(false);
     setCurrentPage("main");
+  };
+
+  // Edit IP handlers
+  const openEditModal = (ip: any) => {
+    setEditingIP(ip);
+    setEditFormData({
+      title: ip.title,
+      earnings: ip.earnings,
+    });
+    setShowEditModal(true);
+  };
+
+  const saveEditIP = () => {
+    if (!editingIP) return;
+
+    setProtectedIPs(prev =>
+      prev.map(ip =>
+        ip.id === editingIP.id
+          ? { ...ip, title: editFormData.title, earnings: editFormData.earnings }
+          : ip
+      )
+    );
+
+    setShowEditModal(false);
+    setEditingIP(null);
+  };
+
+  const closeEditModal = () => {
+    setShowEditModal(false);
+    setEditingIP(null);
   };
 
   // NEW HANDLER: Quick Protect for detected content (Skip form)
@@ -680,9 +759,14 @@ export default function IPShieldExtension() {
                 <div className="relative bg-gray-800/50 backdrop-blur-lg px-3 py-1.5 rounded-full border border-purple-500/30 group-hover:border-purple-400/50 transition-all">
                   <div className="flex items-center gap-2">
                     <span className="text-lg leading-none">{currentUser?.avatar || <User className="w-4 h-4" />}</span>
-                    <span className="text-purple-50 text-xs font-medium">
-                      {currentUser?.username || "User"}
-                    </span>
+                    <div className="flex flex-col items-start">
+                      <span className="text-purple-50 text-[10px] font-medium leading-tight">
+                        {currentUser?.username || "User"}
+                      </span>
+                      <span className={`text-[8px] font-bold leading-tight ${currentUser?.role === 'admin' ? 'text-yellow-400' : 'text-blue-400'}`}>
+                        {currentUser?.role === 'admin' ? 'ADMIN' : 'DEMO'}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </button>
@@ -702,6 +786,9 @@ export default function IPShieldExtension() {
                 value: protectedIPs.length,
                 icon: <LinkIcon className="w-5 h-5" />,
                 color: "from-purple-500 to-pink-600",
+                limit: getUserPermissions().maxIPRegistrations !== Infinity
+                  ? `${protectedIPs.length}/${getUserPermissions().maxIPRegistrations}`
+                  : null,
               },
               {
                 label: "Alerts",
@@ -722,8 +809,13 @@ export default function IPShieldExtension() {
                     {stat.label}
                   </p>
                   <p className="text-white font-black text-sm drop-shadow-[0_0_10px_rgba(100,255,255,0.3)]">
-                    {stat.value}
+                    {stat.limit || stat.value}
                   </p>
+                  {stat.limit && (
+                    <p className="text-[8px] text-yellow-400 font-bold mt-0.5">
+                      Demo Limit
+                    </p>
+                  )}
                 </div>
               </div>
             ))}
@@ -1662,6 +1754,73 @@ export default function IPShieldExtension() {
     );
   };
 
+  // Edit IP Modal Component
+  const EditIPModal = () => {
+    if (!showEditModal || !editingIP) return null;
+
+    return (
+      <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/70 backdrop-blur-sm">
+        <div className="w-[350px] bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl border border-cyan-500/30 shadow-2xl p-6" onClick={(e) => e.stopPropagation()}>
+          {/* Header */}
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="text-white font-bold text-lg">Edit IP Asset</h3>
+            <button
+              onClick={closeEditModal}
+              className="p-1.5 hover:bg-gray-700 rounded-lg transition-colors"
+            >
+              <X className="w-4 h-4 text-gray-400" />
+            </button>
+          </div>
+
+          {/* Form */}
+          <div className="space-y-4 mb-5">
+            <div>
+              <label className="text-sm font-bold text-gray-300 mb-2 block">
+                Title
+              </label>
+              <input
+                type="text"
+                value={editFormData.title}
+                onChange={(e) => setEditFormData(prev => ({ ...prev, title: e.target.value }))}
+                className="w-full bg-gray-900/50 border border-gray-700 focus:border-cyan-500 focus:ring-0 text-white p-3 rounded-xl placeholder-gray-500 transition-all"
+                placeholder="Enter IP title"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-bold text-gray-300 mb-2 block">
+                Earnings
+              </label>
+              <input
+                type="text"
+                value={editFormData.earnings}
+                onChange={(e) => setEditFormData(prev => ({ ...prev, earnings: e.target.value }))}
+                className="w-full bg-gray-900/50 border border-gray-700 focus:border-cyan-500 focus:ring-0 text-white p-3 rounded-xl placeholder-gray-500 transition-all"
+                placeholder="e.g. $100.00"
+              />
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-3">
+            <button
+              onClick={closeEditModal}
+              className="flex-1 py-2.5 bg-gray-700 hover:bg-gray-600 rounded-xl font-bold text-sm text-white transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={saveEditIP}
+              className="flex-1 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 rounded-xl font-bold text-sm text-white transition-colors"
+            >
+              Save Changes
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const DashboardView = () => {
     // Mock total earnings, now based on protectedIPs length
     const totalEarnings = protectedIPs.length * 100 + 90.0;
@@ -1760,9 +1919,45 @@ export default function IPShieldExtension() {
                         )}
                       </p>
                     </div>
-                    <button className="p-2 bg-purple-500/10 rounded-lg text-purple-400 hover:bg-purple-500/20">
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
+
+                    {/* Role-based action buttons */}
+                    <div className="flex items-center gap-1">
+                      {canUserPerform('edit') ? (
+                        <>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openEditModal(ip);
+                            }}
+                            className="p-1.5 bg-cyan-500/10 rounded-lg text-cyan-400 hover:bg-cyan-500/20 transition-colors"
+                            title="Edit IP"
+                          >
+                            <PenTool className="w-3.5 h-3.5" />
+                          </button>
+                          {canUserPerform('delete') && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (confirm(`Delete "${ip.title}"?`)) {
+                                  setProtectedIPs(prev => prev.filter(item => item.id !== ip.id));
+                                }
+                              }}
+                              className="p-1.5 bg-red-500/10 rounded-lg text-red-400 hover:bg-red-500/20 transition-colors"
+                              title="Delete IP"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </>
+                      ) : (
+                        <div className="px-2 py-1 bg-blue-500/10 rounded text-blue-400 text-[8px] font-bold border border-blue-500/30">
+                          View Only
+                        </div>
+                      )}
+                      <button className="p-2 bg-purple-500/10 rounded-lg text-purple-400 hover:bg-purple-500/20">
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -1887,6 +2082,9 @@ export default function IPShieldExtension() {
                   }}
                 />
               )}
+
+              {/* 7. Edit IP Modal */}
+              <EditIPModal />
             </>
           )}
         </div>

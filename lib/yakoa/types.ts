@@ -9,7 +9,7 @@ export interface YakoaResult {
   riskScore: number;
   category: string;
   flagged: boolean;
-  details?: any;
+  details?: Record<string, unknown>;
 }
 
 export interface YakoaError {

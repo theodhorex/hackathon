@@ -230,7 +230,6 @@ function toggleMonitoring() {
     isMonitoring = !isMonitoring;
 
     const statusText = document.querySelector('.system-status');
-    const statusDot = statusText.querySelector('.status-dot');
 
     if (isMonitoring) {
         monitoringBtn.classList.add('active');
