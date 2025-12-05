@@ -1,276 +1,296 @@
-# IP Shield Chrome Extension
+# 🛡️ IP Shield - Chrome Extension
 
-## ✅ SOLUSI TERBAIK - 100% Working!
+<div align="center">
 
-Extension sekarang menggunakan **iframe ke localhost:3000** untuk menampilkan komponen `Extension_Panel_alven.tsx` secara langsung.
+**Protect Your Digital Content with AI-Powered Detection & Blockchain Registration**
 
-### 🎯 Keunggulan Pendekatan Ini
+*Powered by Yakoa AI & Story Protocol*
 
-- ✅ **SEMUA tombol berfungsi 100%** - Tidak ada konversi manual
-- ✅ **Tampilan PERSIS sama** dengan Extension_Panel_alven.tsx
-- ✅ **Hot reload** - Setiap perubahan code langsung terlihat
-- ✅ **Mudah develop** - Edit Extension_Panel_alven.tsx seperti biasa
-- ✅ **No CSP errors** - Localhost diizinkan di manifest
-- ✅ **Full React functionality** - Semua hooks, state, effects bekerja
-- ✅ **Login persistence** - Chrome storage tetap berfungsi
-- ✅ **Particle animations** - Canvas background bekerja perfect
+![Version](https://img.shields.io/badge/Version-1.0.0-cyan)
+![Chrome](https://img.shields.io/badge/Chrome-Extension-blue)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-## 🚀 Cara Menggunakan
+</div>
 
-### 1. Start Development Server
+---
 
-**PENTING**: Extension memerlukan Next.js dev server running di background.
+## 🎨 Logo & Branding
+
+IP Shield menggunakan logo modern dengan shield icon dan text "IP":
+
+### Logo Features:
+- **Shield Design**: Melambangkan perlindungan dan keamanan
+- **Gradient Colors**: Cyan-Blue (#22d3ee → #0891b2)
+- **Glow Effect**: Neon effect untuk kesan futuristik
+- **"IP" Text**: Jelas menunjukkan fokus pada Intellectual Property
+
+### Logo Files:
+```
+icons/
+├── icon16.png    # Toolbar icon (16x16)
+├── icon48.png    # Extension manager (48x48)
+├── icon128.png   # Extension details (128x128)
+└── logo.svg      # Vector logo untuk web
+```
+
+---
+
+## ✅ Extension Status
+
+**100% FUNCTIONAL** - menggunakan iframe ke `localhost:3000`
+
+### 🎯 Keunggulan:
+- ✅ **Semua tombol berfungsi** - No manual conversion needed
+- ✅ **Tampilan identik** dengan Extension_Panel_alven.tsx
+- ✅ **Hot reload** - Perubahan code langsung terlihat
+- ✅ **Full React** - Hooks, state, effects work perfectly
+- ✅ **Logo integration** - Shield logo di loading screen & header
+- ✅ **Smooth animations** - Floating logo, spinner, particles
+
+---
+
+## 🚀 Quick Start
+
+### Step 1: Start Development Server
+
+**PENTING**: Extension memerlukan Next.js dev server running.
 
 ```bash
+cd d:\hackathon\hackathon
 npm run dev
 ```
 
-Biarkan terminal ini tetap terbuka selama menggunakan extension.
+Biarkan terminal tetap terbuka.
 
-### 2. Load Extension ke Chrome
+### Step 2: Load Extension
 
-1. Buka Chrome dan navigasi ke: `chrome://extensions/`
-2. Aktifkan **Developer mode** (toggle di kanan atas)
-3. Klik **Load unpacked**
-4. Pilih folder: `d:\hackathon\hackathon\app\extension`
-5. Extension "IP Shield" akan muncul di list
-6. **Klik icon IP Shield** di toolbar Chrome
+1. Buka Chrome: `chrome://extensions/`
+2. Enable **Developer mode** (toggle kanan atas)
+3. Click **Load unpacked**
+4. Select folder: `d:\hackathon\hackathon\app\extension`
+5. Extension "IP Shield" akan muncul dengan logo shield!
 
-### 3. Login ke Extension
+### Step 3: Pin to Toolbar
 
-Demo accounts:
-- **Admin**: `admin` / `admin123` 👤
-- **Demo**: `demo` / `demo123` 🎨
+1. Click Extensions icon (puzzle piece)
+2. Find "IP Shield"
+3. Click pin icon (📌)
+4. Logo shield sekarang di toolbar!
 
-### 4. Fitur Yang Berfungsi
+### Step 4: Login & Explore
 
-#### ✨ Login Screen
-- ✅ Secure authentication
-- ✅ Form validation
-- ✅ Error handling
-- ✅ Loading states
-- ✅ Demo accounts info
-- ✅ Animated background
+**Login credentials:**
+- **Admin**: `admin` / `admin123` (unlimited)
+- **Demo**: `demo` / `demo123` (max 5 IPs)
 
-#### 🛡️ Main Dashboard
-- ✅ 3 Stats cards (Detected, Protected, Alerts)
-- ✅ Monitoring toggle button
-- ✅ Alerts notification center
-- ✅ User profile dengan logout
-- ✅ Particle background animation
+---
 
-#### 🔍 3 Interactive Tabs
+## 🎨 UI Components
 
-**1. Detect & Protect Tab**
-- ✅ Content detection sidebar
-- ✅ Yakoa AI integration
-- ✅ Quick protect button
-- ✅ Content status badges
-- ✅ File preview
+### 1. Loading Screen
 
-**2. IP Analysis Tab**  
-- ✅ Deep analysis UI
-- ✅ Security score
-- ✅ Domain verification
-- ✅ Progress indicators
-- ✅ Results display
+**Features tampilan loading:**
+- ✨ Animated gradient background
+- 🛡️ Floating shield logo dengan glow effect
+- ⭕ Spinning ring animation mengelilingi logo
+- 💎 "IP Shield" text dengan cyan glow
+- 📝 "Powered by Yakoa AI & Story Protocol" subtitle
 
-**3. Register IP Tab**
-- ✅ File upload
-- ✅ Asset type selection
-- ✅ License configuration
-- ✅ Royalty slider
-- ✅ Story Protocol integration
-- ✅ Success confirmation
+**Animations:**
+- Logo float: 3s ease-in-out (up/down motion)
+- Spinner: 2s linear rotation
+- Text pulse: 2s opacity fade
+- Background: 6s floating particles
 
-#### 🎨 Advanced Features
-- ✅ Sidebar views dengan smooth animations
-- ✅ Tab switching dengan gradient effects
-- ✅ Mock data untuk demo
-- ✅ Toast notifications
-- ✅ Modal dialogs
-- ✅ Form validation
-- ✅ Loading states
-- ✅ Error handling
+### 2. Main Dashboard
 
-## 📁 Struktur Extension
+**Header:**
+- 🛡️ Small shield logo with gradient background
+- 📊 Monitoring status indicator (green pulse when active)
+- 🔔 Notification bell with badge count
+- 👤 User profile with role badge (ADMIN/DEMO)
+
+**Stats Cards:**
+```
+┌─────────┬──────────┬─────────┐
+│ Detected│ Protected│ Alerts  │
+│ (Yakoa) │ (Story)  │         │
+│    4    │   3/5    │   3     │
+└─────────┴──────────┴─────────┘
+```
+
+**Tabs:**
+1. **Detect & Protect** (Blue/Cyan gradient)
+2. **IP Analysis** (Teal/Cyan gradient)
+3. **Register IP** (Purple/Pink gradient)
+
+---
+
+## ✨ Features
+
+### 🔍 Content Detection (Yakoa AI)
+- Auto-scan halaman web untuk images, audio, video
+- AI analysis untuk IP status
+- Status badges (✅ Original, ⚠️ Brand IP, 🔒 Registered)
+- Quick Protect button untuk instant protection
+
+### 🛡️ IP Registration (Story Protocol)
+- One-click registration ke blockchain
+- NFT minting untuk IP assets
+- License setup (Commercial, Non-Commercial, No Derivatives)
+- Royalty configuration untuk commercial licenses
+
+### 📊 Dashboard & Monitoring
+- Protected IPs list dengan earnings
+- Real-time infringement alerts
+- Background monitoring
+- Toast notifications
+
+### 👥 Role-Based Access
+- **Admin**: Unlimited registrations, full edit/delete
+- **Demo**: Max 5 registrations, view-only mode
+
+---
+
+## 📁 File Structure
 
 ```
 app/extension/
-├── manifest.json          # Extension manifest (Manifest V3)
-├── popup.html            # Main popup dengan iframe
-├── background.js         # Background service worker
-├── content.js            # Content script
-├── popup-styles.css      # (Tidak dipakai - menggunakan Next.js styles)
-└── popup-script.js       # (Tidak dipakai - menggunakan React)
+├── 📂 icons/                  # Extension icons & logo
+│   ├── icon16.png             # Toolbar (16x16)
+│   ├── icon48.png             # Manager (48x48)
+│   ├── icon128.png            # Details (128x128)
+│   ├── logo.svg               # Vector logo
+│   └── generate-icons.html    # Icon generator tool
+│
+├── 📄 manifest.json           # Extension manifest with icons
+├── 📄 popup.html              # Popup dengan animated logo
+├── 📄 popup-loader.css        # Loading screen styles
+├── 📄 popup-loader.js         # Loading logic
+├── 📄 background.js           # Background worker
+├── 📄 content.js              # Content scanner
+│
+├── 📖 README.md               # This file
+├── 📖 INSTALLATION.md         # Installation guide
+└── 📖 UI-DOCUMENTATION.md     # UI design docs
 ```
 
-```
-app/extension-view/
-└── page.tsx              # Next.js page yang merender Extension_Panel_alven
-```
+---
 
-```
-app/components/
-└── Extension_Panel_alven.tsx    # Main extension component (1900+ lines)
-```
+## 🎨 Color Palette
 
-## 🛠️ Technology Stack
+### Primary Colors:
+- **Yakoa Blue**: `#3b82f6` → `#06b6d4`
+- **Story Purple**: `#a855f7` → `#ec4899`
+- **Shield Cyan**: `#22d3ee`
+- **Dark Base**: `#0a0f1d`
 
-- **Next.js 16** - Framework
-- **React 19** - UI library
-- **Tailwind CSS 4** - Styling
-- **Lucide React** - Icons
-- **Chrome Extension API** - Extension functionality
-- **Canvas API** - Background animations
+### Status Colors:
+- **Original** (Green): `#10b981`
+- **Brand IP** (Orange): `#f97316`
+- **Registered** (Red): `#ef4444`
+- **Protected** (Purple): `#a855f7`
+- **Processing** (Blue): `#3b82f6`
 
-## 💡 Development Workflow
+---
 
-### Untuk Mengedit Extension
+## 🔧 Development
 
-1. Edit file `app/components/Extension_Panel_alven.tsx`
-2. Simpan file (Next.js akan auto-reload)
-3. Refresh extension popup di Chrome
-4. Perubahan langsung terlihat!
+### Edit Extension UI
 
-### Untuk Debug
+1. Edit `app/components/Extension_Panel_alven.tsx`
+2. Save file (Next.js auto-reload)
+3. Refresh extension popup
+4. Changes immediately visible!
 
-1. Right-click extension icon → **Inspect popup**
-2. Console akan terbuka
-3. Lihat errors atau logs
-4. Edit code dan reload popup
+### Edit Loading Screen
 
-### Untuk Test Fitur Baru
+1. Edit `popup.html` untuk HTML/SVG logo
+2. Edit `popup-loader.css` untuk animations
+3. Reload extension di `chrome://extensions/`
 
-1. Tambahkan fitur di `Extension_Panel_alven.tsx`
-2. Test di browser: `http://localhost:3000/extension-view`
-3. Jika sudah oke, test di extension popup
-4. Reload extension jika perlu
+### Add New Icons
 
-## 🔧 Troubleshooting
-
-### Extension Menampilkan "Server Not Running"
-
-**Solusi:**
-1. Buka terminal di `d:\hackathon\hackathon`
-2. Jalankan `npm run dev`
-3. Tunggu sampai "Ready" muncul
-4. Reload extension popup
-
-### Extension Popup Blank/Kosong
-
-**Solusi:**
-1. Check browser console (F12)
-2. Pastikan `npm run dev` berjalan
-3. Test `http://localhost:3000/extension-view` di browser
-4. Reload extension di `chrome://extensions/`
-
-### Perubahan Code Tidak Terlihat
-
-**Solusi:**
-1. Simpan file yang diedit
-2. Tunggu Next.js reload (check terminal)
-3. Close extension popup
-4. Buka extension popup lagi
-
-### Login Tidak Berfungsi
-
-**Solusi:**
-1. Check credentials: `admin/admin123` atau `demo/demo123`
-2. Open console dan lihat errors
-3. Clear Chrome storage: `chrome.storage.local.clear()`
+1. Generate icons (16, 48, 128 sizes)
+2. Place in `icons/` folder
+3. Update `manifest.json` if needed
 4. Reload extension
 
-## 📊 Extension Permissions
+---
 
-Di `manifest.json`:
+## 🐛 Troubleshooting
 
-```json
-{
-  "permissions": [
-    "activeTab",      // Akses tab aktif
-    "scripting",      // Inject scripts
-    "storage"         // Local storage untuk login
-  ],
-  "host_permissions": [
-    "http://localhost:3000/*",     // Dev server
-    "http://127.0.0.1:3000/*",     // Alt localhost
-    "<all_urls>"                   // Content script
-  ]
-}
+### Extension shows "Server Not Running"
+**Solution:**
+```bash
+npm run dev  # Start server terlebih dahulu
 ```
 
-## 🎯 Next Steps
+### Logo tidak muncul
+**Check:**
+- ✅ Icons folder exists?
+- ✅ PNG files di folder icons?
+- ✅ manifest.json icons path correct?
+- ✅ Reload extension di chrome://extensions/
 
-### Untuk Development
-- ✅ Extension sudah siap digunakan
-- ✅ Edit `Extension_Panel_alven.tsx` untuk add features
-- ✅ Test langsung di extension popup
-
-### Untuk Production (Chrome Web Store)
-
-Jika ingin publish ke Chrome Web Store:
-
-1. **Build Static Version**
-   ```bash
-   npm run build
-   npm run export
-   ```
-
-2. **Copy Static Files**
-   - Copy built files ke extension folder
-   - Update popup.html untuk tidak pakai iframe
-   - Bundle all dependencies
-
-3. **Add Icons**
-   - 16x16.png
-   - 48x48.png
-   - 128x128.png
-
-4. **Update Manifest**
-   - Remove localhost dari host_permissions
-   - Add icons
-   - Update description
-   - Add screenshots for store
-
-5. **Test Production Build**
-   - Load unpacked dengan static files
-   - Test semua fitur
-   - Fix any issues
-
-6. **Submit to Chrome Web Store**
-   - Zip extension folder
-   - Upload ke Chrome Web Store
-   - Fill in store listing
-   - Wait for review
+### Loading screen stuck
+**Debug:**
+1. Right-click popup → Inspect
+2. Check console errors
+3. Verify `http://localhost:3000` accessible
+4. Reload extension
 
 ---
 
-## 📝 Summary
+## 📚 Documentation
 
-**Current Status**: ✅ Fully Working Extension for Development
+- 📖 **[INSTALLATION.md](./INSTALLATION.md)** - Detailed installation steps
+- 📖 **[UI-DOCUMENTATION.md](./UI-DOCUMENTATION.md)** - UI design & components
+- 📖 **[README original](./README.original.md)** - Feature specifications
 
-**What Works**:
-- ✅ All buttons and interactions
+---
+
+## 🎯 What Works
+
+**Fully Functional:**
+- ✅ Animated loading dengan logo
 - ✅ Login/logout system
+- ✅ Role-based permissions
 - ✅ Tab switching
-- ✅ Content detection mock
-- ✅ IP analysis mock
+- ✅ Content detection
+- ✅ IP Analysis
 - ✅ Registration form
-- ✅ Animations and effects
-- ✅ UI identical to original
+- ✅ Dashboard dengan stats
+- ✅ Alerts system
+- ✅ All buttons & interactions
+- ✅ Smooth animations
+- ✅ Particle background
 
-**Requirements**:
+**Requirements:**
 - ⚠️ Requires `npm run dev` running
-- ⚠️ For development only (not production-ready)
-
-**Benefits**:
-- � Super fast development
-- 🎨 Perfect UI/UX
-- 💯 100% functionality
-- � Hot reload enabled
-- 🛠️ Easy to maintain
+- ⚠️ For development only (not production-ready yet)
 
 ---
 
-**Powered by Yakoa AI & Story Protocol** 🚀
+## 📦 Production Deployment
+
+Untuk publish ke Chrome Web Store (future):
+
+1. **Build static version**
+2. **Bundle dependencies**
+3. **Add production icons**
+4. **Remove localhost dependencies**
+5. **Test thoroughly**
+6. **Submit to Chrome Web Store**
+
+*(Detailed guide coming soon)*
+
+---
+
+<div align="center">
+
+**🚀 Powered by Yakoa AI & Story Protocol**
+
+Made with ❤️ for protecting digital content
+
+</div>

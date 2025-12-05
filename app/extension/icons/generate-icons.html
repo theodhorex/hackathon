@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Icon Generator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #0a0f1d;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        canvas {
+            border: 2px solid #22d3ee;
+            margin: 10px;
+            background: #1e40af;
+        }
+
+        button {
+            background: linear-gradient(90deg, #3b82f6, #06b6d4);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: 600;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>IP Shield Icon Generator</h1>
+        <p>Click the buttons below to download each icon size:</p>
+
+        <div>
+            <canvas id="canvas16" width="16" height="16"></canvas>
+            <button onclick="downloadIcon(16)">Download 16x16</button>
+        </div>
+
+        <div>
+            <canvas id="canvas48" width="48" height="48"></canvas>
+            <button onclick="downloadIcon(48)">Download 48x48</button>
+        </div>
+
+        <div>
+            <canvas id="canvas128" width="128" height="128"></canvas>
+            <button onclick="downloadIcon(128)">Download 128x128</button>
+        </div>
+    </div>
+
+    <script>
+        function drawIcon(size) {
+            const canvas = document.getElementById(`canvas${size}`);
+            const ctx = canvas.getContext('2d');
+
+            // Background gradient
+            const bgGradient = ctx.createLinearGradient(0, 0, 0, size);
+            bgGradient.addColorStop(0, '#1e40af');
+            bgGradient.addColorStop(1, '#0891b2');
+            ctx.fillStyle = bgGradient;
+            ctx.fillRect(0, 0, size, size);
+
+            // Scale factor
+            const scale = size / 128;
+
+            // Shield path
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const shieldWidth = size * 0.5;
+            const shieldHeight = size * 0.6;
+
+            ctx.save();
+            ctx.translate(centerX, centerY);
+
+            // Draw shield
+            ctx.beginPath();
+            ctx.moveTo(0, -shieldHeight / 2);
+            ctx.lineTo(shieldWidth / 2, -shieldHeight / 3);
+            ctx.lineTo(shieldWidth / 2, shieldHeight / 6);
+            ctx.quadraticCurveTo(shieldWidth / 2, shieldHeight / 2, 0, shieldHeight / 2);
+            ctx.quadraticCurveTo(-shieldWidth / 2, shieldHeight / 2, -shieldWidth / 2, shieldHeight / 6);
+            ctx.lineTo(-shieldWidth / 2, -shieldHeight / 3);
+            ctx.closePath();
+
+            // Shield gradient
+            const shieldGradient = ctx.createLinearGradient(0, -shieldHeight / 2, 0, shieldHeight / 2);
+            shieldGradient.addColorStop(0, '#22d3ee');
+            shieldGradient.addColorStop(1, '#0891b2');
+            ctx.fillStyle = shieldGradient;
+            ctx.fill();
+
+            // Shield stroke
+            ctx.strokeStyle = '#22d3ee';
+            ctx.lineWidth = Math.max(1, size * 0.015);
+            ctx.stroke();
+
+            // Draw "IP" text
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${size * 0.25}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('IP', 0, shieldHeight * 0.05);
+
+            ctx.restore();
+        }
+
+        function downloadIcon(size) {
+            const canvas = document.getElementById(`canvas${size}`);
+            const link = document.createElement('a');
+            link.download = `icon${size}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // Draw all icons on page load
+        window.onload = function () {
+            drawIcon(16);
+            drawIcon(48);
+            drawIcon(128);
+        };
+    </script>
+</body>
+
+</html>

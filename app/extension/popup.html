@@ -10,8 +10,36 @@
 <body>
     <!-- Loading Screen -->
     <div id="loading">
-        <div class="spinner"></div>
-        <div class="loading-text">Loading IP Shield...</div>
+        <div class="logo-container">
+            <div class="logo-shield">
+                <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="shieldGradient" x1="40" y1="8" x2="40" y2="72"
+                            gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#22d3ee" />
+                            <stop offset="100%" stop-color="#0891b2" />
+                        </linearGradient>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    <!-- Shield -->
+                    <path d="M40 72C40 72 64 60 64 44V20L40 10L16 20V44C16 60 40 72 40 72Z" fill="url(#shieldGradient)"
+                        stroke="#22d3ee" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        filter="url(#glow)" opacity="0.9" />
+                    <!-- IP Text -->
+                    <text x="40" y="46" text-anchor="middle" font-family="Arial, sans-serif" font-size="20"
+                        font-weight="bold" fill="white">IP</text>
+                </svg>
+            </div>
+            <div class="spinner"></div>
+        </div>
+        <div class="loading-text">IP Shield</div>
+        <div class="loading-subtitle">Powered by Yakoa AI & Story Protocol</div>
     </div>
 
     <!-- Error Screen -->

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Shield Icon Generator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            background: linear-gradient(135deg, #0a0f1d 0%, #1a1f2e 100%);
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            background: linear-gradient(90deg, #22d3ee, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 40px;
+        }
+
+        .preview-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(34, 211, 238, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .preview-item {
+            text-align: center;
+        }
+
+        .canvas-wrapper {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 15px;
+            border: 2px solid rgba(34, 211, 238, 0.2);
+        }
+
+        canvas {
+            display: block;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+
+        .size-label {
+            font-weight: 600;
+            color: #22d3ee;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .usage-label {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-bottom: 15px;
+        }
+
+        button {
+            background: linear-gradient(90deg, #3b82f6, #06b6d4);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .instructions {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .instructions h3 {
+            color: #3b82f6;
+            margin-top: 0;
+        }
+
+        .instructions ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+
+        .instructions li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+
+        .success-message {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .download-all {
+            margin-top: 30px;
+            padding: 15px 30px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🛡️ IP Shield Icon Generator</h1>
+        <p class="subtitle">Generate Chrome Extension icons - Shield logo only (no text)</p>
+
+        <div class="preview-section">
+            <h2>Preview & Download Icons</h2>
+            <div class="preview-grid">
+                <div class="preview-item">
+                    <div class="size-label">16 × 16</div>
+                    <div class="usage-label">Toolbar Icon</div>
+                    <div class="canvas-wrapper">
+                        <canvas id="canvas16" width="16" height="16"></canvas>
+                    </div>
+                    <button onclick="downloadIcon(16)">Download 16×16</button>
+                </div>
+
+                <div class="preview-item">
+                    <div class="size-label">48 × 48</div>
+                    <div class="usage-label">Extension Manager</div>
+                    <div class="canvas-wrapper">
+                        <canvas id="canvas48" width="48" height="48"></canvas>
+                    </div>
+                    <button onclick="downloadIcon(48)">Download 48×48</button>
+                </div>
+
+                <div class="preview-item">
+                    <div class="size-label">128 × 128</div>
+                    <div class="usage-label">Extension Details</div>
+                    <div class="canvas-wrapper">
+                        <canvas id="canvas128" width="128" height="128"></canvas>
+                    </div>
+                    <button onclick="downloadIcon(128)">Download 128×128</button>
+                </div>
+            </div>
+
+            <button class="download-all" onclick="downloadAll()">⬇️ Download All Icons</button>
+
+            <div class="success-message" id="successMessage">
+                ✅ Icons downloaded! Copy files ke: d:\hackathon\hackathon\app\extension\icons\
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>📋 Installation Instructions</h3>
+            <ol>
+                <li>Klik <strong>"Download All Icons"</strong> atau download satu-per-satu</li>
+                <li>Files akan tersimpan: <code>icon16.png</code>, <code>icon48.png</code>, <code>icon128.png</code>
+                </li>
+                <li>Copy files ke folder: <code>d:\hackathon\hackathon\app\extension\icons\</code></li>
+                <li>Buka Chrome: <code>chrome://extensions/</code></li>
+                <li>Klik icon <strong>Reload (↻)</strong> pada IP Shield extension</li>
+                <li>Logo shield (tanpa text) sekarang muncul! 🎉</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function drawIcon(size) {
+            const canvas = document.getElementById(`canvas${size}`);
+            const ctx = canvas.getContext('2d');
+
+            // Clear canvas
+            ctx.clearRect(0, 0, size, size);
+
+            // Background - circular gradient
+            const bgGradient = ctx.createLinearGradient(0, 0, 0, size);
+            bgGradient.addColorStop(0, '#1e40af');
+            bgGradient.addColorStop(1, '#0891b2');
+
+            // Draw circular background
+            ctx.fillStyle = bgGradient;
+            ctx.beginPath();
+            ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Shield parameters
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const shieldWidth = size * 0.5;
+            const shieldHeight = size * 0.6;
+
+            ctx.save();
+            ctx.translate(centerX, centerY);
+
+            // Draw shield shape
+            ctx.beginPath();
+            ctx.moveTo(0, -shieldHeight / 2);
+            ctx.lineTo(shieldWidth / 2, -shieldHeight / 2.5);
+            ctx.lineTo(shieldWidth / 2, shieldHeight / 6);
+            ctx.quadraticCurveTo(shieldWidth / 2, shieldHeight / 2, 0, shieldHeight / 2);
+            ctx.quadraticCurveTo(-shieldWidth / 2, shieldHeight / 2, -shieldWidth / 2, shieldHeight / 6);
+            ctx.lineTo(-shieldWidth / 2, -shieldHeight / 2.5);
+            ctx.closePath();
+
+            // Shield fill gradient
+            const shieldGradient = ctx.createLinearGradient(0, -shieldHeight / 2, 0, shieldHeight / 2);
+            shieldGradient.addColorStop(0, '#22d3ee');
+            shieldGradient.addColorStop(1, '#0891b2');
+            ctx.fillStyle = shieldGradient;
+            ctx.fill();
+
+            // Shield stroke
+            ctx.strokeStyle = '#67e8f9';
+            ctx.lineWidth = Math.max(1, size * 0.02);
+            ctx.stroke();
+
+            // Add subtle glow for larger sizes
+            if (size >= 48) {
+                ctx.shadowColor = 'rgba(34, 211, 238, 0.5)';
+                ctx.shadowBlur = size * 0.08;
+                ctx.stroke();
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+            }
+
+            // NO TEXT - Shield icon only for cleaner look
+
+            ctx.restore();
+        }
+
+        function downloadIcon(size) {
+            const canvas = document.getElementById(`canvas${size}`);
+            const link = document.createElement('a');
+            link.download = `icon${size}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+
+            // Show success message
+            document.getElementById('successMessage').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('successMessage').style.display = 'none';
+            }, 3000);
+        }
+
+        function downloadAll() {
+            downloadIcon(16);
+            setTimeout(() => downloadIcon(48), 200);
+            setTimeout(() => downloadIcon(128), 400);
+        }
+
+        // Draw all icons on page load
+        window.onload = function () {
+            drawIcon(16);
+            drawIcon(48);
+            drawIcon(128);
+        };
+    </script>
+</body>
+
+</html>

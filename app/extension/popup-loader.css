@@ -26,11 +26,35 @@ iframe {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: #0a0f1d;
+    background: linear-gradient(135deg, #0a0f1d 0%, #1a1f2e 100%);
     color: white;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     z-index: 1000;
     transition: opacity 0.3s;
+    overflow: hidden;
+}
+
+/* Animated background particles */
+#loading::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 20% 30%, rgba(34, 211, 238, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+    animation: floatBg 6s ease-in-out infinite;
+}
+
+@keyframes floatBg {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
 }
 
 #loading.hidden {
@@ -38,26 +62,84 @@ iframe {
     pointer-events: none;
 }
 
+/* Logo container with glow effect */
+.logo-container {
+    position: relative;
+    margin-bottom: 24px;
+    animation: logoFloat 3s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.logo-shield {
+    width: 80px;
+    height: 80px;
+    position: relative;
+    filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.5));
+}
+
+.logo-shield svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Spinner around logo */
 .spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid rgba(34, 211, 238, 0.2);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    border: 3px solid rgba(34, 211, 238, 0.1);
     border-top-color: #22d3ee;
+    border-right-color: #3b82f6;
     border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 16px;
+    animation: spin 2s linear infinite;
 }
 
 @keyframes spin {
     to {
-        transform: rotate(360deg);
+        transform: translate(-50%, -50%) rotate(360deg);
     }
 }
 
 .loading-text {
-    font-size: 14px;
+    font-size: 16px;
     color: #22d3ee;
-    font-weight: 600;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+    margin-bottom: 8px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.loading-subtitle {
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 500;
 }
 
 /* Error screen */
