@@ -2,6 +2,16 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { LoginScreen } from "./LoginScreen";
+import { getYakoaClient } from "@/lib/yakoa/client";
+import { getStoryClient } from "@/lib/story/client";
+import type { ContentCheckResult } from "@/lib/yakoa/client";
+import type { RegisterIPResult, IPAssetMetadata, NFTMetadata, LicenseTerms } from "@/lib/story/client";
+import {
+  verifyContentWithYakoa,
+  registerIPOnStory,
+  getWorkflowPath,
+  getVerificationStatusInfo
+} from "./helpers/yakoaStoryIntegration";
 import {
   ChevronRight,
   Shield,
@@ -36,6 +46,46 @@ import {
   StopCircle,
   User,
 } from "lucide-react";
+
+// =================================================================
+// TYPE DEFINITIONS
+// =================================================================
+interface AlertItem {
+  id: number;
+  type: string;
+  severity: string;
+  title: string;
+  description: string;
+  detailedInfo: string;
+  timestamp: Date;
+  ipId: string;
+  action: string;
+  icon: React.ReactNode;
+  color: string;
+}
+
+interface DetectedContent {
+  id: number;
+  url: string;
+  type: string;
+  status: string;
+  confidence: number;
+  size: string;
+  title: string;
+  alt: string;
+  brand?: string;
+  owner?: string;
+}
+
+interface ProtectedIPItem {
+  id: number;
+  url: string;
+  title: string;
+  status: string;
+  earnings: string;
+  alerts: number;
+  storyId: string;
+}
 
 // =================================================================
 // KOMPONEN LOGO CUSTOM
@@ -143,7 +193,7 @@ const TYPE_OPTIONS = [
   },
 ];
 
-const STATUS_COLORS = {
+const STATUS_COLORS: Record<string, { bg: string; text: string; icon: React.ReactNode; label: string }> = {
   ORIGINAL: {
     bg: "bg-emerald-500/90 border-emerald-400/30",
     text: "text-white",
@@ -221,15 +271,15 @@ export default function IPShieldExtension() {
   const [showRegisterView, setShowRegisterView] = useState(false);
 
   // Data State
-  const [activeContent, setActiveContent] = useState(null); // Konten yang sedang diproses (dari halaman web)
+  const [activeContent, setActiveContent] = useState<DetectedContent | null>(null); // Konten yang sedang diproses (dari halaman web)
   const [isMonitoring, setIsMonitoring] = useState(true);
-  const [notificationQueue, setNotificationQueue] = useState([]);
+  const [notificationQueue, setNotificationQueue] = useState<AlertItem[]>([]);
   const [isSidebarClosing, setIsSidebarClosing] = useState(false);
-  const canvasRef = useRef(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // NEW STATES for Quick Protect
   const [showQuickProtectSuccess, setShowQuickProtectSuccess] = useState(false);
-  const [quickProtectSuccessData, setQuickProtectSuccessData] = useState(null);
+  const [quickProtectSuccessData, setQuickProtectSuccessData] = useState<{ title: string; assetType: string; previewUrl: string; status: string } | null>(null);
 
   // NEW STATES for Edit IP
   const [showEditModal, setShowEditModal] = useState(false);
@@ -239,9 +289,20 @@ export default function IPShieldExtension() {
     earnings: "",
   });
 
+  // NEW STATES for Yakoa & Story Integration
+  const [yakoaClient] = useState(() => getYakoaClient());
+  const [storyClient] = useState(() => getStoryClient());
+  const [verificationResults, setVerificationResults] = useState<Map<number, ContentCheckResult>>(new Map());
+  const [isVerifying, setIsVerifying] = useState<Set<number>>(new Set());
+  const [registrationStatus, setRegistrationStatus] = useState<{ isRegistering: boolean; progress: string }>({
+    isRegistering: false,
+    progress: ""
+  });
+
   // =================================================================
   // DATA MOCK (Sesuai P0 & P2)
   // =================================================================
+
   const mockAlerts = [
     {
       id: 1,
@@ -404,7 +465,16 @@ export default function IPShieldExtension() {
     canvas.width = 400;
     canvas.height = 600;
 
-    const particles = [];
+    interface Particle {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      size: number;
+      opacity: number;
+    }
+
+    const particles: Particle[] = [];
     const MAX_PARTICLES = 80;
 
     for (let i = 0; i < MAX_PARTICLES; i++) {
@@ -418,7 +488,7 @@ export default function IPShieldExtension() {
       });
     }
 
-    let animationId;
+    let animationId: number;
     const animate = () => {
       ctx.fillStyle = "rgba(10, 15, 25, 0.2)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -468,7 +538,7 @@ export default function IPShieldExtension() {
   }, []);
   // ... [Monitoring Background Process - Tidak diubah] ...
   useEffect(() => {
-    let interval;
+    let interval: ReturnType<typeof setInterval> | undefined;
     if (isMonitoring) {
       interval = setInterval(() => {
         setNotificationQueue((prevQueue) => {
@@ -504,12 +574,12 @@ export default function IPShieldExtension() {
     }, 300);
   };
 
-  const openRegisterForContent = (content) => {
+  const openRegisterForContent = (content: DetectedContent) => {
     setActiveContent(content); // Set konten spesifik
     setShowRegisterView(true); // Buka form
   };
 
-  const updateContentStatus = (id, newStatus) => {
+  const updateContentStatus = (id: number, newStatus: string) => {
     setDetectedContent((prev) =>
       prev.map((content) =>
         content.id === id ? { ...content, status: newStatus } : content
@@ -533,7 +603,7 @@ export default function IPShieldExtension() {
   };
 
   // HANDLER: Add new IP to the dashboard list (with role-based limit)
-  const addProtectedIP = (ipData) => {
+  const addProtectedIP = (ipData: { title: string; assetType?: string; previewUrl?: string; status?: string }) => {
     const perms = getUserPermissions();
 
     // Check if demo user has reached limit
@@ -608,7 +678,7 @@ export default function IPShieldExtension() {
   };
 
   // NEW HANDLER: Quick Protect for detected content (Skip form)
-  const quickProtect = (content) => {
+  const quickProtect = (content: DetectedContent) => {
     // 1. Setup Status & Close Sidebar
     setShowSidebar(false); // Close sidebar immediately
 
@@ -637,7 +707,7 @@ export default function IPShieldExtension() {
   // SUB-KOMPONEN
   // =================================================================
 
-  const NotificationToast = ({ alert, isFirst }) => (
+  const NotificationToast = ({ alert, isFirst }: { alert: AlertItem; isFirst: boolean }) => (
     <div
       className={`fixed ${isFirst ? "top-6 right-6" : "top-24 right-6"} z-[60] max-w-sm animate-in slide-in-from-right-96 duration-300`}
     >
@@ -971,7 +1041,7 @@ export default function IPShieldExtension() {
 
   // --- CONTENT SIDEBAR VIEW (P0 - Auto Detection & Analysis) ---
   // MENERIMA PROP quickProtect
-  const ContentSidebarView = ({ quickProtect }) => (
+  const ContentSidebarView = ({ quickProtect }: { quickProtect: (content: DetectedContent) => void }) => (
     <div
       className={`w-[400px] h-[600px] absolute inset-0 transition-transform duration-300 z-50 ${isSidebarClosing ? "translate-x-full" : "translate-x-0"} ${THEME_COLORS.BASE_DARK}`}
     >
@@ -1217,6 +1287,10 @@ export default function IPShieldExtension() {
     addProtectedIP,
     updateContentStatus,
     activeContent: initialActiveContent,
+  }: {
+    addProtectedIP: (ipData: { title: string; assetType?: string; previewUrl?: string; status?: string }) => void;
+    updateContentStatus: (id: number, status: string) => void;
+    activeContent: DetectedContent | null;
   }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [step, setStep] = useState(1);
@@ -1320,7 +1394,15 @@ export default function IPShieldExtension() {
     };
 
     // Komponen simulasi dropdown
-    const CustomDropdown = ({ options, current, onSelect }) => {
+    const CustomDropdown = ({
+      options,
+      current,
+      onSelect,
+    }: {
+      options: { id: string; label: string; icon: React.ReactNode; desc?: string; royaltyEnabled?: boolean }[];
+      current: string;
+      onSelect: (id: string) => void;
+    }) => {
       const [isOpen, setIsOpen] = useState(false);
       const ref = useRef(null);
 
