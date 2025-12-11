@@ -23,6 +23,16 @@
 # misc
 .DS_Store
 *.pem
+Thumbs.db
+
+# media files (large)
+*.mp3
+*.mp4
+*.wav
+*.mov
+*.avi
+*.mkv
+
 
 # debug
 npm-debug.log*
@@ -39,3 +49,19 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# ESLint
+eslint-report.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.AppleDouble
+.LSOverride
+._*
+
