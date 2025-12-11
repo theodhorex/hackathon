@@ -12,14 +12,14 @@ export async function verifyContentWithYakoa(
     contentUrl: string,
     contentType: "image" | "audio" | "video" | "text",
     title?: string
-): Promise\u003c{
+): Promise<{
     status: "ORIGINAL" | "BRAND_IP_DETECTED" | "ALREADY_REGISTERED" | "ERROR";
     confidence: number;
-    brand ?: string;
-    owner ?: string;
+    brand?: string;
+    owner?: string;
     recommendations: string[];
-    yakoaResult ?: ContentCheckResult;
-} \u003e {
+    yakoaResult?: ContentCheckResult;
+}> {
     try {
         const yakoaClient = getYakoaClient();
 
@@ -64,12 +64,12 @@ export async function verifyContentWithYakoa(
  * Upload file to IPFS (Mock implementation - replace with actual IPFS client)
  * In production, use Pinata, web3.storage, or similar service
  */
-export async function uploadToIPFS(file: File | Blob, metadata: any): Promise\u003c{
+export async function uploadToIPFS(file: File | Blob, metadata: any): Promise<{
     metadataUri: string;
     metadataHash: string;
     mediaUri: string;
     mediaHash: string;
-} \u003e {
+}> {
     try {
         // Mock implementation - replace with actual IPFS upload
         // Example using Pinata: await pinata.upload.file(file)
@@ -82,7 +82,7 @@ export async function uploadToIPFS(file: File | Blob, metadata: any): Promise\u0
         const mediaUri = `ipfs://${mockMediaHash}`;
 
         // Simulate upload delay
-        await new Promise(resolve =\u003e setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
         return {
             metadataUri,
@@ -109,8 +109,8 @@ export async function registerIPOnStory(params: {
     royaltyPercentage: number;
     creatorAddress?: string;
     creatorName?: string;
-    onProgress?: (stage: string) =\u003e void;
-}): Promise\u003cRegisterIPResult \u0026 { ipfsMetadataUri ?: string; ipfsMediaUri ?: string } \u003e {
+    onProgress?: (stage: string) => void;
+}): Promise<RegisterIPResult & { ipfsMetadataUri?: string; ipfsMediaUri?: string }> {
     const {
         title,
         description,
@@ -132,7 +132,7 @@ export async function registerIPOnStory(params: {
             // In production, user needs to connect wallet first
             onProgress?.("Wallet not connected - using simulation mode");
 
-            await new Promise(resolve =\u003e setTimeout(resolve, 2000));
+            await new Promise(resolve => setTimeout(resolve, 2000));
 
             const mockIpId = `0x${Math.random().toString(16).substring(2, 10)}...${Math.random().toString(16).substring(2, 6)}`;
             const mockTxHash = `0x${Math.random().toString(16).substring(2, 66)}`;

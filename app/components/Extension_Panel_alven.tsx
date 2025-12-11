@@ -1311,8 +1311,8 @@ export default function IPShieldExtension() {
 
     const [formData, setFormData] = useState(initialFormData);
     // NEW STATES for local file upload
-    const [localFile, setLocalFile] = useState(null);
-    const [previewUrl, setPreviewUrl] = useState(activeContent?.url || null);
+    const [localFile, setLocalFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(activeContent?.url || null);
 
     // Logic untuk mendapatkan label
     const selectedAssetType =
@@ -1326,8 +1326,8 @@ export default function IPShieldExtension() {
       ?.icon || <Aperture className="w-3.5 h-3.5" />;
 
     // NEW HANDLER: Mengambil file lokal dari device user
-    const handleFileChange = (e) => {
-      const file = e.target.files[0];
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
       if (file) {
         setLocalFile(file);
         setPreviewUrl(URL.createObjectURL(file));
@@ -1361,7 +1361,7 @@ export default function IPShieldExtension() {
       setFormData(initialFormData);
     };
 
-    const handleRegister = (e) => {
+    const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
       // VALIDASI: Pastikan ada file lokal ATAU konten terdeteksi yang siap diregister
@@ -1380,7 +1380,7 @@ export default function IPShieldExtension() {
         const registeredIpData = {
           title: formData.title,
           assetType: formData.assetType,
-          previewUrl: previewUrl, // URL lokal (dari localFile) atau URL content terdeteksi
+          previewUrl: previewUrl || undefined, // URL lokal (dari localFile) atau URL content terdeteksi
         };
 
         // TAMBAHKAN IP BARU KE DAFTAR DASHBOARD
@@ -1404,14 +1404,14 @@ export default function IPShieldExtension() {
       onSelect: (id: string) => void;
     }) => {
       const [isOpen, setIsOpen] = useState(false);
-      const ref = useRef(null);
+      const ref = useRef<HTMLDivElement>(null);
 
       const selectedOption =
         options.find((opt) => opt.id === current) || options[0];
 
       useEffect(() => {
-        function handleClickOutside(event) {
-          if (ref.current && !ref.current.contains(event.target)) {
+        function handleClickOutside(event: MouseEvent) {
+          if (ref.current && !ref.current.contains(event.target as Node)) {
             setIsOpen(false);
           }
         }
@@ -1502,7 +1502,7 @@ export default function IPShieldExtension() {
                     {/* 1. Jika file lokal bertipe IMAGE, tampilkan preview gambar */}
                     {localFile && formData.assetType === "IMAGE" ? (
                       <img
-                        src={previewUrl}
+                        src={previewUrl || ""}
                         alt="Asset Preview"
                         className="w-full h-full object-cover opacity-70"
                       />
@@ -1790,7 +1790,7 @@ export default function IPShieldExtension() {
   };
 
   // NEW COMPONENT: Quick Protect Status Overlay
-  const QuickProtectSuccessView = ({ data, close }) => {
+  const QuickProtectSuccessView = ({ data, close }: { data: any; close: () => void }) => {
     const isProtected = data.status === "PROTECTED";
 
     return (

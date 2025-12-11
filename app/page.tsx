@@ -6,14 +6,14 @@ import { Menu, X, ChevronDown, Phone, ArrowRight, CheckCircle, BarChart3, Target
 import SpotlightCard from './components/landing-page/SpotlightCard'
 import CircularGallery from './components/landing-page/CircularGallery'
 import Particles from './components/landing-page/Particles'
-import router from 'next/router'
 
 // Lazy load Spline
 const Spline = lazy(() => import('@splinetool/react-spline'))
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } }
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] as const }
 }
 
 const staggerChildren = {
@@ -286,6 +286,7 @@ export default function OpticorePage() {
             >
               <motion.div
                 variants={fadeUp}
+                transition={fadeUp.transition}
                 className={`inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-2 text-xs uppercase tracking-wider text-white/70 ring-1 ring-white/10 backdrop-blur ${isMounted ? 'animate-fadeInUp' : 'opacity-0'}`}
               >
                 <span className="h-2 w-2 rounded-full bg-purple-400 animate-pulse" />
@@ -299,6 +300,7 @@ export default function OpticorePage() {
 
               <motion.h1
                 variants={fadeUp}
+                transition={fadeUp.transition}
                 style={{ animationDelay: '200ms' }}
                 className={`text-5xl lg:text-8xl font-black tracking-tight leading-none ${isMounted ? 'animate-fadeInUp' : 'opacity-0'}`}
               >
@@ -310,6 +312,7 @@ export default function OpticorePage() {
 
               <motion.p
                 variants={fadeUp}
+                transition={fadeUp.transition}
                 style={{ animationDelay: '300ms' }}
                 className={`max-w-3xl mx-auto text-base lg:text-xl text-gray-300 leading-relaxed ${isMounted ? 'animate-fadeInUp' : 'opacity-0'}`}
               >
@@ -318,6 +321,7 @@ export default function OpticorePage() {
 
               <motion.div
                 variants={fadeUp}
+                transition={fadeUp.transition}
                 style={{ animationDelay: '400ms' }}
                 className={`flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 ${isMounted ? 'animate-fadeInUp' : 'opacity-0'}`}
               >
@@ -336,6 +340,7 @@ export default function OpticorePage() {
 
               <motion.div
                 variants={fadeUp}
+                transition={fadeUp.transition}
                 style={{ animationDelay: '500ms' }}
                 className={`flex items-center justify-center gap-4 pt-8 ${isMounted ? 'animate-fadeInUp' : 'opacity-0'}`}
               >
